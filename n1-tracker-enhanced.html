@@ -693,6 +693,41 @@
         <input type="text" id="configTitle" placeholder="N=1 Daily Tracker" style="width:100%;">
       </div>
 
+      <!-- Experiment Configuration -->
+      <div style="margin-bottom: 2rem; padding: 1rem; background: #f0f7ff; border-radius: 6px; border-left: 4px solid #0066cc;">
+        <h3 style="margin-top: 0;">🎯 Experiment Progress Tracker</h3>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+            <input type="checkbox" id="experimentEnabled" style="width: auto;">
+            <strong>Enable Progress Tracker</strong>
+          </label>
+          <small style="color: #666; display: block; margin-top: 0.25rem;">Show visual progress bar with phases and milestones</small>
+        </div>
+
+        <div id="experimentConfig" style="margin-top: 1rem;">
+          <div style="margin-bottom: 1rem;">
+            <label><strong>Experiment Goal</strong></label>
+            <input type="text" id="experimentGoal" placeholder="90-Day Carnivore Reset" style="width:100%;">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+            <div>
+              <label><strong>Start Date</strong></label>
+              <input type="date" id="experimentStart" style="width:100%;">
+            </div>
+            <div>
+              <label><strong>End Date</strong></label>
+              <input type="date" id="experimentEnd" style="width:100%;">
+            </div>
+          </div>
+
+          <p style="font-size: 0.85rem; color: #666; font-style: italic; margin: 0.5rem 0;">
+            💡 Phases and milestones can be customized by editing the settings template (export/import JSON)
+          </p>
+        </div>
+      </div>
+
       <h3>Slider Metrics (−5 to +5)</h3>
       <div id="sliderConfig"></div>
       <button onclick="addSlider()" style="margin-bottom:1rem;">+ Add Slider</button>
@@ -1803,6 +1838,23 @@
     function renderSettingsModal() {
       document.getElementById('configTitle').value = config.title;
 
+      // Populate experiment config
+      if (config.experiment) {
+        document.getElementById('experimentEnabled').checked = config.experiment.enabled;
+        document.getElementById('experimentGoal').value = config.experiment.goal || '';
+        document.getElementById('experimentStart').value = config.experiment.startDate || '';
+        document.getElementById('experimentEnd').value = config.experiment.endDate || '';
+
+        // Show/hide config fields based on enabled state
+        const experimentConfigDiv = document.getElementById('experimentConfig');
+        experimentConfigDiv.style.display = config.experiment.enabled ? 'block' : 'none';
+
+        // Add event listener to toggle
+        document.getElementById('experimentEnabled').onchange = function() {
+          experimentConfigDiv.style.display = this.checked ? 'block' : 'none';
+        };
+      }
+
       // Render slider config
       const sliderConfig = document.getElementById('sliderConfig');
       sliderConfig.innerHTML = '';
@@ -1885,6 +1937,14 @@
     function saveConfig() {
       // Update title
       config.title = document.getElementById('configTitle').value;
+
+      // Update experiment config
+      if (config.experiment) {
+        config.experiment.enabled = document.getElementById('experimentEnabled').checked;
+        config.experiment.goal = document.getElementById('experimentGoal').value;
+        config.experiment.startDate = document.getElementById('experimentStart').value;
+        config.experiment.endDate = document.getElementById('experimentEnd').value;
+      }
 
       // Update sliders
       const sliderInputs = document.querySelectorAll('#sliderConfig input');
