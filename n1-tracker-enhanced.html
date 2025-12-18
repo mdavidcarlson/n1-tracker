@@ -422,6 +422,90 @@
       transform: rotate(90deg);
     }
 
+    /* Experiment Progress Bar */
+    .experiment-progress {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .experiment-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .experiment-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin: 0;
+    }
+    .experiment-dates {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+    .progress-bar-container {
+      background: rgba(255,255,255,0.2);
+      height: 30px;
+      border-radius: 15px;
+      overflow: hidden;
+      position: relative;
+      margin: 1rem 0;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: white;
+      border-radius: 15px;
+      transition: width 0.5s ease;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 10px;
+      font-weight: bold;
+      color: #667eea;
+      font-size: 0.9rem;
+    }
+    .progress-milestones {
+      position: relative;
+      height: 20px;
+      margin-top: -10px;
+    }
+    .milestone-marker {
+      position: absolute;
+      top: 0;
+      transform: translateX(-50%);
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .milestone-marker:hover {
+      transform: translateX(-50%) scale(1.3);
+    }
+    .phase-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      padding: 0.75rem;
+      background: rgba(255,255,255,0.15);
+      border-radius: 6px;
+    }
+    .phase-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      background: white;
+      color: #667eea;
+    }
+    .next-milestone {
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      opacity: 0.95;
+    }
+
     @media (max-width: 600px) {
       body {
         padding: 10px;
@@ -546,22 +630,9 @@
       </button>
     </div>
 
-    <!-- Progress Stats (shown in all tabs) -->
-    <div id="progressStats" style="background: #f0f7ff; padding: 0.75rem; border-radius: 6px; margin-bottom: 1.5rem; display: none;">
-      <div style="display: flex; justify-content: space-around; text-align: center; flex-wrap: wrap; gap: 1rem;">
-        <div>
-          <div style="font-size: 1.5rem; font-weight: bold; color: #0066cc;"><span id="totalDays">0</span></div>
-          <div style="font-size: 0.75rem; color: #666;">Days Tracked</div>
-        </div>
-        <div>
-          <div style="font-size: 1.5rem; font-weight: bold; color: #0066cc;"><span id="currentStreak">0</span>🔥</div>
-          <div style="font-size: 0.75rem; color: #666;">Current Streak</div>
-        </div>
-        <div>
-          <div style="font-size: 1.5rem; font-weight: bold; color: #0066cc;"><span id="percentComplete">0</span>%</div>
-          <div style="font-size: 0.75rem; color: #666;">Progress (90 days)</div>
-        </div>
-      </div>
+    <!-- Experiment Progress (shown in all tabs) -->
+    <div id="experimentProgress" style="display: none;">
+      <!-- Progress bar will be rendered here by JavaScript -->
     </div>
 
     <!-- Table Tab Content -->
@@ -647,11 +718,28 @@
     const CONFIG_KEY = 'n1_tracker_config_v2';
     const EXPORT_KEY = 'n1_last_export_date';
 
-    const CONFIG_VERSION = 2; // Increment when config structure changes
+    const CONFIG_VERSION = 3; // Increment when config structure changes
 
     const DEFAULT_CONFIG = {
       version: CONFIG_VERSION,
       title: "N=1 Daily Tracker – Carnivore-ish Reset",
+      experiment: {
+        enabled: true,
+        startDate: "2025-01-05",
+        endDate: "2025-03-31",
+        goal: "90-Day Carnivore Reset",
+        phases: [
+          { name: "Adaptation", endDay: 42, color: "#ffc107", message: "Your body is adapting. Stick with it!" },
+          { name: "Optimization", endDay: 70, color: "#28a745", message: "You're adapted! Time to optimize." },
+          { name: "Mastery", endDay: 90, color: "#0066cc", message: "Final stretch! You've got this!" }
+        ],
+        milestones: [
+          { day: 1, label: "HTMA Test #1", icon: "🔬" },
+          { day: 42, label: "Adapted!", icon: "💪" },
+          { day: 70, label: "10 Weeks!", icon: "🎯" },
+          { day: 90, label: "HTMA Test #2 - Complete!", icon: "🏆" }
+        ]
+      },
       sliders: [
         { id: "clarity", label: "Mental Clarity", left: "Brain fog", right: "Clear-headed" },
         { id: "food", label: "Food Focus", left: "Live to eat", right: "Eat to live" },
@@ -726,6 +814,14 @@
         // Ensure title exists
         if (!config.title) {
           config.title = DEFAULT_CONFIG.title;
+        }
+
+        // V2 to V3: Add experiment config
+        if (configVersion < 3) {
+          if (!config.experiment) {
+            console.log('Adding experiment config');
+            config.experiment = {...DEFAULT_CONFIG.experiment};
+          }
         }
 
         // Update version
@@ -848,46 +944,118 @@
         });
       }
 
-      updateProgressStats(entries);
+      renderExperimentProgress(entries);
     }
 
-    function updateProgressStats(entries) {
-      if (entries.length === 0) {
-        document.getElementById('progressStats').style.display = 'none';
+    function renderExperimentProgress(entries) {
+      const container = document.getElementById('experimentProgress');
+
+      // Don't show if experiment is disabled or no entries
+      if (!config.experiment || !config.experiment.enabled || entries.length === 0) {
+        container.style.display = 'none';
         return;
       }
 
-      document.getElementById('progressStats').style.display = 'block';
+      container.style.display = 'block';
 
-      // Total days tracked
-      document.getElementById('totalDays').textContent = entries.length;
+      const exp = config.experiment;
+      const today = new Date().toISOString().slice(0, 10);
+      const startDate = new Date(exp.startDate);
+      const endDate = new Date(exp.endDate);
+      const todayDate = new Date(today);
 
-      // Calculate current streak (consecutive days from most recent)
-      let streak = 0;
-      if (entries.length > 0) {
-        const sortedEntries = [...entries].sort((a, b) => b.date.localeCompare(a.date));
-        const today = new Date().toISOString().slice(0, 10);
-        let checkDate = new Date(sortedEntries[0].date);
+      // Calculate total days and current day
+      const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+      let currentDay = Math.ceil((todayDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+      currentDay = Math.max(1, Math.min(currentDay, totalDays));
 
-        // Start from most recent entry
-        for (let i = 0; i < sortedEntries.length; i++) {
-          const entryDate = sortedEntries[i].date;
-          const expectedDate = new Date(checkDate);
-          expectedDate.setDate(expectedDate.getDate() - i);
-          const expectedDateStr = expectedDate.toISOString().slice(0, 10);
+      // Calculate progress percentage
+      const progressPercent = Math.min(100, Math.round((currentDay / totalDays) * 100));
 
-          if (entryDate === expectedDateStr) {
-            streak++;
-          } else {
-            break;
-          }
+      // Determine current phase
+      let currentPhase = exp.phases[exp.phases.length - 1]; // Default to last phase
+      for (const phase of exp.phases) {
+        if (currentDay <= phase.endDay) {
+          currentPhase = phase;
+          break;
         }
       }
-      document.getElementById('currentStreak').textContent = streak;
 
-      // Calculate percentage of 90 days
-      const percentComplete = Math.round((entries.length / 90) * 100);
-      document.getElementById('percentComplete').textContent = Math.min(percentComplete, 100);
+      // Find next milestone
+      let nextMilestone = null;
+      for (const milestone of exp.milestones) {
+        if (milestone.day >= currentDay) {
+          nextMilestone = milestone;
+          break;
+        }
+      }
+
+      // Days until next milestone
+      const daysUntilNext = nextMilestone ? nextMilestone.day - currentDay : 0;
+
+      // Format dates for display
+      const formatDate = (dateStr) => {
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      };
+
+      // Build HTML
+      let html = `
+        <div class="experiment-progress">
+          <div class="experiment-header">
+            <div>
+              <div class="experiment-title">🎯 ${exp.goal}</div>
+              <div class="experiment-dates">${formatDate(exp.startDate)} - ${formatDate(exp.endDate)}</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 1.5rem; font-weight: bold;">Day ${currentDay}</div>
+              <div style="font-size: 0.85rem; opacity: 0.9;">of ${totalDays}</div>
+            </div>
+          </div>
+
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" style="width: ${progressPercent}%;">
+              ${progressPercent}%
+            </div>
+          </div>
+
+          <div class="progress-milestones">
+      `;
+
+      // Add milestone markers
+      exp.milestones.forEach(milestone => {
+        const position = (milestone.day / totalDays) * 100;
+        const isPast = currentDay >= milestone.day;
+        const opacity = isPast ? '1' : '0.5';
+        html += `
+          <div class="milestone-marker" style="left: ${position}%; opacity: ${opacity};" title="${milestone.label} (Day ${milestone.day})">
+            ${milestone.icon}
+          </div>
+        `;
+      });
+
+      html += `
+          </div>
+
+          <div class="phase-indicator">
+            <span class="phase-badge" style="background: ${currentPhase.color}; color: white;">
+              ${currentPhase.name} Phase
+            </span>
+            <span style="flex: 1;">${currentPhase.message}</span>
+          </div>
+      `;
+
+      if (nextMilestone) {
+        html += `
+          <div class="next-milestone">
+            🎯 Next: Day ${nextMilestone.day} - ${nextMilestone.label}
+            ${daysUntilNext > 0 ? `(${daysUntilNext} day${daysUntilNext > 1 ? 's' : ''})` : '(Today!)'}
+          </div>
+        `;
+      }
+
+      html += '</div>';
+      container.innerHTML = html;
     }
 
     // Trend calculation functions
