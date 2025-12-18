@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>N=1 Daily Tracker – Customizable</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+      line-height: 1.4;
+    }
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.25rem;
+    }
+    h2 {
+      font-size: 1.2rem;
+      margin-top: 1.5rem;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 0.25rem;
+    }
+    .row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .row label {
+      min-width: 140px;
+      font-weight: 600;
+    }
+    input[type="date"],
+    input[type="number"],
+    input[type="text"],
+    select,
+    textarea {
+      padding: 6px 8px;
+      font-size: 0.9rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 60px;
+      resize: vertical;
+    }
+    .slider-group {
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      background: #f9f9f9;
+      border-radius: 6px;
+    }
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: #555;
+      margin-top: 0.25rem;
+    }
+    .slider-header {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+    }
+    input[type="range"] {
+      width: 100%;
+      margin: 0.25rem 0;
+    }
+    .value-display {
+      font-weight: 600;
+      min-width: 30px;
+      text-align: right;
+      color: #0066cc;
+    }
+    .buttons {
+      margin-top: 1.5rem;
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    button {
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: white;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #f0f0f0;
+    }
+    button.primary {
+      background: #0066cc;
+      color: white;
+      border-color: #0066cc;
+    }
+    button.primary:hover {
+      background: #0052a3;
+    }
+    button.danger {
+      background: #cc0000;
+      color: white;
+      border-color: #cc0000;
+    }
+    button.danger:hover {
+      background: #a30000;
+    }
+    #status {
+      margin-top: 0.75rem;
+      padding: 0.5rem;
+      font-size: 0.85rem;
+      border-radius: 4px;
+      display: none;
+    }
+    #status.show {
+      display: block;
+    }
+    #status.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    #status.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    #status.warning {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 0.8rem;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 6px 8px;
+      text-align: left;
+    }
+    th {
+      background: #f5f5f5;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      font-weight: 600;
+    }
+    .hint {
+      font-size: 0.85rem;
+      color: #666;
+      background: #f0f7ff;
+      padding: 0.75rem;
+      border-radius: 4px;
+      border-left: 3px solid #0066cc;
+      margin: 1rem 0;
+    }
+    .table-container {
+      max-height: 400px;
+      overflow: auto;
+      border: 1px solid #ddd;
+      margin-top: 0.5rem;
+      border-radius: 4px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      padding: 20px;
+      overflow: auto;
+    }
+    .modal.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow: auto;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 0.5rem;
+    }
+    .modal-header h2 {
+      margin: 0;
+      border: none;
+    }
+    .close-btn {
+      font-size: 1.5rem;
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+    }
+    .config-item {
+      margin-bottom: 1rem;
+      padding: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: #fafafa;
+    }
+    .config-item label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    .config-item input {
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+    .config-item small {
+      color: #666;
+      font-size: 0.8rem;
+    }
+    .backup-warning {
+      background: #fff3cd;
+      border: 2px solid #ffc107;
+      padding: 1rem;
+      border-radius: 6px;
+      margin: 1rem 0;
+    }
+    .backup-warning strong {
+      color: #856404;
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      .row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .row label {
+        min-width: 0;
+      }
+      .buttons {
+        flex-direction: column;
+      }
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1 id="trackerTitle">N=1 Daily Tracker</h1>
+  <p class="hint">
+    <strong>Quick Start:</strong> Set sliders once per day, click "Save day". Your data is stored in this browser only.
+    <strong>⚠️ Export CSV weekly to prevent data loss!</strong>
+  </p>
+
+  <div class="backup-warning" id="backupWarning" style="display:none;">
+    <strong>⚠️ Backup Reminder:</strong> You haven't exported data in <span id="daysSinceExport">0</span> days.
+    <button onclick="exportCsv()" class="primary" style="margin-left: 10px;">Export Now</button>
+  </div>
+
+  <h2>Basic Info</h2>
+  <div class="row">
+    <label for="date">Date</label>
+    <input type="date" id="date">
+    <label for="day">Day #</label>
+    <input type="number" id="day" min="1" max="365" style="width:80px;">
+  </div>
+
+  <h2>
+    Track Metrics
+    <button onclick="openSettings()" style="float:right; font-size:0.85rem;">⚙️ Customize</button>
+  </h2>
+  <div id="slidersContainer"></div>
+
+  <h2>Additional Fields</h2>
+  <div id="fieldsContainer"></div>
+
+  <div class="row">
+    <label for="notes">Notes</label>
+    <textarea id="notes" placeholder="Anything that stands out today…"></textarea>
+  </div>
+
+  <div class="buttons">
+    <button id="saveDay" type="button" class="primary">Save Day</button>
+    <button id="exportCsv" type="button">📥 Export CSV</button>
+    <button id="importCsv" type="button">📤 Import CSV</button>
+    <button id="exportConfig" type="button">📋 Export Settings Template</button>
+    <button id="importConfig" type="button">📋 Import Settings Template</button>
+    <button id="clearAll" type="button" class="danger">Clear All Data</button>
+  </div>
+
+  <div id="status"></div>
+
+  <h2>Saved Days (<span id="entryCount">0</span> entries)</h2>
+  <div class="table-container">
+    <table id="logTable">
+      <thead id="tableHeader"></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Customize Tracker</h2>
+        <button class="close-btn" onclick="closeSettings()">×</button>
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label><strong>Tracker Title</strong></label>
+        <input type="text" id="configTitle" placeholder="N=1 Daily Tracker" style="width:100%;">
+      </div>
+
+      <h3>Slider Metrics (−5 to +5)</h3>
+      <div id="sliderConfig"></div>
+      <button onclick="addSlider()" style="margin-bottom:1rem;">+ Add Slider</button>
+
+      <h3>Additional Fields</h3>
+      <div id="fieldConfig"></div>
+      <button onclick="addField()" style="margin-bottom:1rem;">+ Add Field</button>
+
+      <div class="buttons">
+        <button onclick="saveConfig()" class="primary">Save Settings</button>
+        <button onclick="resetToDefault()">Reset to Default</button>
+        <button onclick="closeSettings()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden file inputs -->
+  <input type="file" id="csvFileInput" accept=".csv" style="display:none;">
+  <input type="file" id="configFileInput" accept=".json" style="display:none;">
+
+  <script>
+    const STORAGE_KEY = 'n1_daily_log_entries_v2';
+    const CONFIG_KEY = 'n1_tracker_config_v2';
+    const EXPORT_KEY = 'n1_last_export_date';
+
+    const DEFAULT_CONFIG = {
+      title: "N=1 Daily Tracker – Carnivore-ish Reset",
+      sliders: [
+        { id: "clarity", label: "Mental Clarity", left: "Brain fog", right: "Clear-headed" },
+        { id: "food", label: "Food Focus", left: "Live to eat", right: "Eat to live" },
+        { id: "sleep", label: "Sleep (Waking State)", left: "Wake by snooze", right: "Ready to start the day" },
+        { id: "gut", label: "Gut State", left: "Bloated and slow", right: "Light and clean" },
+        { id: "energy", label: "Energy Stability", left: "Crashing / wired-tired", right: "Steady / grounded all day" },
+        { id: "joints", label: "Joint Comfort", left: "Stiff and creaky", right: "Free and easy" }
+      ],
+      fields: [
+        { id: "cramps", label: "Cramps", type: "select", options: ["—", "None", "Mild", "Wakes-me-up"] },
+        { id: "palps", label: "Palpitations", type: "select", options: ["—", "None", "Mild", "Concerning"] },
+        { id: "offplan", label: "Off plan?", type: "select", options: ["—", "No", "Yes"] },
+        { id: "offnote", label: "Off-plan note", type: "text", placeholder: "cookies, chips, beer…" },
+        { id: "ketones", label: "Ketones (mmol/L)", type: "number", step: "0.1", min: "0" },
+        { id: "macros", label: "Macros logged?", type: "select", options: ["—", "No", "Yes"] }
+      ]
+    };
+
+    let config = loadConfig();
+
+    function loadConfig() {
+      try {
+        const saved = localStorage.getItem(CONFIG_KEY);
+        return saved ? JSON.parse(saved) : DEFAULT_CONFIG;
+      } catch (e) {
+        console.error('Failed to load config', e);
+        return DEFAULT_CONFIG;
+      }
+    }
+
+    function saveConfigToStorage() {
+      localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+    }
+
+    function renderTracker() {
+      // Update title
+      document.getElementById('trackerTitle').textContent = config.title;
+
+      // Render sliders
+      const slidersContainer = document.getElementById('slidersContainer');
+      slidersContainer.innerHTML = '';
+      config.sliders.forEach(slider => {
+        const div = document.createElement('div');
+        div.className = 'slider-group';
+        div.innerHTML = `
+          <div class="slider-header">
+            <span>${slider.label}</span>
+            <span class="value-display" id="val-${slider.id}">0</span>
+          </div>
+          <div class="slider-label">
+            <span>${slider.left}</span>
+            <span>${slider.right}</span>
+          </div>
+          <input type="range" id="${slider.id}" min="-5" max="5" value="0" step="1">
+        `;
+        slidersContainer.appendChild(div);
+
+        // Bind slider
+        const input = div.querySelector('input');
+        const display = div.querySelector('.value-display');
+        input.addEventListener('input', () => {
+          display.textContent = input.value;
+        });
+      });
+
+      // Render fields
+      const fieldsContainer = document.getElementById('fieldsContainer');
+      fieldsContainer.innerHTML = '';
+      config.fields.forEach(field => {
+        const div = document.createElement('div');
+        div.className = 'row';
+
+        const label = document.createElement('label');
+        label.textContent = field.label;
+        label.htmlFor = field.id;
+        div.appendChild(label);
+
+        let input;
+        if (field.type === 'select') {
+          input = document.createElement('select');
+          input.id = field.id;
+          field.options.forEach(opt => {
+            const option = document.createElement('option');
+            option.value = opt === '—' ? '' : opt;
+            option.textContent = opt;
+            input.appendChild(option);
+          });
+        } else if (field.type === 'textarea') {
+          input = document.createElement('textarea');
+          input.id = field.id;
+          if (field.placeholder) input.placeholder = field.placeholder;
+        } else {
+          input = document.createElement('input');
+          input.type = field.type;
+          input.id = field.id;
+          if (field.placeholder) input.placeholder = field.placeholder;
+          if (field.step) input.step = field.step;
+          if (field.min) input.min = field.min;
+          if (field.type === 'text') input.style.flex = '1';
+        }
+
+        div.appendChild(input);
+        fieldsContainer.appendChild(div);
+      });
+
+      renderTable();
+    }
+
+    function renderTable() {
+      const entries = loadEntries();
+      const header = document.getElementById('tableHeader');
+      const tbody = document.getElementById('tableBody');
+
+      // Build headers
+      header.innerHTML = '<tr><th>Date</th><th>Day#</th>' +
+        config.sliders.map(s => `<th>${s.label}</th>`).join('') +
+        config.fields.map(f => `<th>${f.label}</th>`).join('') +
+        '<th>Notes</th></tr>';
+
+      // Build rows
+      tbody.innerHTML = '';
+      entries.forEach(entry => {
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+          `<td>${entry.date || ''}</td><td>${entry.day || ''}</td>` +
+          config.sliders.map(s => `<td>${entry[s.id] ?? ''}</td>`).join('') +
+          config.fields.map(f => `<td>${entry[f.id] ?? ''}</td>`).join('') +
+          `<td>${entry.notes || ''}</td>`;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('entryCount').textContent = entries.length;
+    }
+
+    function getValue(id) {
+      const el = document.getElementById(id);
+      return el ? el.value : '';
+    }
+
+    function loadEntries() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        console.error('Failed to load entries', e);
+        return [];
+      }
+    }
+
+    function saveEntries(entries) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    }
+
+    function showStatus(msg, type = 'success') {
+      const el = document.getElementById('status');
+      el.textContent = msg;
+      el.className = `show ${type}`;
+      setTimeout(() => el.classList.remove('show'), 5000);
+    }
+
+    function checkBackupReminder() {
+      const lastExport = localStorage.getItem(EXPORT_KEY);
+      if (!lastExport) return;
+
+      const daysSince = Math.floor((Date.now() - parseInt(lastExport)) / (1000 * 60 * 60 * 24));
+      if (daysSince >= 7) {
+        document.getElementById('daysSinceExport').textContent = daysSince;
+        document.getElementById('backupWarning').style.display = 'block';
+      }
+    }
+
+    function setToday() {
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      document.getElementById('date').value = `${yyyy}-${mm}-${dd}`;
+    }
+
+    // Save day
+    document.getElementById('saveDay').addEventListener('click', () => {
+      const date = getValue('date');
+      if (!date) {
+        showStatus('Please set a date before saving.', 'error');
+        return;
+      }
+
+      const entry = {
+        date,
+        day: getValue('day'),
+        notes: getValue('notes')
+      };
+
+      // Collect slider values
+      config.sliders.forEach(s => {
+        entry[s.id] = getValue(s.id);
+      });
+
+      // Collect field values
+      config.fields.forEach(f => {
+        entry[f.id] = getValue(f.id);
+      });
+
+      let entries = loadEntries();
+      const idx = entries.findIndex(e => e.date === date);
+      if (idx >= 0) {
+        entries[idx] = entry;
+        showStatus(`Updated entry for ${date}.`, 'success');
+      } else {
+        entries.push(entry);
+        entries.sort((a, b) => a.date.localeCompare(b.date));
+        showStatus(`Saved entry for ${date}.`, 'success');
+      }
+
+      saveEntries(entries);
+      renderTable();
+      checkBackupReminder();
+    });
+
+    // Export CSV
+    function exportCsv() {
+      const entries = loadEntries();
+      if (!entries.length) {
+        showStatus('No data to export.', 'warning');
+        return;
+      }
+
+      const headers = ['Date', 'Day#']
+        .concat(config.sliders.map(s => s.label.replace(/\s+/g, '_')))
+        .concat(config.fields.map(f => f.label.replace(/\s+/g, '_')))
+        .concat(['Notes']);
+
+      const rows = entries.map(e => {
+        return [e.date, e.day ?? '']
+          .concat(config.sliders.map(s => e[s.id] ?? ''))
+          .concat(config.fields.map(f => e[f.id] ?? ''))
+          .concat([e.notes ?? '']);
+      });
+
+      function escapeCsv(v) {
+        if (v === null || v === undefined) return '';
+        const s = String(v);
+        return (s.includes(',') || s.includes('"') || s.includes('\n'))
+          ? `"${s.replace(/"/g, '""')}"`
+          : s;
+      }
+
+      const csv = [headers.map(escapeCsv).join(',')]
+        .concat(rows.map(r => r.map(escapeCsv).join(',')))
+        .join('\n');
+
+      downloadFile(csv, `n1_daily_log_${getTodayString()}.csv`, 'text/csv');
+
+      localStorage.setItem(EXPORT_KEY, Date.now().toString());
+      document.getElementById('backupWarning').style.display = 'none';
+      showStatus('CSV exported successfully!', 'success');
+    }
+
+    document.getElementById('exportCsv').addEventListener('click', exportCsv);
+
+    // Import CSV
+    document.getElementById('importCsv').addEventListener('click', () => {
+      document.getElementById('csvFileInput').click();
+    });
+
+    document.getElementById('csvFileInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        try {
+          const csv = evt.target.result;
+          const lines = csv.split('\n').filter(l => l.trim());
+          if (lines.length < 2) {
+            showStatus('CSV file is empty or invalid.', 'error');
+            return;
+          }
+
+          const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+          const newEntries = [];
+
+          for (let i = 1; i < lines.length; i++) {
+            const values = parseCSVLine(lines[i]);
+            const entry = {};
+            headers.forEach((h, idx) => {
+              if (values[idx] !== undefined) {
+                const key = h.toLowerCase().replace(/[^a-z0-9]/g, '');
+                entry[key] = values[idx];
+              }
+            });
+
+            if (entry.date) {
+              // Map CSV headers to current config
+              const mappedEntry = { date: entry.date, day: entry.day || '', notes: entry.notes || '' };
+
+              config.sliders.forEach(s => {
+                const key = s.label.toLowerCase().replace(/[^a-z0-9]/g, '');
+                mappedEntry[s.id] = entry[key] || '';
+              });
+
+              config.fields.forEach(f => {
+                const key = f.label.toLowerCase().replace(/[^a-z0-9]/g, '');
+                mappedEntry[f.id] = entry[key] || '';
+              });
+
+              newEntries.push(mappedEntry);
+            }
+          }
+
+          if (newEntries.length === 0) {
+            showStatus('No valid entries found in CSV.', 'error');
+            return;
+          }
+
+          if (confirm(`Import ${newEntries.length} entries? This will merge with existing data.`)) {
+            let entries = loadEntries();
+
+            newEntries.forEach(newEntry => {
+              const idx = entries.findIndex(e => e.date === newEntry.date);
+              if (idx >= 0) {
+                entries[idx] = newEntry;
+              } else {
+                entries.push(newEntry);
+              }
+            });
+
+            entries.sort((a, b) => a.date.localeCompare(b.date));
+            saveEntries(entries);
+            renderTable();
+            showStatus(`Imported ${newEntries.length} entries successfully!`, 'success');
+          }
+        } catch (err) {
+          showStatus('Failed to import CSV: ' + err.message, 'error');
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    });
+
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+          if (inQuotes && line[i + 1] === '"') {
+            current += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          result.push(current.trim());
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      result.push(current.trim());
+      return result;
+    }
+
+    // Export settings template
+    document.getElementById('exportConfig').addEventListener('click', () => {
+      const json = JSON.stringify(config, null, 2);
+      downloadFile(json, `tracker_settings_${getTodayString()}.json`, 'application/json');
+      showStatus('Settings template exported!', 'success');
+    });
+
+    // Import settings template
+    document.getElementById('importConfig').addEventListener('click', () => {
+      document.getElementById('configFileInput').click();
+    });
+
+    document.getElementById('configFileInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        try {
+          const imported = JSON.parse(evt.target.result);
+          if (!imported.sliders || !imported.fields) {
+            showStatus('Invalid settings file.', 'error');
+            return;
+          }
+
+          if (confirm('Import these settings? This will replace your current tracker configuration.')) {
+            config = imported;
+            saveConfigToStorage();
+            renderTracker();
+            showStatus('Settings imported successfully!', 'success');
+          }
+        } catch (err) {
+          showStatus('Failed to import settings: ' + err.message, 'error');
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    });
+
+    // Clear all data
+    document.getElementById('clearAll').addEventListener('click', () => {
+      if (!confirm('⚠️ Clear ALL saved data in this browser? This cannot be undone!')) return;
+      if (!confirm('Are you SURE? Export a CSV backup first if needed!')) return;
+
+      localStorage.removeItem(STORAGE_KEY);
+      renderTable();
+      showStatus('All data cleared from this browser.', 'warning');
+    });
+
+    // Settings modal
+    function openSettings() {
+      renderSettingsModal();
+      document.getElementById('settingsModal').classList.add('show');
+    }
+
+    function closeSettings() {
+      document.getElementById('settingsModal').classList.remove('show');
+    }
+
+    function renderSettingsModal() {
+      document.getElementById('configTitle').value = config.title;
+
+      // Render slider config
+      const sliderConfig = document.getElementById('sliderConfig');
+      sliderConfig.innerHTML = '';
+      config.sliders.forEach((slider, idx) => {
+        const div = document.createElement('div');
+        div.className = 'config-item';
+        div.innerHTML = `
+          <label>Slider ${idx + 1}</label>
+          <input type="text" placeholder="Label" value="${slider.label}" data-idx="${idx}" data-field="label">
+          <input type="text" placeholder="Left label" value="${slider.left}" data-idx="${idx}" data-field="left">
+          <input type="text" placeholder="Right label" value="${slider.right}" data-idx="${idx}" data-field="right">
+          <button onclick="removeSlider(${idx})" class="danger" style="margin-top:0.5rem;">Remove</button>
+        `;
+        sliderConfig.appendChild(div);
+      });
+
+      // Render field config
+      const fieldConfig = document.getElementById('fieldConfig');
+      fieldConfig.innerHTML = '';
+      config.fields.forEach((field, idx) => {
+        const div = document.createElement('div');
+        div.className = 'config-item';
+
+        let optionsHtml = '';
+        if (field.type === 'select') {
+          optionsHtml = `
+            <label>Options (comma-separated)</label>
+            <input type="text" placeholder="—, None, Mild, Severe" value="${field.options.join(', ')}" data-idx="${idx}" data-field="options">
+          `;
+        }
+
+        div.innerHTML = `
+          <label>Field ${idx + 1}</label>
+          <input type="text" placeholder="Label" value="${field.label}" data-idx="${idx}" data-field="label">
+          <select data-idx="${idx}" data-field="type">
+            <option value="text" ${field.type === 'text' ? 'selected' : ''}>Text</option>
+            <option value="number" ${field.type === 'number' ? 'selected' : ''}>Number</option>
+            <option value="select" ${field.type === 'select' ? 'selected' : ''}>Dropdown</option>
+          </select>
+          ${optionsHtml}
+          <button onclick="removeField(${idx})" class="danger" style="margin-top:0.5rem;">Remove</button>
+        `;
+        fieldConfig.appendChild(div);
+      });
+    }
+
+    function addSlider() {
+      config.sliders.push({
+        id: `slider${Date.now()}`,
+        label: "New Metric",
+        left: "Low",
+        right: "High"
+      });
+      renderSettingsModal();
+    }
+
+    function removeSlider(idx) {
+      if (confirm('Remove this slider?')) {
+        config.sliders.splice(idx, 1);
+        renderSettingsModal();
+      }
+    }
+
+    function addField() {
+      config.fields.push({
+        id: `field${Date.now()}`,
+        label: "New Field",
+        type: "text"
+      });
+      renderSettingsModal();
+    }
+
+    function removeField(idx) {
+      if (confirm('Remove this field?')) {
+        config.fields.splice(idx, 1);
+        renderSettingsModal();
+      }
+    }
+
+    function saveConfig() {
+      // Update title
+      config.title = document.getElementById('configTitle').value;
+
+      // Update sliders
+      const sliderInputs = document.querySelectorAll('#sliderConfig input');
+      sliderInputs.forEach(input => {
+        const idx = parseInt(input.dataset.idx);
+        const field = input.dataset.field;
+        if (config.sliders[idx]) {
+          config.sliders[idx][field] = input.value;
+        }
+      });
+
+      // Update fields
+      const fieldInputs = document.querySelectorAll('#fieldConfig input, #fieldConfig select');
+      fieldInputs.forEach(input => {
+        const idx = parseInt(input.dataset.idx);
+        const field = input.dataset.field;
+        if (config.fields[idx]) {
+          if (field === 'options') {
+            config.fields[idx][field] = input.value.split(',').map(s => s.trim());
+          } else {
+            config.fields[idx][field] = input.value;
+          }
+        }
+      });
+
+      saveConfigToStorage();
+      renderTracker();
+      closeSettings();
+      showStatus('Settings saved successfully!', 'success');
+    }
+
+    function resetToDefault() {
+      if (confirm('Reset to default settings? Your data will not be affected.')) {
+        config = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+        saveConfigToStorage();
+        renderTracker();
+        closeSettings();
+        showStatus('Settings reset to default.', 'success');
+      }
+    }
+
+    function downloadFile(content, filename, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    function getTodayString() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    // Initialize
+    setToday();
+    renderTracker();
+    checkBackupReminder();
+  </script>
+</body>
+</html>
