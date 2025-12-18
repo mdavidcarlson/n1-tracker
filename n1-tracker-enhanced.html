@@ -644,7 +644,10 @@
     const CONFIG_KEY = 'n1_tracker_config_v2';
     const EXPORT_KEY = 'n1_last_export_date';
 
+    const CONFIG_VERSION = 2; // Increment when config structure changes
+
     const DEFAULT_CONFIG = {
+      version: CONFIG_VERSION,
       title: "N=1 Daily Tracker – Carnivore-ish Reset",
       sliders: [
         { id: "clarity", label: "Mental Clarity", left: "Brain fog", right: "Clear-headed" },
@@ -668,11 +671,67 @@
     function loadConfig() {
       try {
         const saved = localStorage.getItem(CONFIG_KEY);
-        return saved ? JSON.parse(saved) : DEFAULT_CONFIG;
+        if (!saved) {
+          return DEFAULT_CONFIG;
+        }
+
+        const loadedConfig = JSON.parse(saved);
+
+        // Migrate old configs to new version
+        const migratedConfig = migrateConfig(loadedConfig);
+
+        // Save migrated config back if it changed
+        if (migratedConfig !== loadedConfig) {
+          localStorage.setItem(CONFIG_KEY, JSON.stringify(migratedConfig));
+        }
+
+        return migratedConfig;
       } catch (e) {
         console.error('Failed to load config', e);
         return DEFAULT_CONFIG;
       }
+    }
+
+    function migrateConfig(config) {
+      // If no version or old version, migrate
+      const configVersion = config.version || 1;
+
+      if (configVersion < CONFIG_VERSION) {
+        console.log(`Migrating config from v${configVersion} to v${CONFIG_VERSION}`);
+
+        // Ensure sliders array exists
+        if (!config.sliders || !Array.isArray(config.sliders)) {
+          console.log('Missing sliders array, adding defaults');
+          config.sliders = [...DEFAULT_CONFIG.sliders];
+        } else {
+          // Ensure all default sliders exist (in case user deleted some)
+          DEFAULT_CONFIG.sliders.forEach(defaultSlider => {
+            const exists = config.sliders.some(s => s.id === defaultSlider.id);
+            if (!exists) {
+              console.log(`Adding missing slider: ${defaultSlider.id}`);
+              config.sliders.push({...defaultSlider});
+            }
+          });
+        }
+
+        // Ensure fields array exists
+        if (!config.fields || !Array.isArray(config.fields)) {
+          console.log('Missing fields array, adding defaults');
+          config.fields = [...DEFAULT_CONFIG.fields];
+        }
+
+        // Ensure title exists
+        if (!config.title) {
+          config.title = DEFAULT_CONFIG.title;
+        }
+
+        // Update version
+        config.version = CONFIG_VERSION;
+
+        console.log('Config migration complete');
+      }
+
+      return config;
     }
 
     function saveConfigToStorage() {
@@ -1676,6 +1735,9 @@
         }
       });
 
+      // Ensure version is maintained
+      config.version = CONFIG_VERSION;
+
       saveConfigToStorage();
       renderTracker();
       closeSettings();
@@ -1684,7 +1746,9 @@
 
     function resetToDefault() {
       if (confirm('Reset to default settings? Your data will not be affected.')) {
+        // Deep clone to avoid reference issues
         config = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+        config.version = CONFIG_VERSION; // Ensure version is set
         saveConfigToStorage();
         renderTracker();
         closeSettings();
@@ -1712,6 +1776,12 @@
     setToday();
     renderTracker();
     checkBackupReminder();
+
+    // Show migration notice if config was upgraded
+    const savedConfigVersion = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}').version || 1;
+    if (savedConfigVersion < CONFIG_VERSION && loadEntries().length > 0) {
+      showStatus('✨ Tracker updated! Your customizations have been preserved.', 'success');
+    }
 
     // Collapse input section if there are existing entries
     const entries = loadEntries();
