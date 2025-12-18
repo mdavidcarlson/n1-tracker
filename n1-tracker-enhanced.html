@@ -58,6 +58,23 @@
       background: #f9f9f9;
       border-radius: 6px;
     }
+    .slider-group:nth-child(even) {
+      background: #ffffff;
+    }
+    details summary {
+      position: relative;
+      padding-left: 1.5rem;
+    }
+    details summary:before {
+      content: '▶';
+      position: absolute;
+      left: 0.5rem;
+      transition: transform 0.2s;
+      font-size: 0.8rem;
+    }
+    details[open] summary:before {
+      transform: rotate(90deg);
+    }
     .slider-label {
       display: flex;
       justify-content: space-between;
@@ -385,12 +402,17 @@
 
   <h2>
     Track Metrics
-    <button onclick="openSettings()" style="float:right; font-size:0.85rem;">⚙️ Customize</button>
+    <button onclick="openSettings()" style="float:right; font-size:0.95rem; padding: 6px 12px; background: #f0f7ff; border: 1px solid #0066cc; color: #0066cc; font-weight: 600;">⚙️ Customize</button>
   </h2>
   <div id="slidersContainer"></div>
 
-  <h2>Additional Fields</h2>
-  <div id="fieldsContainer"></div>
+  <!-- Additional Fields (Collapsible) -->
+  <details open>
+    <summary style="cursor: pointer; padding: 0.75rem; background: #f9f9f9; border-radius: 4px; margin-bottom: 1rem; font-weight: 600; font-size: 1.1rem;">
+      Additional Fields
+    </summary>
+    <div id="fieldsContainer"></div>
+  </details>
 
   <div class="row">
     <label for="notes">Notes</label>
@@ -790,6 +812,16 @@
       const mm = String(d.getMonth() + 1).padStart(2, '0');
       const dd = String(d.getDate()).padStart(2, '0');
       document.getElementById('date').value = `${yyyy}-${mm}-${dd}`;
+
+      // Auto-increment day number based on last entry
+      const entries = loadEntries();
+      if (entries.length > 0) {
+        const sortedEntries = [...entries].sort((a, b) => b.date.localeCompare(a.date));
+        const lastEntry = sortedEntries[0];
+        if (lastEntry.day && !isNaN(lastEntry.day)) {
+          document.getElementById('day').value = parseInt(lastEntry.day) + 1;
+        }
+      }
     }
 
     // Save day
@@ -1183,6 +1215,11 @@
     setToday();
     renderTracker();
     checkBackupReminder();
+
+    // Default to card view on mobile
+    if (window.innerWidth < 600 && loadEntries().length > 0) {
+      toggleView(); // Switch to card view
+    }
   </script>
 </body>
 </html>
