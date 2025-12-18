@@ -1138,6 +1138,8 @@
       document.getElementById('trendsModal').classList.remove('show');
     }
 
+    let trendsViewMode = 'combined'; // or 'individual'
+
     function renderTrends() {
       const entries = loadEntries();
       const container = document.getElementById('trendsContent');
@@ -1149,13 +1151,178 @@
 
       let html = '<div style="padding: 1rem;">';
 
-      // For each slider metric, generate a chart and stats
-      config.sliders.forEach(slider => {
-        html += generateMetricTrend(entries, slider);
-      });
+      // Toggle button
+      html += `
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+          <button onclick="toggleTrendsView()" style="padding: 0.5rem 1.5rem; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
+            ${trendsViewMode === 'combined' ? '📊 View Individual Charts' : '📈 View Combined Overview'}
+          </button>
+        </div>
+      `;
+
+      if (trendsViewMode === 'combined') {
+        // Show combined chart
+        html += generateCombinedChart(entries);
+
+        // Show summary stats grid
+        html += '<h3 style="margin-top: 2rem; color: #0066cc;">Metric Summary</h3>';
+        html += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">';
+
+        config.sliders.forEach(slider => {
+          const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
+          const values = sorted.map(e => parseFloat(e[slider.id])).filter(v => !isNaN(v));
+
+          if (values.length > 0) {
+            const avg = values.reduce((sum, v) => sum + v, 0) / values.length;
+            const current = values[values.length - 1];
+            const trend = getTrendIndicator(current, avg);
+            const trendColor = getTrendColor(trend);
+            const metricColor = getMetricColor(slider.id);
+
+            html += `
+              <div style="padding: 1rem; background: white; border-left: 4px solid ${metricColor}; border-radius: 4px;">
+                <div style="font-weight: 600; color: #555; margin-bottom: 0.5rem;">${slider.label}</div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <div style="font-size: 1.5rem; font-weight: bold; color: ${trendColor};">${current} ${trend}</div>
+                    <div style="font-size: 0.75rem; color: #999;">Avg: ${avg.toFixed(1)}</div>
+                  </div>
+                </div>
+              </div>
+            `;
+          }
+        });
+        html += '</div>';
+      } else {
+        // Show individual charts
+        config.sliders.forEach(slider => {
+          html += generateMetricTrend(entries, slider);
+        });
+      }
 
       html += '</div>';
       container.innerHTML = html;
+    }
+
+    function toggleTrendsView() {
+      trendsViewMode = trendsViewMode === 'combined' ? 'individual' : 'combined';
+      renderTrends();
+    }
+
+    function getMetricColor(metricId) {
+      const colors = {
+        'clarity': '#0066cc',   // Blue
+        'food': '#28a745',      // Green
+        'sleep': '#6f42c1',     // Purple
+        'gut': '#fd7e14',       // Orange
+        'energy': '#dc3545',    // Red
+        'joints': '#17a2b8'     // Teal
+      };
+      return colors[metricId] || '#6c757d';
+    }
+
+    function generateCombinedChart(entries) {
+      const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
+
+      // Collect all metric data
+      const metricsData = config.sliders.map(slider => {
+        const values = sorted.map(e => ({
+          date: e.date,
+          value: parseFloat(e[slider.id])
+        })).filter(v => !isNaN(v.value));
+
+        return {
+          id: slider.id,
+          label: slider.label,
+          values: values,
+          color: getMetricColor(slider.id)
+        };
+      }).filter(m => m.values.length > 0);
+
+      const width = 700;
+      const height = 400;
+      const padding = 60;
+      const chartWidth = width - 2 * padding;
+      const chartHeight = height - 2 * padding;
+
+      // Find global min/max across all metrics
+      let globalMin = Infinity;
+      let globalMax = -Infinity;
+
+      metricsData.forEach(metric => {
+        metric.values.forEach(v => {
+          if (v.value < globalMin) globalMin = v.value;
+          if (v.value > globalMax) globalMax = v.value;
+        });
+      });
+
+      const range = globalMax - globalMin || 1;
+
+      // Generate SVG
+      let svg = `
+        <div style="background: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+          <h3 style="margin-top: 0; color: #0066cc; text-align: center;">All Metrics Over Time</h3>
+          <svg width="100%" viewBox="0 0 ${width} ${height}" style="max-width: 700px; display: block; margin: 0 auto;">
+            <!-- Grid lines -->
+            <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${padding + chartHeight}" stroke="#ddd" stroke-width="1"/>
+            <line x1="${padding}" y1="${padding + chartHeight}" x2="${padding + chartWidth}" y2="${padding + chartHeight}" stroke="#ddd" stroke-width="1"/>
+
+            <!-- Zero line if applicable -->
+            ${globalMin < 0 && globalMax > 0 ? `<line x1="${padding}" y1="${padding + chartHeight - ((-globalMin) / range) * chartHeight}" x2="${padding + chartWidth}" y2="${padding + chartHeight - ((-globalMin) / range) * chartHeight}" stroke="#999" stroke-width="1" stroke-dasharray="4"/>` : ''}
+
+            <!-- Y-axis labels -->
+            <text x="${padding - 10}" y="${padding}" font-size="12" fill="#666" text-anchor="end">${globalMax}</text>
+            <text x="${padding - 10}" y="${padding + chartHeight}" font-size="12" fill="#666" text-anchor="end">${globalMin}</text>
+            <text x="${padding - 10}" y="${padding + chartHeight / 2}" font-size="12" fill="#666" text-anchor="end">${((globalMax + globalMin) / 2).toFixed(1)}</text>
+
+            <!-- X-axis labels -->
+            <text x="${padding}" y="${height - 5}" font-size="11" fill="#666">${sorted[0].date}</text>
+            <text x="${padding + chartWidth}" y="${height - 5}" font-size="11" fill="#666" text-anchor="end">${sorted[sorted.length - 1].date}</text>
+      `;
+
+      // Plot each metric
+      metricsData.forEach(metric => {
+        const points = metric.values.map((v, i) => {
+          const dateIndex = sorted.findIndex(e => e.date === v.date);
+          const x = padding + (dateIndex / (sorted.length - 1)) * chartWidth;
+          const y = padding + chartHeight - ((v.value - globalMin) / range) * chartHeight;
+          return `${x},${y}`;
+        }).join(' ');
+
+        // Draw line
+        svg += `<polyline points="${points}" fill="none" stroke="${metric.color}" stroke-width="2.5" opacity="0.8"/>`;
+
+        // Draw points
+        metric.values.forEach((v, i) => {
+          const dateIndex = sorted.findIndex(e => e.date === v.date);
+          const x = padding + (dateIndex / (sorted.length - 1)) * chartWidth;
+          const y = padding + chartHeight - ((v.value - globalMin) / range) * chartHeight;
+          svg += `<circle cx="${x}" cy="${y}" r="4" fill="${metric.color}" opacity="0.9"/>`;
+        });
+      });
+
+      svg += `
+          </svg>
+
+          <!-- Legend -->
+          <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #eee;">
+      `;
+
+      metricsData.forEach(metric => {
+        svg += `
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <div style="width: 20px; height: 3px; background: ${metric.color};"></div>
+            <span style="font-size: 0.85rem; color: #555;">${metric.label}</span>
+          </div>
+        `;
+      });
+
+      svg += `
+          </div>
+        </div>
+      `;
+
+      return svg;
     }
 
     function generateMetricTrend(entries, slider) {
