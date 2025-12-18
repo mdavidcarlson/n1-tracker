@@ -380,6 +380,9 @@
         <div style="font-size: 0.75rem; color: #666;">Progress (90 days)</div>
       </div>
     </div>
+    <button id="viewTrendsBtn" onclick="openTrends()" style="width: 100%; margin-top: 0.75rem; padding: 0.5rem; background: white; border: 2px solid #0066cc; color: #0066cc; font-weight: 600; border-radius: 4px; cursor: pointer; display: none;">
+      📈 View Trends & Analysis
+    </button>
   </div>
 
   <p class="hint">
@@ -495,6 +498,20 @@
         <button onclick="saveConfig()" class="primary">Save Settings</button>
         <button onclick="resetToDefault()">Reset to Default</button>
         <button onclick="closeSettings()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trends Modal -->
+  <div id="trendsModal" class="modal">
+    <div class="modal-content" style="max-width: 900px;">
+      <div class="modal-header">
+        <h2>📈 Trends & Analysis</h2>
+        <button class="close-btn" onclick="closeTrends()">×</button>
+      </div>
+
+      <div id="trendsContent">
+        <p style="text-align: center; color: #666;">Loading trends...</p>
       </div>
     </div>
   </div>
@@ -681,6 +698,43 @@
       // Calculate percentage of 90 days
       const percentComplete = Math.round((entries.length / 90) * 100);
       document.getElementById('percentComplete').textContent = Math.min(percentComplete, 100);
+
+      // Show/hide View Trends button
+      const trendsBtn = document.getElementById('viewTrendsBtn');
+      if (entries.length >= 3) {
+        trendsBtn.style.display = 'block';
+      } else {
+        trendsBtn.style.display = 'none';
+      }
+    }
+
+    // Trend calculation functions
+    function calculate7DayAverage(entries, metricId, beforeDate) {
+      const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
+      const beforeIndex = sorted.findIndex(e => e.date === beforeDate);
+
+      if (beforeIndex < 0) return null;
+
+      const last7 = sorted.slice(Math.max(0, beforeIndex - 6), beforeIndex + 1);
+      const values = last7.map(e => parseFloat(e[metricId])).filter(v => !isNaN(v));
+
+      if (values.length === 0) return null;
+      return values.reduce((sum, v) => sum + v, 0) / values.length;
+    }
+
+    function getTrendIndicator(currentValue, average) {
+      if (average === null || isNaN(currentValue)) return '';
+
+      const diff = currentValue - average;
+      if (Math.abs(diff) < 0.5) return '→'; // Stable
+      if (diff > 0) return '↗'; // Improving
+      return '↘'; // Declining
+    }
+
+    function getTrendColor(indicator) {
+      if (indicator === '↗') return '#28a745'; // Green
+      if (indicator === '↘') return '#dc3545'; // Red
+      return '#6c757d'; // Gray for stable
     }
 
     let currentView = 'table'; // or 'cards'
@@ -727,14 +781,19 @@
           </div>
         `;
 
-        // Add sliders
+        // Add sliders with trend indicators
         config.sliders.forEach(slider => {
           const value = entry[slider.id];
           if (value !== undefined && value !== '') {
+            const avg = calculate7DayAverage(entries, slider.id, entry.date);
+            const trend = getTrendIndicator(parseFloat(value), avg);
+            const trendColor = getTrendColor(trend);
+            const trendHtml = trend ? ` <span style="color: ${trendColor}; font-weight: bold;">${trend}</span>` : '';
+
             html += `
               <div class="entry-card-row">
                 <div class="entry-card-label">${slider.label}</div>
-                <div class="entry-card-value">${value}</div>
+                <div class="entry-card-value">${value}${trendHtml}</div>
               </div>
             `;
           }
@@ -1067,6 +1126,139 @@
 
     function closeSettings() {
       document.getElementById('settingsModal').classList.remove('show');
+    }
+
+    // Trends modal functions
+    function openTrends() {
+      renderTrends();
+      document.getElementById('trendsModal').classList.add('show');
+    }
+
+    function closeTrends() {
+      document.getElementById('trendsModal').classList.remove('show');
+    }
+
+    function renderTrends() {
+      const entries = loadEntries();
+      const container = document.getElementById('trendsContent');
+
+      if (entries.length < 3) {
+        container.innerHTML = '<p style="text-align:center; color:#666; padding:2rem;">Need at least 3 days of data to show trends. Keep tracking!</p>';
+        return;
+      }
+
+      let html = '<div style="padding: 1rem;">';
+
+      // For each slider metric, generate a chart and stats
+      config.sliders.forEach(slider => {
+        html += generateMetricTrend(entries, slider);
+      });
+
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    function generateMetricTrend(entries, slider) {
+      const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
+      const values = sorted.map(e => ({ date: e.date, value: parseFloat(e[slider.id]) })).filter(v => !isNaN(v.value));
+
+      if (values.length < 2) return '';
+
+      // Calculate stats
+      const allValues = values.map(v => v.value);
+      const avg = allValues.reduce((sum, v) => sum + v, 0) / allValues.length;
+      const max = Math.max(...allValues);
+      const min = Math.min(...allValues);
+      const maxEntry = values.find(v => v.value === max);
+      const minEntry = values.find(v => v.value === min);
+      const current = values[values.length - 1].value;
+      const trend = getTrendIndicator(current, avg);
+      const trendColor = getTrendColor(trend);
+
+      // Generate SVG chart
+      const chart = generateSVGChart(values, slider.label);
+
+      return `
+        <div style="margin-bottom: 2rem; padding: 1rem; background: #f9f9f9; border-radius: 8px;">
+          <h3 style="margin-top: 0; color: #0066cc;">${slider.label} <span style="color: ${trendColor};">${trend}</span></h3>
+
+          ${chart}
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1rem;">
+            <div style="text-align: center; padding: 0.5rem; background: white; border-radius: 4px;">
+              <div style="font-size: 0.75rem; color: #666;">Current</div>
+              <div style="font-size: 1.25rem; font-weight: bold; color: ${trendColor};">${current}</div>
+            </div>
+            <div style="text-align: center; padding: 0.5rem; background: white; border-radius: 4px;">
+              <div style="font-size: 0.75rem; color: #666;">7-Day Avg</div>
+              <div style="font-size: 1.25rem; font-weight: bold;">${avg.toFixed(1)}</div>
+            </div>
+            <div style="text-align: center; padding: 0.5rem; background: white; border-radius: 4px;">
+              <div style="font-size: 0.75rem; color: #666;">Best</div>
+              <div style="font-size: 1.25rem; font-weight: bold; color: #28a745;">${max}</div>
+              <div style="font-size: 0.7rem; color: #999;">${maxEntry.date}</div>
+            </div>
+            <div style="text-align: center; padding: 0.5rem; background: white; border-radius: 4px;">
+              <div style="font-size: 0.75rem; color: #666;">Worst</div>
+              <div style="font-size: 1.25rem; font-weight: bold; color: #dc3545;">${min}</div>
+              <div style="font-size: 0.7rem; color: #999;">${minEntry.date}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function generateSVGChart(values, label) {
+      const width = 600;
+      const height = 150;
+      const padding = 40;
+      const chartWidth = width - 2 * padding;
+      const chartHeight = height - 2 * padding;
+
+      const allValues = values.map(v => v.value);
+      const minVal = Math.min(...allValues);
+      const maxVal = Math.max(...allValues);
+      const range = maxVal - minVal || 1;
+
+      // Generate points for the line
+      const points = values.map((v, i) => {
+        const x = padding + (i / (values.length - 1)) * chartWidth;
+        const y = padding + chartHeight - ((v.value - minVal) / range) * chartHeight;
+        return `${x},${y}`;
+      }).join(' ');
+
+      // Generate path for filled area
+      const areaPoints = `${padding},${padding + chartHeight} ` + points + ` ${padding + chartWidth},${padding + chartHeight}`;
+
+      return `
+        <svg width="100%" viewBox="0 0 ${width} ${height}" style="max-width: 600px; display: block; margin: 0 auto;">
+          <!-- Grid lines -->
+          <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${padding + chartHeight}" stroke="#ddd" stroke-width="1"/>
+          <line x1="${padding}" y1="${padding + chartHeight}" x2="${padding + chartWidth}" y2="${padding + chartHeight}" stroke="#ddd" stroke-width="1"/>
+
+          <!-- Zero line if range includes zero -->
+          ${minVal < 0 && maxVal > 0 ? `<line x1="${padding}" y1="${padding + chartHeight - ((-minVal) / range) * chartHeight}" x2="${padding + chartWidth}" y2="${padding + chartHeight - ((-minVal) / range) * chartHeight}" stroke="#999" stroke-width="1" stroke-dasharray="4"/>` : ''}
+
+          <!-- Area fill -->
+          <polygon points="${areaPoints}" fill="#0066cc" fill-opacity="0.1"/>
+
+          <!-- Line -->
+          <polyline points="${points}" fill="none" stroke="#0066cc" stroke-width="2"/>
+
+          <!-- Data points -->
+          ${values.map((v, i) => {
+            const x = padding + (i / (values.length - 1)) * chartWidth;
+            const y = padding + chartHeight - ((v.value - minVal) / range) * chartHeight;
+            return `<circle cx="${x}" cy="${y}" r="3" fill="#0066cc"/>`;
+          }).join('')}
+
+          <!-- Labels -->
+          <text x="${padding}" y="${height - 5}" font-size="10" fill="#666">${values[0].date}</text>
+          <text x="${padding + chartWidth}" y="${height - 5}" font-size="10" fill="#666" text-anchor="end">${values[values.length - 1].date}</text>
+          <text x="${5}" y="${padding}" font-size="10" fill="#666">${maxVal}</text>
+          <text x="${5}" y="${padding + chartHeight}" font-size="10" fill="#666">${minVal}</text>
+        </svg>
+      `;
     }
 
     function renderSettingsModal() {
