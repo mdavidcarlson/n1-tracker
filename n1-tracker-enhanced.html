@@ -320,6 +320,108 @@
       color: #666;
       font-size: 0.85rem;
     }
+    /* Header styles */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #e0e0e0;
+    }
+    .app-header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+    .settings-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #f0f7ff;
+      border: 1px solid #0066cc;
+      color: #0066cc;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .settings-icon:hover {
+      background: #0066cc;
+      color: white;
+    }
+
+    /* Tab navigation styles */
+    .tab-navigation {
+      display: flex;
+      gap: 0;
+      border-bottom: 2px solid #e0e0e0;
+      margin-bottom: 1.5rem;
+    }
+    .tab-button {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #666;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .tab-button:hover {
+      background: #f9f9f9;
+      color: #0066cc;
+    }
+    .tab-button.active {
+      color: #0066cc;
+      border-bottom-color: #0066cc;
+      background: #f0f7ff;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Section styles */
+    .input-section {
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      padding: 0.75rem;
+      background: white;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      user-select: none;
+    }
+    .section-header h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      border: none;
+    }
+    .collapse-icon {
+      font-size: 1.2rem;
+      transition: transform 0.2s;
+    }
+    .collapse-icon.open {
+      transform: rotate(90deg);
+    }
+
     @media (max-width: 600px) {
       body {
         padding: 10px;
@@ -359,35 +461,23 @@
       .value-display {
         font-size: 1.2rem;
       }
+      .tab-button {
+        font-size: 0.85rem;
+        padding: 0.6rem 0.5rem;
+      }
     }
   </style>
 </head>
 <body>
-  <h1 id="trackerTitle">N=1 Daily Tracker</h1>
-
-  <div id="progressStats" style="background: #f0f7ff; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; display: none;">
-    <div style="display: flex; justify-content: space-around; text-align: center; flex-wrap: wrap; gap: 1rem;">
-      <div>
-        <div style="font-size: 1.5rem; font-weight: bold; color: #0066cc;"><span id="totalDays">0</span></div>
-        <div style="font-size: 0.75rem; color: #666;">Days Tracked</div>
-      </div>
-      <div>
-        <div style="font-size: 1.5rem; font-weight: bold; color: #0066cc;"><span id="currentStreak">0</span>🔥</div>
-        <div style="font-size: 0.75rem; color: #666;">Current Streak</div>
-      </div>
-      <div>
-        <div style="font-size: 1.5rem; font-weight: bold; color: #0066cc;"><span id="percentComplete">0</span>%</div>
-        <div style="font-size: 0.75rem; color: #666;">Progress (90 days)</div>
-      </div>
-    </div>
-    <button id="viewTrendsBtn" onclick="openTrends()" style="width: 100%; margin-top: 0.75rem; padding: 0.5rem; background: white; border: 2px solid #0066cc; color: #0066cc; font-weight: 600; border-radius: 4px; cursor: pointer; display: none;">
-      📈 View Trends & Analysis
-    </button>
+  <!-- App Header -->
+  <div class="app-header">
+    <h1 id="trackerTitle">N=1 Daily Tracker</h1>
+    <button class="settings-icon" onclick="openSettings()" title="Settings">⚙️</button>
   </div>
 
   <p class="hint">
-    <strong>Quick Start:</strong> Set sliders once per day, click "Save day". Your data is stored in this browser only.
-    <strong>⚠️ Export CSV weekly to prevent data loss!</strong>
+    <strong>Quick Start:</strong> Track daily metrics, save your progress, and analyze trends over time.
+    <strong>⚠️ Export data regularly to prevent loss!</strong>
   </p>
 
   <div class="backup-warning" id="backupWarning" style="display:none;">
@@ -395,93 +485,136 @@
     <button onclick="exportCsv()" class="primary" style="margin-left: 10px;">Export Now</button>
   </div>
 
-  <h2>Basic Info</h2>
-  <div class="row">
-    <label for="date">Date</label>
-    <input type="date" id="date">
-    <label for="day">Day #</label>
-    <input type="number" id="day" min="1" max="365" style="width:80px;">
-  </div>
-
-  <h2>
-    Track Metrics
-    <button onclick="openSettings()" style="float:right; font-size:0.95rem; padding: 6px 12px; background: #f0f7ff; border: 1px solid #0066cc; color: #0066cc; font-weight: 600;">⚙️ Customize</button>
-  </h2>
-  <div id="slidersContainer"></div>
-
-  <!-- Additional Fields (Collapsible) -->
-  <details open>
-    <summary style="cursor: pointer; padding: 0.75rem; background: #f9f9f9; border-radius: 4px; margin-bottom: 1rem; font-weight: 600; font-size: 1.1rem;">
-      Additional Fields
-    </summary>
-    <div id="fieldsContainer"></div>
-  </details>
-
-  <div class="row">
-    <label for="notes">Notes</label>
-    <textarea id="notes" placeholder="Anything that stands out today…"></textarea>
-  </div>
-
-  <!-- Primary Action -->
-  <button id="saveDay" type="button" class="primary" style="width: 100%; padding: 1rem; font-size: 1.1rem; font-weight: bold; margin: 1.5rem 0 1rem 0;">
-    💾 Save Day
-  </button>
-
-  <!-- Quick Actions -->
-  <div style="margin-bottom: 1rem;">
-    <button id="exportCsv" type="button" style="width: 100%; padding: 0.75rem;">📥 Export CSV Backup</button>
-  </div>
-
-  <!-- Advanced Options (Collapsible) -->
-  <details style="margin-bottom: 1rem;">
-    <summary style="cursor: pointer; padding: 0.5rem; background: #f5f5f5; border-radius: 4px; user-select: none;">
-      <strong>⚙️ Advanced Options</strong> (Import, Settings, Clear Data)
-    </summary>
-    <div class="buttons" style="margin-top: 0.75rem; gap: 0.5rem;">
-      <button id="importCsv" type="button">📤 Import CSV</button>
-      <button id="exportConfig" type="button">📋 Export Settings Template</button>
-      <button id="importConfig" type="button">📋 Import Settings Template</button>
-      <button id="clearAll" type="button" class="danger">Clear All Data</button>
+  <!-- Input Section (Collapsible) -->
+  <div class="input-section">
+    <div class="section-header" onclick="toggleInputSection()">
+      <h2>💾 Save Today's Entry</h2>
+      <span class="collapse-icon open" id="inputCollapseIcon">▶</span>
     </div>
-  </details>
+
+    <div id="inputFormContent">
+      <h3 style="font-size: 1rem; color: #666; margin-top: 0;">Basic Info</h3>
+      <div class="row">
+        <label for="date">Date</label>
+        <input type="date" id="date">
+        <label for="day">Day #</label>
+        <input type="number" id="day" min="1" max="365" style="width:80px;">
+      </div>
+
+      <h3 style="font-size: 1rem; color: #666; margin-top: 1.5rem;">Track Metrics</h3>
+      <div id="slidersContainer"></div>
+
+      <!-- Additional Fields (Collapsible) -->
+      <details open>
+        <summary style="cursor: pointer; padding: 0.75rem; background: white; border-radius: 4px; margin-bottom: 1rem; font-weight: 600; font-size: 1rem; margin-top: 1rem;">
+          Additional Fields
+        </summary>
+        <div id="fieldsContainer"></div>
+      </details>
+
+      <div class="row">
+        <label for="notes">Notes</label>
+        <textarea id="notes" placeholder="Anything that stands out today…"></textarea>
+      </div>
+
+      <!-- Primary Action -->
+      <button id="saveDay" type="button" class="primary" style="width: 100%; padding: 1rem; font-size: 1.1rem; font-weight: bold; margin: 1rem 0;">
+        💾 Save Day
+      </button>
+    </div>
+  </div>
 
   <div id="status"></div>
 
-  <!-- Saved Days (Collapsible) -->
-  <details open style="margin-top: 1.5rem;">
-    <summary style="cursor: pointer; padding: 0.75rem; background: #f0f7ff; border-radius: 4px; user-select: none; list-style: none;">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
+  <!-- View Your Data Section -->
+  <div style="margin-top: 2rem;">
+    <h2 style="margin-bottom: 1rem;">📊 View Your Data</h2>
+
+    <!-- Tab Navigation -->
+    <div class="tab-navigation">
+      <button class="tab-button active" onclick="switchTab('table')" id="tabTable">
+        <span>📊</span> Table
+      </button>
+      <button class="tab-button" onclick="switchTab('cards')" id="tabCards">
+        <span>📱</span> Cards
+      </button>
+      <button class="tab-button" onclick="switchTab('trends')" id="tabTrends">
+        <span>📈</span> Trends
+      </button>
+    </div>
+
+    <!-- Progress Stats (shown in all tabs) -->
+    <div id="progressStats" style="background: #f0f7ff; padding: 0.75rem; border-radius: 6px; margin-bottom: 1.5rem; display: none;">
+      <div style="display: flex; justify-content: space-around; text-align: center; flex-wrap: wrap; gap: 1rem;">
         <div>
-          <strong style="font-size: 1.1rem;">📊 Saved Days (<span id="entryCount">0</span> entries)</strong>
+          <div style="font-size: 1.5rem; font-weight: bold; color: #0066cc;"><span id="totalDays">0</span></div>
+          <div style="font-size: 0.75rem; color: #666;">Days Tracked</div>
         </div>
-        <button id="viewToggle" onclick="event.stopPropagation(); toggleView();" style="font-size:0.85rem; padding: 6px 12px; background: white;">📱 Card View</button>
+        <div>
+          <div style="font-size: 1.5rem; font-weight: bold; color: #0066cc;"><span id="currentStreak">0</span>🔥</div>
+          <div style="font-size: 0.75rem; color: #666;">Current Streak</div>
+        </div>
+        <div>
+          <div style="font-size: 1.5rem; font-weight: bold; color: #0066cc;"><span id="percentComplete">0</span>%</div>
+          <div style="font-size: 0.75rem; color: #666;">Progress (90 days)</div>
+        </div>
       </div>
-    </summary>
+    </div>
 
-    <div style="margin-top: 1rem;">
-      <!-- Card View Container -->
-      <div id="cardContainer" style="display: none;">
-      </div>
-
-      <!-- Table View Container -->
+    <!-- Table Tab Content -->
+    <div class="tab-content active" id="contentTable">
       <div class="table-container" id="tableContainer">
         <table id="logTable">
           <thead id="tableHeader"></thead>
           <tbody id="tableBody"></tbody>
         </table>
       </div>
+      <p id="tableEmptyState" style="text-align: center; color: #999; padding: 3rem; display: none;">
+        No entries yet. Save your first day above! 📝
+      </p>
     </div>
-  </details>
+
+    <!-- Cards Tab Content -->
+    <div class="tab-content" id="contentCards">
+      <div id="cardContainer"></div>
+      <p id="cardsEmptyState" style="text-align: center; color: #999; padding: 3rem; display: none;">
+        No entries yet. Save your first day above! 📝
+      </p>
+    </div>
+
+    <!-- Trends Tab Content -->
+    <div class="tab-content" id="contentTrends">
+      <div id="trendsContainer">
+        <p style="text-align: center; color: #999; padding: 3rem;">
+          Need at least 3 days of data to show trends. Keep tracking! 📈
+        </p>
+      </div>
+    </div>
+  </div>
 
   <!-- Settings Modal -->
   <div id="settingsModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Customize Tracker</h2>
+        <h2>⚙️ Settings</h2>
         <button class="close-btn" onclick="closeSettings()">×</button>
       </div>
 
+      <!-- Data Management Section -->
+      <div style="margin-bottom: 2rem; padding: 1rem; background: #f9f9f9; border-radius: 6px;">
+        <h3 style="margin-top: 0;">📦 Data Management</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <button onclick="exportCsv(); closeSettings();" style="width: 100%; padding: 0.75rem;">📥 Export Data (CSV)</button>
+          <button onclick="document.getElementById('csvFileInput').click();" style="width: 100%; padding: 0.75rem;">📤 Import Data (CSV)</button>
+          <button onclick="document.getElementById('configFileInput').click();" style="width: 100%; padding: 0.75rem;">📋 Import Settings Template</button>
+          <button onclick="exportConfig();" style="width: 100%; padding: 0.75rem;">📋 Export Settings Template</button>
+          <button onclick="clearAllData()" class="danger" style="width: 100%; padding: 0.75rem;">🗑️ Clear All Data</button>
+        </div>
+      </div>
+
+      <!-- Customization Section -->
       <div style="margin-bottom: 1rem;">
+        <h3>🎨 Customize Tracker</h3>
         <label><strong>Tracker Title</strong></label>
         <input type="text" id="configTitle" placeholder="N=1 Daily Tracker" style="width:100%;">
       </div>
@@ -498,20 +631,6 @@
         <button onclick="saveConfig()" class="primary">Save Settings</button>
         <button onclick="resetToDefault()">Reset to Default</button>
         <button onclick="closeSettings()">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Trends Modal -->
-  <div id="trendsModal" class="modal">
-    <div class="modal-content" style="max-width: 900px;">
-      <div class="modal-header">
-        <h2>📈 Trends & Analysis</h2>
-        <button class="close-btn" onclick="closeTrends()">×</button>
-      </div>
-
-      <div id="trendsContent">
-        <p style="text-align: center; color: #666;">Loading trends...</p>
       </div>
     </div>
   </div>
@@ -638,26 +757,35 @@
       const entries = loadEntries();
       const header = document.getElementById('tableHeader');
       const tbody = document.getElementById('tableBody');
+      const emptyState = document.getElementById('tableEmptyState');
+      const tableContainer = document.getElementById('tableContainer');
 
-      // Build headers
-      header.innerHTML = '<tr><th>Date</th><th>Day#</th>' +
-        config.sliders.map(s => `<th>${s.label}</th>`).join('') +
-        config.fields.map(f => `<th>${f.label}</th>`).join('') +
-        '<th>Notes</th></tr>';
+      if (entries.length === 0) {
+        emptyState.style.display = 'block';
+        tableContainer.style.display = 'none';
+      } else {
+        emptyState.style.display = 'none';
+        tableContainer.style.display = 'block';
 
-      // Build rows
-      tbody.innerHTML = '';
-      entries.forEach(entry => {
-        const tr = document.createElement('tr');
-        tr.innerHTML =
-          `<td>${entry.date || ''}</td><td>${entry.day || ''}</td>` +
-          config.sliders.map(s => `<td>${entry[s.id] ?? ''}</td>`).join('') +
-          config.fields.map(f => `<td>${entry[f.id] ?? ''}</td>`).join('') +
-          `<td>${entry.notes || ''}</td>`;
-        tbody.appendChild(tr);
-      });
+        // Build headers
+        header.innerHTML = '<tr><th>Date</th><th>Day#</th>' +
+          config.sliders.map(s => `<th>${s.label}</th>`).join('') +
+          config.fields.map(f => `<th>${f.label}</th>`).join('') +
+          '<th>Notes</th></tr>';
 
-      document.getElementById('entryCount').textContent = entries.length;
+        // Build rows
+        tbody.innerHTML = '';
+        entries.forEach(entry => {
+          const tr = document.createElement('tr');
+          tr.innerHTML =
+            `<td>${entry.date || ''}</td><td>${entry.day || ''}</td>` +
+            config.sliders.map(s => `<td>${entry[s.id] ?? ''}</td>`).join('') +
+            config.fields.map(f => `<td>${entry[f.id] ?? ''}</td>`).join('') +
+            `<td>${entry.notes || ''}</td>`;
+          tbody.appendChild(tr);
+        });
+      }
+
       updateProgressStats(entries);
     }
 
@@ -698,14 +826,6 @@
       // Calculate percentage of 90 days
       const percentComplete = Math.round((entries.length / 90) * 100);
       document.getElementById('percentComplete').textContent = Math.min(percentComplete, 100);
-
-      // Show/hide View Trends button
-      const trendsBtn = document.getElementById('viewTrendsBtn');
-      if (entries.length >= 3) {
-        trendsBtn.style.display = 'block';
-      } else {
-        trendsBtn.style.display = 'none';
-      }
     }
 
     // Trend calculation functions
@@ -737,35 +857,58 @@
       return '#6c757d'; // Gray for stable
     }
 
-    let currentView = 'table'; // or 'cards'
+    let currentTab = 'table';
 
-    function toggleView() {
-      currentView = currentView === 'table' ? 'cards' : 'table';
-      const toggleBtn = document.getElementById('viewToggle');
-      const tableContainer = document.getElementById('tableContainer');
-      const cardContainer = document.getElementById('cardContainer');
+    // Tab switching function
+    function switchTab(tabName) {
+      currentTab = tabName;
 
-      if (currentView === 'cards') {
-        tableContainer.style.display = 'none';
-        cardContainer.style.display = 'block';
-        toggleBtn.textContent = '📊 Table View';
+      // Update tab buttons
+      document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active');
+
+      // Update tab content
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      document.getElementById('content' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active');
+
+      // Render appropriate content
+      if (tabName === 'cards') {
         renderCards();
+      } else if (tabName === 'trends') {
+        renderTrendsInTab();
+      }
+    }
+
+    // Input section collapse function
+    function toggleInputSection() {
+      const content = document.getElementById('inputFormContent');
+      const icon = document.getElementById('inputCollapseIcon');
+
+      if (content.style.display === 'none') {
+        content.style.display = 'block';
+        icon.classList.add('open');
       } else {
-        tableContainer.style.display = 'block';
-        cardContainer.style.display = 'none';
-        toggleBtn.textContent = '📱 Card View';
+        content.style.display = 'none';
+        icon.classList.remove('open');
       }
     }
 
     function renderCards() {
       const entries = loadEntries();
       const container = document.getElementById('cardContainer');
+      const emptyState = document.getElementById('cardsEmptyState');
       container.innerHTML = '';
 
       if (entries.length === 0) {
-        container.innerHTML = '<p style="text-align:center; color:#666; padding:2rem;">No entries yet. Save your first day above!</p>';
+        emptyState.style.display = 'block';
         return;
       }
+
+      emptyState.style.display = 'none';
 
       // Reverse to show most recent first
       const sortedEntries = [...entries].sort((a, b) => b.date.localeCompare(a.date));
@@ -964,11 +1107,7 @@
 
     document.getElementById('exportCsv').addEventListener('click', exportCsv);
 
-    // Import CSV
-    document.getElementById('importCsv').addEventListener('click', () => {
-      document.getElementById('csvFileInput').click();
-    });
-
+    // Import CSV file handler
     document.getElementById('csvFileInput').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -1069,18 +1208,7 @@
       return result;
     }
 
-    // Export settings template
-    document.getElementById('exportConfig').addEventListener('click', () => {
-      const json = JSON.stringify(config, null, 2);
-      downloadFile(json, `tracker_settings_${getTodayString()}.json`, 'application/json');
-      showStatus('Settings template exported!', 'success');
-    });
-
-    // Import settings template
-    document.getElementById('importConfig').addEventListener('click', () => {
-      document.getElementById('configFileInput').click();
-    });
-
+    // Import settings template file handler
     document.getElementById('configFileInput').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -1109,14 +1237,22 @@
     });
 
     // Clear all data
-    document.getElementById('clearAll').addEventListener('click', () => {
+    function clearAllData() {
       if (!confirm('⚠️ Clear ALL saved data in this browser? This cannot be undone!')) return;
       if (!confirm('Are you SURE? Export a CSV backup first if needed!')) return;
 
       localStorage.removeItem(STORAGE_KEY);
       renderTable();
+      closeSettings();
       showStatus('All data cleared from this browser.', 'warning');
-    });
+    }
+
+    // Export config helper
+    function exportConfig() {
+      const json = JSON.stringify(config, null, 2);
+      downloadFile(json, `tracker_settings_${getTodayString()}.json`, 'application/json');
+      showStatus('Settings template exported!', 'success');
+    }
 
     // Settings modal
     function openSettings() {
@@ -1128,28 +1264,31 @@
       document.getElementById('settingsModal').classList.remove('show');
     }
 
-    // Trends modal functions
-    function openTrends() {
-      renderTrends();
-      document.getElementById('trendsModal').classList.add('show');
-    }
-
-    function closeTrends() {
-      document.getElementById('trendsModal').classList.remove('show');
-    }
-
+    // Trends rendering (in tab)
     let trendsViewMode = 'combined'; // or 'individual'
 
-    function renderTrends() {
+    function renderTrendsInTab() {
       const entries = loadEntries();
-      const container = document.getElementById('trendsContent');
+      const container = document.getElementById('trendsContainer');
 
       if (entries.length < 3) {
-        container.innerHTML = '<p style="text-align:center; color:#666; padding:2rem;">Need at least 3 days of data to show trends. Keep tracking!</p>';
+        container.innerHTML = '<p style="text-align:center; color:#999; padding:3rem;">Need at least 3 days of data to show trends. Keep tracking! 📈</p>';
         return;
       }
 
-      let html = '<div style="padding: 1rem;">';
+      renderTrends();
+    }
+
+    function renderTrends() {
+      const entries = loadEntries();
+      const container = document.getElementById('trendsContainer');
+
+      if (entries.length < 3) {
+        container.innerHTML = '<p style="text-align:center; color:#999; padding:3rem;">Need at least 3 days of data to show trends. Keep tracking! 📈</p>';
+        return;
+      }
+
+      let html = '';
 
       // Toggle button
       html += `
@@ -1180,7 +1319,7 @@
             const metricColor = getMetricColor(slider.id);
 
             html += `
-              <div style="padding: 1rem; background: white; border-left: 4px solid ${metricColor}; border-radius: 4px;">
+              <div style="padding: 1rem; background: white; border-left: 4px solid ${metricColor}; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                 <div style="font-weight: 600; color: #555; margin-bottom: 0.5rem;">${slider.label}</div>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                   <div>
@@ -1200,7 +1339,6 @@
         });
       }
 
-      html += '</div>';
       container.innerHTML = html;
     }
 
@@ -1575,9 +1713,11 @@
     renderTracker();
     checkBackupReminder();
 
-    // Default to card view on mobile
-    if (window.innerWidth < 600 && loadEntries().length > 0) {
-      toggleView(); // Switch to card view
+    // Collapse input section if there are existing entries
+    const entries = loadEntries();
+    if (entries.length > 0) {
+      document.getElementById('inputFormContent').style.display = 'none';
+      document.getElementById('inputCollapseIcon').classList.remove('open');
     }
   </script>
 </body>
