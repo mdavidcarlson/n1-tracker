@@ -798,23 +798,36 @@
       try {
         const saved = localStorage.getItem(CONFIG_KEY);
         if (!saved) {
-          return DEFAULT_CONFIG;
+          console.log('No saved config, using defaults');
+          return JSON.parse(JSON.stringify(DEFAULT_CONFIG));
         }
 
         const loadedConfig = JSON.parse(saved);
+        console.log('Loaded config version:', loadedConfig.version || 1);
 
         // Migrate old configs to new version
+        const needsMigration = (loadedConfig.version || 1) < CONFIG_VERSION;
         const migratedConfig = migrateConfig(loadedConfig);
 
-        // Save migrated config back if it changed
-        if (migratedConfig !== loadedConfig) {
+        // Always save migrated config back if migration occurred
+        if (needsMigration) {
+          console.log('Saving migrated config to localStorage');
           localStorage.setItem(CONFIG_KEY, JSON.stringify(migratedConfig));
         }
 
+        // Verify sliders exist (emergency fallback)
+        if (!migratedConfig.sliders || migratedConfig.sliders.length === 0) {
+          console.error('CRITICAL: Config has no sliders! Forcing defaults.');
+          migratedConfig.sliders = JSON.parse(JSON.stringify(DEFAULT_CONFIG.sliders));
+          localStorage.setItem(CONFIG_KEY, JSON.stringify(migratedConfig));
+        }
+
+        console.log('Config loaded successfully. Sliders:', migratedConfig.sliders.length);
         return migratedConfig;
       } catch (e) {
-        console.error('Failed to load config', e);
-        return DEFAULT_CONFIG;
+        console.error('Failed to load config:', e);
+        console.log('Returning default config');
+        return JSON.parse(JSON.stringify(DEFAULT_CONFIG));
       }
     }
 
@@ -823,46 +836,59 @@
       const configVersion = config.version || 1;
 
       if (configVersion < CONFIG_VERSION) {
-        console.log(`Migrating config from v${configVersion} to v${CONFIG_VERSION}`);
+        console.log(`🔄 Migrating config from v${configVersion} to v${CONFIG_VERSION}`);
 
         // Ensure sliders array exists
         if (!config.sliders || !Array.isArray(config.sliders)) {
-          console.log('Missing sliders array, adding defaults');
-          config.sliders = [...DEFAULT_CONFIG.sliders];
+          console.log('❌ Missing sliders array, adding defaults');
+          config.sliders = JSON.parse(JSON.stringify(DEFAULT_CONFIG.sliders));
+        } else if (config.sliders.length === 0) {
+          console.log('❌ Empty sliders array, adding defaults');
+          config.sliders = JSON.parse(JSON.stringify(DEFAULT_CONFIG.sliders));
         } else {
           // Ensure all default sliders exist (in case user deleted some)
+          console.log('✓ Checking for missing sliders...');
           DEFAULT_CONFIG.sliders.forEach(defaultSlider => {
             const exists = config.sliders.some(s => s.id === defaultSlider.id);
             if (!exists) {
-              console.log(`Adding missing slider: ${defaultSlider.id}`);
-              config.sliders.push({...defaultSlider});
+              console.log(`  + Adding missing slider: ${defaultSlider.id}`);
+              config.sliders.push(JSON.parse(JSON.stringify(defaultSlider)));
             }
           });
         }
 
         // Ensure fields array exists
         if (!config.fields || !Array.isArray(config.fields)) {
-          console.log('Missing fields array, adding defaults');
-          config.fields = [...DEFAULT_CONFIG.fields];
+          console.log('❌ Missing fields array, adding defaults');
+          config.fields = JSON.parse(JSON.stringify(DEFAULT_CONFIG.fields));
+        } else if (config.fields.length === 0) {
+          console.log('❌ Empty fields array, adding defaults');
+          config.fields = JSON.parse(JSON.stringify(DEFAULT_CONFIG.fields));
         }
 
         // Ensure title exists
         if (!config.title) {
+          console.log('❌ Missing title, adding default');
           config.title = DEFAULT_CONFIG.title;
         }
 
         // V2 to V3: Add experiment config
         if (configVersion < 3) {
           if (!config.experiment) {
-            console.log('Adding experiment config');
-            config.experiment = {...DEFAULT_CONFIG.experiment};
+            console.log('✓ Adding experiment config');
+            config.experiment = JSON.parse(JSON.stringify(DEFAULT_CONFIG.experiment));
           }
         }
 
         // Update version
         config.version = CONFIG_VERSION;
 
-        console.log('Config migration complete');
+        console.log('✅ Config migration complete');
+        console.log('   Sliders:', config.sliders.length);
+        console.log('   Fields:', config.fields.length);
+        console.log('   Experiment enabled:', config.experiment?.enabled);
+      } else {
+        console.log('✓ Config is up to date (v' + CONFIG_VERSION + ')');
       }
 
       return config;
@@ -873,8 +899,19 @@
     }
 
     function renderTracker() {
+      console.log('🎨 Rendering tracker...');
+
       // Update title
       document.getElementById('trackerTitle').textContent = config.title;
+
+      // Verify config has sliders
+      if (!config.sliders || config.sliders.length === 0) {
+        console.error('❌ CRITICAL: No sliders to render! Forcing reload of defaults.');
+        config.sliders = JSON.parse(JSON.stringify(DEFAULT_CONFIG.sliders));
+        saveConfigToStorage();
+      }
+
+      console.log(`  Rendering ${config.sliders.length} sliders`);
 
       // Render sliders
       const slidersContainer = document.getElementById('slidersContainer');
