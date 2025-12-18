@@ -251,6 +251,58 @@
     .backup-warning strong {
       color: #856404;
     }
+    .entry-card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .entry-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    .entry-card-date {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #0066cc;
+    }
+    .entry-card-day {
+      font-size: 0.9rem;
+      color: #666;
+    }
+    .entry-card-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    .entry-card-row:last-child {
+      border-bottom: none;
+    }
+    .entry-card-label {
+      font-weight: 600;
+      color: #555;
+      font-size: 0.85rem;
+    }
+    .entry-card-value {
+      color: #333;
+      font-size: 0.85rem;
+      text-align: right;
+    }
+    .entry-card-notes {
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 2px solid #f0f0f0;
+      font-style: italic;
+      color: #666;
+      font-size: 0.85rem;
+    }
     @media (max-width: 600px) {
       body {
         padding: 10px;
@@ -261,12 +313,34 @@
       }
       .row label {
         min-width: 0;
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
       }
       .buttons {
         flex-direction: column;
       }
       button {
         width: 100%;
+      }
+      /* Bigger touch targets on mobile */
+      input[type="date"],
+      input[type="number"],
+      input[type="text"],
+      select {
+        padding: 12px;
+        font-size: 16px; /* Prevents zoom on iOS */
+        min-height: 44px; /* Apple's recommended touch target */
+      }
+      textarea {
+        padding: 12px;
+        font-size: 16px;
+        min-height: 80px;
+      }
+      .slider-header {
+        font-size: 1rem;
+      }
+      .value-display {
+        font-size: 1.2rem;
       }
     }
   </style>
@@ -348,13 +422,31 @@
 
   <div id="status"></div>
 
-  <h2>Saved Days (<span id="entryCount">0</span> entries)</h2>
-  <div class="table-container">
-    <table id="logTable">
-      <thead id="tableHeader"></thead>
-      <tbody id="tableBody"></tbody>
-    </table>
-  </div>
+  <!-- Saved Days (Collapsible) -->
+  <details open style="margin-top: 1.5rem;">
+    <summary style="cursor: pointer; padding: 0.75rem; background: #f0f7ff; border-radius: 4px; user-select: none; list-style: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <strong style="font-size: 1.1rem;">📊 Saved Days (<span id="entryCount">0</span> entries)</strong>
+        </div>
+        <button id="viewToggle" onclick="event.stopPropagation(); toggleView();" style="font-size:0.85rem; padding: 6px 12px; background: white;">📱 Card View</button>
+      </div>
+    </summary>
+
+    <div style="margin-top: 1rem;">
+      <!-- Card View Container -->
+      <div id="cardContainer" style="display: none;">
+      </div>
+
+      <!-- Table View Container -->
+      <div class="table-container" id="tableContainer">
+        <table id="logTable">
+          <thead id="tableHeader"></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </details>
 
   <!-- Settings Modal -->
   <div id="settingsModal" class="modal">
@@ -567,6 +659,90 @@
       // Calculate percentage of 90 days
       const percentComplete = Math.round((entries.length / 90) * 100);
       document.getElementById('percentComplete').textContent = Math.min(percentComplete, 100);
+    }
+
+    let currentView = 'table'; // or 'cards'
+
+    function toggleView() {
+      currentView = currentView === 'table' ? 'cards' : 'table';
+      const toggleBtn = document.getElementById('viewToggle');
+      const tableContainer = document.getElementById('tableContainer');
+      const cardContainer = document.getElementById('cardContainer');
+
+      if (currentView === 'cards') {
+        tableContainer.style.display = 'none';
+        cardContainer.style.display = 'block';
+        toggleBtn.textContent = '📊 Table View';
+        renderCards();
+      } else {
+        tableContainer.style.display = 'block';
+        cardContainer.style.display = 'none';
+        toggleBtn.textContent = '📱 Card View';
+      }
+    }
+
+    function renderCards() {
+      const entries = loadEntries();
+      const container = document.getElementById('cardContainer');
+      container.innerHTML = '';
+
+      if (entries.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:#666; padding:2rem;">No entries yet. Save your first day above!</p>';
+        return;
+      }
+
+      // Reverse to show most recent first
+      const sortedEntries = [...entries].sort((a, b) => b.date.localeCompare(a.date));
+
+      sortedEntries.forEach(entry => {
+        const card = document.createElement('div');
+        card.className = 'entry-card';
+
+        let html = `
+          <div class="entry-card-header">
+            <div class="entry-card-date">${entry.date}</div>
+            <div class="entry-card-day">Day ${entry.day || '—'}</div>
+          </div>
+        `;
+
+        // Add sliders
+        config.sliders.forEach(slider => {
+          const value = entry[slider.id];
+          if (value !== undefined && value !== '') {
+            html += `
+              <div class="entry-card-row">
+                <div class="entry-card-label">${slider.label}</div>
+                <div class="entry-card-value">${value}</div>
+              </div>
+            `;
+          }
+        });
+
+        // Add fields
+        config.fields.forEach(field => {
+          const value = entry[field.id];
+          if (value !== undefined && value !== '') {
+            html += `
+              <div class="entry-card-row">
+                <div class="entry-card-label">${field.label}</div>
+                <div class="entry-card-value">${value}</div>
+              </div>
+            `;
+          }
+        });
+
+        // Add notes if present
+        if (entry.notes && entry.notes.trim()) {
+          html += `
+            <div class="entry-card-notes">
+              <strong>Notes:</strong> ${entry.notes}
+            </div>
+          `;
+        }
+
+        card.innerHTML = html;
+        container.appendChild(card);
+      });
     }
 
     function getValue(id) {
