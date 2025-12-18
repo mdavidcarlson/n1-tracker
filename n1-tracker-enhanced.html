@@ -273,6 +273,24 @@
 </head>
 <body>
   <h1 id="trackerTitle">N=1 Daily Tracker</h1>
+
+  <div id="progressStats" style="background: #f0f7ff; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; display: none;">
+    <div style="display: flex; justify-content: space-around; text-align: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <div style="font-size: 1.5rem; font-weight: bold; color: #0066cc;"><span id="totalDays">0</span></div>
+        <div style="font-size: 0.75rem; color: #666;">Days Tracked</div>
+      </div>
+      <div>
+        <div style="font-size: 1.5rem; font-weight: bold; color: #0066cc;"><span id="currentStreak">0</span>🔥</div>
+        <div style="font-size: 0.75rem; color: #666;">Current Streak</div>
+      </div>
+      <div>
+        <div style="font-size: 1.5rem; font-weight: bold; color: #0066cc;"><span id="percentComplete">0</span>%</div>
+        <div style="font-size: 0.75rem; color: #666;">Progress (90 days)</div>
+      </div>
+    </div>
+  </div>
+
   <p class="hint">
     <strong>Quick Start:</strong> Set sliders once per day, click "Save day". Your data is stored in this browser only.
     <strong>⚠️ Export CSV weekly to prevent data loss!</strong>
@@ -305,14 +323,28 @@
     <textarea id="notes" placeholder="Anything that stands out today…"></textarea>
   </div>
 
-  <div class="buttons">
-    <button id="saveDay" type="button" class="primary">Save Day</button>
-    <button id="exportCsv" type="button">📥 Export CSV</button>
-    <button id="importCsv" type="button">📤 Import CSV</button>
-    <button id="exportConfig" type="button">📋 Export Settings Template</button>
-    <button id="importConfig" type="button">📋 Import Settings Template</button>
-    <button id="clearAll" type="button" class="danger">Clear All Data</button>
+  <!-- Primary Action -->
+  <button id="saveDay" type="button" class="primary" style="width: 100%; padding: 1rem; font-size: 1.1rem; font-weight: bold; margin: 1.5rem 0 1rem 0;">
+    💾 Save Day
+  </button>
+
+  <!-- Quick Actions -->
+  <div style="margin-bottom: 1rem;">
+    <button id="exportCsv" type="button" style="width: 100%; padding: 0.75rem;">📥 Export CSV Backup</button>
   </div>
+
+  <!-- Advanced Options (Collapsible) -->
+  <details style="margin-bottom: 1rem;">
+    <summary style="cursor: pointer; padding: 0.5rem; background: #f5f5f5; border-radius: 4px; user-select: none;">
+      <strong>⚙️ Advanced Options</strong> (Import, Settings, Clear Data)
+    </summary>
+    <div class="buttons" style="margin-top: 0.75rem; gap: 0.5rem;">
+      <button id="importCsv" type="button">📤 Import CSV</button>
+      <button id="exportConfig" type="button">📋 Export Settings Template</button>
+      <button id="importConfig" type="button">📋 Import Settings Template</button>
+      <button id="clearAll" type="button" class="danger">Clear All Data</button>
+    </div>
+  </details>
 
   <div id="status"></div>
 
@@ -375,7 +407,6 @@
       fields: [
         { id: "cramps", label: "Muscle Cramps", type: "select", options: ["—", "None", "Mild", "Wakes-me-up"] },
         { id: "palps", label: "Palpitations", type: "select", options: ["—", "None", "Mild", "Concerning"] },
-        { id: "offplan", label: "Off plan?", type: "select", options: ["—", "No", "Yes"] },
         { id: "offnote", label: "Off-plan note", type: "text", placeholder: "cookies, chips, beer…" },
         { id: "ketones", label: "Ketones (mmol/L)", type: "number", step: "0.1", min: "0" },
         { id: "macros", label: "Macros logged?", type: "select", options: ["—", "No", "Yes"] }
@@ -496,6 +527,46 @@
       });
 
       document.getElementById('entryCount').textContent = entries.length;
+      updateProgressStats(entries);
+    }
+
+    function updateProgressStats(entries) {
+      if (entries.length === 0) {
+        document.getElementById('progressStats').style.display = 'none';
+        return;
+      }
+
+      document.getElementById('progressStats').style.display = 'block';
+
+      // Total days tracked
+      document.getElementById('totalDays').textContent = entries.length;
+
+      // Calculate current streak (consecutive days from most recent)
+      let streak = 0;
+      if (entries.length > 0) {
+        const sortedEntries = [...entries].sort((a, b) => b.date.localeCompare(a.date));
+        const today = new Date().toISOString().slice(0, 10);
+        let checkDate = new Date(sortedEntries[0].date);
+
+        // Start from most recent entry
+        for (let i = 0; i < sortedEntries.length; i++) {
+          const entryDate = sortedEntries[i].date;
+          const expectedDate = new Date(checkDate);
+          expectedDate.setDate(expectedDate.getDate() - i);
+          const expectedDateStr = expectedDate.toISOString().slice(0, 10);
+
+          if (entryDate === expectedDateStr) {
+            streak++;
+          } else {
+            break;
+          }
+        }
+      }
+      document.getElementById('currentStreak').textContent = streak;
+
+      // Calculate percentage of 90 days
+      const percentComplete = Math.round((entries.length / 90) * 100);
+      document.getElementById('percentComplete').textContent = Math.min(percentComplete, 100);
     }
 
     function getValue(id) {
