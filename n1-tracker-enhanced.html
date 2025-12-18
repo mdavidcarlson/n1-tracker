@@ -495,11 +495,14 @@
     <div id="inputFormContent">
       <h3 style="font-size: 1rem; color: #666; margin-top: 0;">Basic Info</h3>
       <div class="row">
-        <label for="date">Date</label>
-        <input type="date" id="date">
-        <label for="day">Day #</label>
-        <input type="number" id="day" min="1" max="365" style="width:80px;">
+        <label for="date">Date <span style="color: #dc3545;">*</span></label>
+        <input type="date" id="date" required>
+        <label for="day">Day # <span style="font-size: 0.75rem; font-weight: normal; color: #999;">(experiment day)</span></label>
+        <input type="number" id="day" min="1" max="365" style="width:80px;" placeholder="Auto">
       </div>
+      <p style="font-size: 0.8rem; color: #666; margin: 0.5rem 0 0 0; font-style: italic;">
+        💡 Day # auto-increments to track your experiment progress (e.g., "Day 30 of 90")
+      </p>
 
       <h3 style="font-size: 1rem; color: #666; margin-top: 1.5rem;">Track Metrics</h3>
       <div id="slidersContainer"></div>
@@ -1087,15 +1090,19 @@
 
     // Save day
     document.getElementById('saveDay').addEventListener('click', () => {
+      const dateInput = document.getElementById('date');
       const date = getValue('date');
+
+      // Validate required date field
       if (!date) {
-        showStatus('Please set a date before saving.', 'error');
+        showStatus('⚠️ Please select a date before saving.', 'error');
+        dateInput.focus();
         return;
       }
 
       const entry = {
         date,
-        day: getValue('day'),
+        day: getValue('day') || '', // Allow empty day number
         notes: getValue('notes')
       };
 
