@@ -677,12 +677,49 @@
       <!-- Data Management Section -->
       <div style="margin-bottom: 2rem; padding: 1rem; background: #f9f9f9; border-radius: 6px;">
         <h3 style="margin-top: 0;">📦 Data Management</h3>
-        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-          <button onclick="exportCsv(); closeSettings();" style="width: 100%; padding: 0.75rem;">📥 Export Data (CSV)</button>
-          <button onclick="document.getElementById('csvFileInput').click();" style="width: 100%; padding: 0.75rem;">📤 Import Data (CSV)</button>
-          <button onclick="document.getElementById('configFileInput').click();" style="width: 100%; padding: 0.75rem;">📋 Import Settings Template</button>
-          <button onclick="exportConfig();" style="width: 100%; padding: 0.75rem;">📋 Export Settings Template</button>
-          <button onclick="clearAllData()" class="danger" style="width: 100%; padding: 0.75rem;">🗑️ Clear All Data</button>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+
+          <div>
+            <button onclick="exportCsv(); closeSettings();" style="width: 100%; padding: 0.75rem;">📥 Export Data (CSV)</button>
+            <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
+              Download all your daily entries as a CSV file for backup or analysis in Excel/Sheets
+            </small>
+          </div>
+
+          <div>
+            <button onclick="document.getElementById('csvFileInput').click();" style="width: 100%; padding: 0.75rem;">📤 Import Data (CSV)</button>
+            <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
+              Restore previously exported entries or merge data from another device
+            </small>
+          </div>
+
+          <div>
+            <button onclick="exportConfig();" style="width: 100%; padding: 0.75rem;">📋 Export Settings Template</button>
+            <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
+              Save your tracker configuration (sliders, fields, phases, milestones) to share or backup
+            </small>
+          </div>
+
+          <div>
+            <button onclick="document.getElementById('configFileInput').click();" style="width: 100%; padding: 0.75rem;">📋 Import Settings Template</button>
+            <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
+              Load a tracker configuration from a template (won't affect your data)
+            </small>
+          </div>
+
+          <div style="border-top: 2px solid #ddd; padding-top: 1rem; margin-top: 0.5rem;">
+            <button onclick="resetToDefault()" style="width: 100%; padding: 0.75rem; background: #ffc107; border-color: #ffc107;">🔄 Reset Settings to Default</button>
+            <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
+              Restore default tracker configuration (sliders, fields, etc.). Your saved entries are NOT affected.
+            </small>
+          </div>
+
+          <div>
+            <button onclick="clearAllData()" class="danger" style="width: 100%; padding: 0.75rem;">🗑️ Clear All Data</button>
+            <small style="display: block; color: #dc3545; margin-top: 0.25rem; font-style: italic; font-weight: 600;">
+              ⚠️ DELETES all saved entries permanently. Export a backup first! (Settings are not affected)
+            </small>
+          </div>
         </div>
       </div>
 
@@ -722,9 +759,28 @@
             </div>
           </div>
 
-          <p style="font-size: 0.85rem; color: #666; font-style: italic; margin: 0.5rem 0;">
-            💡 Phases and milestones can be customized by editing the settings template (export/import JSON)
-          </p>
+          <div style="background: #fff3cd; border: 1px solid #ffc107; padding: 0.75rem; border-radius: 4px; margin-top: 1rem;">
+            <div style="font-weight: 600; color: #856404; margin-bottom: 0.5rem;">📝 How to Edit Phases & Milestones:</div>
+            <ol style="margin: 0; padding-left: 1.5rem; font-size: 0.85rem; color: #666;">
+              <li>Click "📋 Export Settings Template" above</li>
+              <li>Open the downloaded JSON file in any text editor</li>
+              <li>Find the "experiment" section with "phases" and "milestones" arrays</li>
+              <li>Edit phase names, day ranges, colors, and milestone icons/labels</li>
+              <li>Save the file and click "📋 Import Settings Template"</li>
+            </ol>
+            <details style="margin-top: 0.5rem;">
+              <summary style="cursor: pointer; font-size: 0.8rem; color: #0066cc;">Show JSON structure example</summary>
+              <pre style="background: white; padding: 0.5rem; border-radius: 4px; font-size: 0.7rem; overflow-x: auto; margin-top: 0.5rem;">
+"phases": [
+  { "name": "Adaptation", "endDay": 42, "color": "#ffc107", "message": "..." },
+  { "name": "Optimization", "endDay": 70, "color": "#28a745", "message": "..." }
+],
+"milestones": [
+  { "day": 1, "label": "Start!", "icon": "🎬" },
+  { "day": 42, "label": "Adapted!", "icon": "💪" }
+]</pre>
+            </details>
+          </div>
         </div>
       </div>
 
@@ -738,7 +794,6 @@
 
       <div class="buttons">
         <button onclick="saveConfig()" class="primary">Save Settings</button>
-        <button onclick="resetToDefault()">Reset to Default</button>
         <button onclick="closeSettings()">Cancel</button>
       </div>
     </div>
