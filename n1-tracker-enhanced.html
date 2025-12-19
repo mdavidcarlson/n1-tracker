@@ -56,18 +56,16 @@
       margin-bottom: 1rem;
       padding: 1rem;
       background: white;
-      border: 1px solid #e0e0e0;
       border-radius: 8px;
-      transition: border-color 0.2s, background 0.2s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      transition: all 0.2s;
     }
     .slider-group.unset {
       background: #f9f9f9;
-      border-color: #e8e8e8;
     }
     .slider-group.set {
       background: white;
-      border-color: #0066cc;
-      box-shadow: 0 1px 3px rgba(0,102,204,0.1);
+      box-shadow: 0 0 0 2px #e3f2ff, 0 1px 3px rgba(0,102,204,0.15);
     }
     details summary {
       position: relative;
@@ -151,14 +149,14 @@
     }
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      height: 32px;
-      width: 32px;
+      height: 24px;
+      width: 24px;
       border-radius: 50%;
       background: white;
-      border: 3px solid #0066cc;
+      border: 2px solid #0066cc;
       cursor: pointer;
-      margin-top: -13px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      margin-top: -9px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
     }
     input[type="range"]::-moz-range-track {
       width: 100%;
@@ -167,13 +165,13 @@
       border-radius: 3px;
     }
     input[type="range"]::-moz-range-thumb {
-      height: 32px;
-      width: 32px;
+      height: 24px;
+      width: 24px;
       border-radius: 50%;
       background: white;
-      border: 3px solid #0066cc;
+      border: 2px solid #0066cc;
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
     }
     .slider-group.unset input[type="range"]::-webkit-slider-thumb {
       border-color: #ccc;
@@ -210,7 +208,6 @@
     }
     .spectrum-legend {
       background: #f0f7ff;
-      border: 1px solid #b3d9ff;
       border-radius: 6px;
       padding: 0.75rem 1rem;
       margin-bottom: 1.5rem;
@@ -260,7 +257,7 @@
     }
     .symptom-row {
       background: white;
-      border: 1px solid #e0e0e0;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
       border-radius: 8px;
       padding: 1rem;
       margin-bottom: 1rem;
@@ -278,8 +275,8 @@
     }
     .severity-btn {
       padding: 10px 8px;
-      border: 2px solid #e0e0e0;
-      background: white;
+      border: none;
+      background: #f5f5f5;
       border-radius: 6px;
       cursor: pointer;
       font-size: 0.85rem;
@@ -288,11 +285,10 @@
       text-align: center;
     }
     .severity-btn:hover {
-      border-color: #0066cc;
+      background: #e8e8e8;
     }
     .severity-btn.selected {
       background: #0066cc;
-      border-color: #0066cc;
       color: white;
     }
     .symptom-context {
@@ -319,29 +315,40 @@
       padding: 8px 16px;
       font-size: 0.9rem;
       cursor: pointer;
-      border: 1px solid #ccc;
+      border: none;
       border-radius: 4px;
-      background: white;
-      transition: background 0.2s;
+      background: transparent;
+      color: #666;
+      transition: all 0.2s;
+      font-weight: 500;
     }
     button:hover {
-      background: #f0f0f0;
+      background: #f5f5f5;
+      color: #333;
     }
     button.primary {
       background: #0066cc;
       color: white;
-      border-color: #0066cc;
+      font-weight: 600;
     }
     button.primary:hover {
       background: #0052a3;
     }
     button.danger {
-      background: #cc0000;
+      background: #dc3545;
       color: white;
-      border-color: #cc0000;
+      font-weight: 600;
     }
     button.danger:hover {
-      background: #a30000;
+      background: #c82333;
+    }
+    button.warning {
+      background: #f59e0b;
+      color: white;
+      font-weight: 600;
+    }
+    button.warning:hover {
+      background: #d97706;
     }
     #status {
       position: fixed;
@@ -532,22 +539,21 @@
       font-size: 0.8rem;
     }
     .backup-warning {
-      background: #fff3cd;
-      border: 2px solid #ffc107;
+      background: #f9f9f9;
+      border-left: 3px solid #0066cc;
       padding: 1rem;
-      border-radius: 6px;
+      border-radius: 4px;
       margin: 1rem 0;
     }
     .backup-warning strong {
-      color: #856404;
+      color: #333;
     }
     .entry-card {
       background: white;
-      border: 1px solid #ddd;
       border-radius: 8px;
       padding: 1rem;
       margin-bottom: 1rem;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
     .entry-card-header {
       display: flex;
@@ -610,9 +616,9 @@
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background: #f0f7ff;
-      border: 1px solid #0066cc;
-      color: #0066cc;
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      color: #666;
       font-size: 1.2rem;
       display: flex;
       align-items: center;
@@ -621,8 +627,8 @@
       transition: all 0.2s;
     }
     .settings-icon:hover {
-      background: #0066cc;
-      color: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      color: #0066cc;
     }
 
     /* Tab navigation styles */
@@ -698,7 +704,7 @@
     /* Experiment Progress Bar */
     .experiment-progress {
       background: white;
-      border: 1px solid #e0e0e0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
       padding: 1.5rem;
       border-radius: 8px;
       margin-bottom: 1.5rem;
@@ -847,11 +853,11 @@
 
   <p class="hint">
     <strong>Quick Start:</strong> Track daily metrics, save your progress, and analyze trends over time.
-    <strong style="color: #f59e0b;">⚠ Export data regularly to prevent loss!</strong>
+    <strong style="color: #666;">Export data regularly to prevent loss.</strong>
   </p>
 
   <div class="backup-warning" id="backupWarning" style="display:none;">
-    <strong style="color: #f59e0b;">⚠ Backup Reminder:</strong> You haven't exported data in <span id="daysSinceExport">0</span> days.
+    <strong>Backup Reminder:</strong> You haven't exported data in <span id="daysSinceExport">0</span> days.
     <button onclick="exportCsv()" class="primary" style="margin-left: 10px;">Export Now</button>
   </div>
 
@@ -1021,8 +1027,8 @@
               </div>
             </div>
 
-            <details style="background: #fff3cd; border: 1px solid #ffc107; padding: 0.75rem; border-radius: 4px; margin-top: 1rem;">
-              <summary style="cursor: pointer; font-weight: 600; color: #856404;">How to Edit Phases & Milestones</summary>
+            <details style="background: #f9f9f9; padding: 0.75rem; border-radius: 4px; margin-top: 1rem; border-left: 3px solid #0066cc;">
+              <summary style="cursor: pointer; font-weight: 600; color: #333;">How to Edit Phases & Milestones</summary>
               <ol style="margin: 0.75rem 0 0 1.5rem; padding: 0; font-size: 0.85rem; color: #666;">
                 <li style="margin-bottom: 0.25rem;">Click "Export Settings Template" in the Data tab</li>
                 <li style="margin-bottom: 0.25rem;">Open the downloaded JSON file in any text editor</li>
@@ -1099,7 +1105,7 @@
             </div>
 
             <div style="border-top: 2px solid #ddd; padding-top: 1rem; margin-top: 0.5rem;">
-              <button onclick="resetToDefault()" style="width: 100%; padding: 0.75rem; background: #ffc107; border-color: #ffc107;">Reset Settings to Default</button>
+              <button onclick="resetToDefault()" class="warning" style="width: 100%; padding: 0.75rem;">Reset Settings to Default</button>
               <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
                 Restore the default tracker layout (sliders, fields, phases). Saved entries stay.
               </small>
