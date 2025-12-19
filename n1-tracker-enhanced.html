@@ -54,12 +54,20 @@
     }
     .slider-group {
       margin-bottom: 1rem;
-      padding: 0.75rem;
-      background: #f9f9f9;
-      border-radius: 6px;
+      padding: 1rem;
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      transition: border-color 0.2s, background 0.2s;
     }
-    .slider-group:nth-child(even) {
-      background: #ffffff;
+    .slider-group.unset {
+      background: #f9f9f9;
+      border-color: #e8e8e8;
+    }
+    .slider-group.set {
+      background: white;
+      border-color: #0066cc;
+      box-shadow: 0 1px 3px rgba(0,102,204,0.1);
     }
     details summary {
       position: relative;
@@ -83,20 +91,198 @@
       margin-top: 0.25rem;
     }
     .slider-header {
-      font-weight: 600;
-      margin-bottom: 0.5rem;
       display: flex;
       justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+    .slider-header .metric-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #333;
+      flex: 1;
+    }
+    .slider-header .value-chip {
+      min-width: 48px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 16px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0 12px;
+    }
+    .slider-group.unset .value-chip {
+      background: #e8e8e8;
+      color: #999;
+    }
+    .slider-group.set .value-chip {
+      background: #0066cc;
+      color: white;
+    }
+    .clear-btn {
+      margin-left: 8px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      background: transparent;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .clear-btn:hover {
+      background: #f5f5f5;
+      border-color: #999;
     }
     input[type="range"] {
       width: 100%;
-      margin: 0.25rem 0;
+      height: 44px;
+      margin: 0.5rem 0 0 0;
+      -webkit-appearance: none;
+      background: transparent;
     }
-    .value-display {
-      font-weight: 600;
-      min-width: 30px;
-      text-align: right;
+    input[type="range"]::-webkit-slider-track {
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(to right, #dc3545 0%, #ffc107 50%, #28a745 100%);
+      border-radius: 3px;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 32px;
+      width: 32px;
+      border-radius: 50%;
+      background: white;
+      border: 3px solid #0066cc;
+      cursor: pointer;
+      margin-top: -13px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    input[type="range"]::-moz-range-track {
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(to right, #dc3545 0%, #ffc107 50%, #28a745 100%);
+      border-radius: 3px;
+    }
+    input[type="range"]::-moz-range-thumb {
+      height: 32px;
+      width: 32px;
+      border-radius: 50%;
+      background: white;
+      border: 3px solid #0066cc;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .slider-group.unset input[type="range"]::-webkit-slider-thumb {
+      border-color: #ccc;
+      opacity: 0.5;
+    }
+    .slider-group.unset input[type="range"]::-moz-range-thumb {
+      border-color: #ccc;
+      opacity: 0.5;
+    }
+    .spectrum-legend {
+      background: #f0f7ff;
+      border: 1px solid #b3d9ff;
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.85rem;
       color: #0066cc;
+      text-align: center;
+      font-weight: 600;
+    }
+    .spectrum-ticks {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.25rem;
+      font-size: 0.75rem;
+      color: #666;
+      padding: 0 2px;
+    }
+    .sticky-bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      border-top: 2px solid #e0e0e0;
+      padding: 12px 16px;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      z-index: 100;
+      display: none;
+    }
+    .sticky-bottom-bar.show {
+      display: block;
+    }
+    .bottom-bar-content {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .completeness {
+      font-size: 0.8rem;
+      color: #666;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .symptom-section {
+      margin: 1.5rem 0;
+    }
+    .symptom-row {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .symptom-header {
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: #333;
+    }
+    .severity-options {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 0.75rem;
+    }
+    .severity-btn {
+      padding: 10px 8px;
+      border: 2px solid #e0e0e0;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .severity-btn:hover {
+      border-color: #0066cc;
+    }
+    .severity-btn.selected {
+      background: #0066cc;
+      border-color: #0066cc;
+      color: white;
+    }
+    .symptom-context {
+      margin-top: 0.75rem;
+      display: none;
+    }
+    .symptom-context.show {
+      display: block;
+    }
+    .symptom-context input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 0.85rem;
     }
     .buttons {
       margin-top: 1.5rem;
@@ -508,7 +694,7 @@
 
     @media (max-width: 600px) {
       body {
-        padding: 10px;
+        padding: 10px 10px 80px 10px; /* Extra bottom padding for sticky bar */
       }
       .row {
         flex-direction: column;
@@ -539,15 +725,20 @@
         font-size: 16px;
         min-height: 80px;
       }
-      .slider-header {
-        font-size: 1rem;
-      }
-      .value-display {
-        font-size: 1.2rem;
-      }
       .tab-button {
         font-size: 0.85rem;
         padding: 0.6rem 0.5rem;
+      }
+      .sticky-bottom-bar.show {
+        display: flex;
+      }
+      .input-section {
+        margin-bottom: 2rem;
+      }
+    }
+    @media (min-width: 601px) {
+      body {
+        padding-bottom: 80px; /* Extra padding for sticky bar on desktop too */
       }
     }
   </style>
@@ -588,30 +779,44 @@
         💡 Day # auto-increments to track your experiment progress (e.g., "Day 30 of 90")
       </p>
 
-      <h3 style="font-size: 1rem; color: #666; margin-top: 1.5rem;">Track Metrics</h3>
+      <h3 style="font-size: 1.1rem; color: #333; margin-top: 2rem; margin-bottom: 0.75rem;">Spectrum Scores (–5 to +5)</h3>
+      <div class="spectrum-legend">
+        –5 = left pole • 0 = neutral • +5 = right pole • Untouched = not tracked
+      </div>
       <div id="slidersContainer"></div>
 
+      <h3 style="font-size: 1.1rem; color: #333; margin-top: 2rem; margin-bottom: 0.75rem;">Symptoms</h3>
+      <div id="symptomsContainer"></div>
+
       <!-- Additional Fields (Collapsible) -->
-      <details open>
-        <summary style="cursor: pointer; padding: 0.75rem; background: white; border-radius: 4px; margin-bottom: 1rem; font-weight: 600; font-size: 1rem; margin-top: 1rem;">
-          Additional Fields
+      <details>
+        <summary style="cursor: pointer; padding: 0.75rem; background: white; border-radius: 4px; margin-bottom: 1rem; font-weight: 600; font-size: 1rem; margin-top: 1rem; color: #666;">
+          📋 Additional Fields (Optional)
         </summary>
         <div id="fieldsContainer"></div>
       </details>
 
       <div class="row">
-        <label for="notes">Notes</label>
-        <textarea id="notes" placeholder="Anything that stands out today…"></textarea>
+        <label for="notes">General Notes</label>
+        <textarea id="notes" placeholder="Anything else that stands out today…"></textarea>
       </div>
-
-      <!-- Primary Action -->
-      <button id="saveDay" type="button" class="primary" style="width: 100%; padding: 1rem; font-size: 1.1rem; font-weight: bold; margin: 1rem 0;">
-        💾 Save Day
-      </button>
     </div>
   </div>
 
   <div id="status"></div>
+
+  <!-- Sticky Bottom Action Bar -->
+  <div id="stickyBottomBar" class="sticky-bottom-bar">
+    <div class="bottom-bar-content">
+      <span class="completeness" id="completenessIndicator">Rated: 0/0</span>
+      <button onclick="setAllNeutral()" style="flex: 1; padding: 12px; font-size: 0.9rem; border: 1px solid #0066cc; background: white; color: #0066cc;">
+        Set All Neutral (0)
+      </button>
+      <button id="saveDay" type="button" class="primary" style="flex: 2; padding: 12px; font-size: 1rem; font-weight: bold;">
+        💾 Save Day
+      </button>
+    </div>
+  </div>
 
   <!-- View Your Data Section -->
   <div style="margin-top: 2rem;">
@@ -953,6 +1158,9 @@
       localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
     }
 
+    // Track slider states (unset vs set)
+    const sliderStates = {};
+
     function renderTracker() {
       console.log('🎨 Rendering tracker...');
 
@@ -968,37 +1176,121 @@
 
       console.log(`  Rendering ${config.sliders.length} sliders`);
 
-      // Render sliders
+      // Initialize slider states (all unset)
+      config.sliders.forEach(slider => {
+        sliderStates[slider.id] = { isSet: false, value: 0 };
+      });
+
+      // Render sliders with new mobile-first layout
       const slidersContainer = document.getElementById('slidersContainer');
       slidersContainer.innerHTML = '';
       config.sliders.forEach(slider => {
         const div = document.createElement('div');
-        div.className = 'slider-group';
+        div.className = 'slider-group unset';
+        div.id = `group-${slider.id}`;
         div.innerHTML = `
           <div class="slider-header">
-            <span>${slider.label}</span>
-            <span class="value-display" id="val-${slider.id}">0</span>
+            <span class="metric-name">${slider.label}</span>
+            <div style="display: flex; align-items: center;">
+              <span class="value-chip" id="val-${slider.id}">—</span>
+              <button class="clear-btn" id="clear-${slider.id}" style="display: none;" onclick="clearSlider('${slider.id}')">Clear</button>
+            </div>
           </div>
           <div class="slider-label">
-            <span>${slider.left}</span>
-            <span>${slider.right}</span>
+            <span style="font-size: 0.85rem; color: #999;">${slider.left}</span>
+            <span style="font-size: 0.85rem; color: #999;">${slider.right}</span>
           </div>
           <input type="range" id="${slider.id}" min="-5" max="5" value="0" step="1">
+          <div class="spectrum-ticks">
+            <span>–5</span>
+            <span>0</span>
+            <span>+5</span>
+          </div>
         `;
         slidersContainer.appendChild(div);
 
-        // Bind slider
+        // Bind slider with unset/set state management
         const input = div.querySelector('input');
-        const display = div.querySelector('.value-display');
+        const valueChip = div.querySelector('.value-chip');
+        const clearBtn = div.querySelector('.clear-btn');
+        const group = div;
+
         input.addEventListener('input', () => {
-          display.textContent = input.value;
+          // Mark as set on first interaction
+          if (!sliderStates[slider.id].isSet) {
+            sliderStates[slider.id].isSet = true;
+            group.classList.remove('unset');
+            group.classList.add('set');
+            clearBtn.style.display = 'inline-block';
+          }
+
+          const val = parseInt(input.value);
+          sliderStates[slider.id].value = val;
+
+          // Format value with sign
+          if (val > 0) {
+            valueChip.textContent = '+' + val;
+          } else {
+            valueChip.textContent = val;
+          }
+
+          updateCompleteness();
         });
       });
 
-      // Render fields
+      // Render symptoms section (moved from fields)
+      const symptomsContainer = document.getElementById('symptomsContainer');
+      symptomsContainer.innerHTML = '';
+
+      const symptoms = [
+        { id: 'cramps', label: 'Muscle Cramps', levels: ['None', 'Mild', 'Moderate', 'Severe'] },
+        { id: 'palps', label: 'Palpitations', levels: ['None', 'Mild', 'Moderate', 'Severe'] }
+      ];
+
+      symptoms.forEach(symptom => {
+        const div = document.createElement('div');
+        div.className = 'symptom-row';
+        div.innerHTML = `
+          <div class="symptom-header">${symptom.label}</div>
+          <div class="severity-options">
+            ${symptom.levels.map(level => `
+              <button type="button" class="severity-btn" data-symptom="${symptom.id}" data-level="${level}">${level}</button>
+            `).join('')}
+          </div>
+          <div class="symptom-context" id="context-${symptom.id}">
+            <input type="text" id="${symptom.id}-context" placeholder="Context or notes...">
+          </div>
+        `;
+        symptomsContainer.appendChild(div);
+
+        // Bind severity buttons
+        div.querySelectorAll('.severity-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            // Clear other selections
+            div.querySelectorAll('.severity-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+
+            // Show/hide context field
+            const contextDiv = div.querySelector('.symptom-context');
+            if (btn.dataset.level !== 'None') {
+              contextDiv.classList.add('show');
+            } else {
+              contextDiv.classList.remove('show');
+              contextDiv.querySelector('input').value = '';
+            }
+          });
+        });
+
+        // Set default to "None"
+        div.querySelector('[data-level="None"]').click();
+      });
+
+      // Render non-symptom fields in Additional Fields section
       const fieldsContainer = document.getElementById('fieldsContainer');
       fieldsContainer.innerHTML = '';
-      config.fields.forEach(field => {
+      const nonSymptomFields = config.fields.filter(f => f.id !== 'cramps' && f.id !== 'palps');
+
+      nonSymptomFields.forEach(field => {
         const div = document.createElement('div');
         div.className = 'row';
 
@@ -1240,17 +1532,69 @@
       }
     }
 
+    // Clear slider back to unset state
+    function clearSlider(sliderId) {
+      sliderStates[sliderId] = { isSet: false, value: 0 };
+
+      const group = document.getElementById(`group-${sliderId}`);
+      const input = document.getElementById(sliderId);
+      const valueChip = document.getElementById(`val-${sliderId}`);
+      const clearBtn = document.getElementById(`clear-${sliderId}`);
+
+      group.classList.remove('set');
+      group.classList.add('unset');
+      input.value = 0;
+      valueChip.textContent = '—';
+      clearBtn.style.display = 'none';
+
+      updateCompleteness();
+    }
+
+    // Update completeness indicator
+    function updateCompleteness() {
+      const total = config.sliders.length;
+      const rated = config.sliders.filter(s => sliderStates[s.id].isSet).length;
+
+      const indicator = document.getElementById('completenessIndicator');
+      indicator.textContent = `Rated: ${rated}/${total}`;
+    }
+
+    // Set all sliders to neutral (0)
+    function setAllNeutral() {
+      config.sliders.forEach(slider => {
+        const input = document.getElementById(slider.id);
+        const group = document.getElementById(`group-${slider.id}`);
+        const valueChip = document.getElementById(`val-${slider.id}`);
+        const clearBtn = document.getElementById(`clear-${slider.id}`);
+
+        // Mark as set
+        sliderStates[slider.id] = { isSet: true, value: 0 };
+
+        // Update UI
+        group.classList.remove('unset');
+        group.classList.add('set');
+        input.value = 0;
+        valueChip.textContent = '0';
+        clearBtn.style.display = 'inline-block';
+      });
+
+      updateCompleteness();
+    }
+
     // Input section collapse function
     function toggleInputSection() {
       const content = document.getElementById('inputFormContent');
       const icon = document.getElementById('inputCollapseIcon');
+      const stickyBar = document.getElementById('stickyBottomBar');
 
       if (content.style.display === 'none') {
         content.style.display = 'block';
         icon.classList.add('open');
+        stickyBar.classList.add('show');
       } else {
         content.style.display = 'none';
         icon.classList.remove('open');
+        stickyBar.classList.remove('show');
       }
     }
 
@@ -1401,25 +1745,54 @@
         notes: getValue('notes')
       };
 
-      // Collect slider values
+      // Collect slider values with unset/set state handling
       config.sliders.forEach(s => {
-        entry[s.id] = getValue(s.id);
+        const state = sliderStates[s.id];
+        if (state && state.isSet) {
+          // Save actual value (including 0) for set sliders
+          entry[s.id] = state.value;
+        } else {
+          // Save empty string for unset sliders (becomes gap in charts)
+          entry[s.id] = '';
+        }
       });
 
-      // Collect field values
-      config.fields.forEach(f => {
+      // Collect symptom values
+      ['cramps', 'palps'].forEach(symptomId => {
+        const selectedBtn = document.querySelector(`.severity-btn[data-symptom="${symptomId}"].selected`);
+        if (selectedBtn) {
+          const level = selectedBtn.dataset.level;
+          entry[symptomId] = level;
+
+          // Include context if not "None"
+          if (level !== 'None') {
+            const contextInput = document.getElementById(`${symptomId}-context`);
+            if (contextInput && contextInput.value.trim()) {
+              entry[`${symptomId}-context`] = contextInput.value.trim();
+            }
+          }
+        }
+      });
+
+      // Collect non-symptom field values (excluding old cramps/palps if they exist)
+      config.fields.filter(f => f.id !== 'cramps' && f.id !== 'palps').forEach(f => {
         entry[f.id] = getValue(f.id);
       });
 
       let entries = loadEntries();
       const idx = entries.findIndex(e => e.date === date);
+
+      // Calculate completeness for status message
+      const rated = config.sliders.filter(s => sliderStates[s.id].isSet).length;
+      const total = config.sliders.length;
+
       if (idx >= 0) {
         entries[idx] = entry;
-        showStatus(`Updated entry for ${date}.`, 'success');
+        showStatus(`✅ Updated ${date} • Rated: ${rated}/${total}`, 'success');
       } else {
         entries.push(entry);
         entries.sort((a, b) => a.date.localeCompare(b.date));
-        showStatus(`Saved entry for ${date}.`, 'success');
+        showStatus(`✅ Saved ${date} • Rated: ${rated}/${total}`, 'success');
       }
 
       saveEntries(entries);
@@ -2110,12 +2483,20 @@
       showStatus('✨ Tracker updated! Your customizations have been preserved.', 'success');
     }
 
-    // Collapse input section if there are existing entries
+    // Collapse input section if there are existing entries, show sticky bar if open
     const entries = loadEntries();
+    const stickyBar = document.getElementById('stickyBottomBar');
     if (entries.length > 0) {
       document.getElementById('inputFormContent').style.display = 'none';
       document.getElementById('inputCollapseIcon').classList.remove('open');
+      stickyBar.classList.remove('show');
+    } else {
+      // Show sticky bar on initial load if input section is open
+      stickyBar.classList.add('show');
     }
+
+    // Update completeness indicator on load
+    updateCompleteness();
   </script>
 </body>
 </html>
