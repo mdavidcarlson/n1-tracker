@@ -194,10 +194,15 @@
       right: 0;
       height: 6px;
       transform: translateY(-50%);
-      background: linear-gradient(to right, #ff6b6b 0%, #e5e5e5 50%, #51cf66 100%);
+      background: linear-gradient(to right, #e89393 0%, #f0f0f0 50%, #93c5b5 100%);
       border-radius: 3px;
       pointer-events: none;
       z-index: 0;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .slider-group.set .slider-gradient-bg {
+      opacity: 1;
     }
     .slider-track-wrapper input[type="range"] {
       position: relative;
