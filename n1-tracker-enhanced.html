@@ -146,7 +146,7 @@
     input[type="range"]::-webkit-slider-track {
       width: 100%;
       height: 6px;
-      background: linear-gradient(to right, #ff6b6b 0%, #e5e5e5 50%, #51cf66 100%) !important;
+      background: transparent;
       border-radius: 3px;
     }
     input[type="range"]::-webkit-slider-thumb {
@@ -163,7 +163,7 @@
     input[type="range"]::-moz-range-track {
       width: 100%;
       height: 6px;
-      background: linear-gradient(to right, #ff6b6b 0%, #e5e5e5 50%, #51cf66 100%) !important;
+      background: transparent;
       border-radius: 3px;
     }
     input[type="range"]::-moz-range-thumb {
@@ -182,6 +182,26 @@
     .slider-group.unset input[type="range"]::-moz-range-thumb {
       border-color: #ccc;
       opacity: 0.5;
+    }
+    .slider-track-wrapper {
+      position: relative;
+      margin: 0.5rem 0;
+    }
+    .slider-gradient-bg {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 6px;
+      transform: translateY(-50%);
+      background: linear-gradient(to right, #ff6b6b 0%, #e5e5e5 50%, #51cf66 100%);
+      border-radius: 3px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .slider-track-wrapper input[type="range"] {
+      position: relative;
+      z-index: 1;
     }
     .spectrum-legend {
       background: #f0f7ff;
@@ -1208,7 +1228,10 @@
             <span style="font-size: 0.85rem; color: #999;">${slider.left}</span>
             <span style="font-size: 0.85rem; color: #999;">${slider.right}</span>
           </div>
-          <input type="range" id="${slider.id}" min="-5" max="5" value="0" step="1">
+          <div class="slider-track-wrapper">
+            <div class="slider-gradient-bg"></div>
+            <input type="range" id="${slider.id}" min="-5" max="5" value="0" step="1">
+          </div>
           <div class="spectrum-ticks">
             <span>–5</span>
             <span>0</span>
