@@ -146,7 +146,7 @@
     input[type="range"]::-webkit-slider-track {
       width: 100%;
       height: 6px;
-      background: #e5e5e5;
+      background: linear-gradient(to right, rgba(220, 120, 120, 0.35) 0%, #e5e5e5 50%, rgba(120, 180, 140, 0.35) 100%);
       border-radius: 3px;
     }
     input[type="range"]::-webkit-slider-thumb {
@@ -163,7 +163,7 @@
     input[type="range"]::-moz-range-track {
       width: 100%;
       height: 6px;
-      background: #e5e5e5;
+      background: linear-gradient(to right, rgba(220, 120, 120, 0.35) 0%, #e5e5e5 50%, rgba(120, 180, 140, 0.35) 100%);
       border-radius: 3px;
     }
     input[type="range"]::-moz-range-thumb {
@@ -182,35 +182,6 @@
     .slider-group.unset input[type="range"]::-moz-range-thumb {
       border-color: #ccc;
       opacity: 0.5;
-    }
-    /* Color scale for slider tracks based on value */
-    .slider-group.val-neg-strong input[type="range"]::-webkit-slider-track,
-    .slider-group.val-neg-strong input[type="range"]::-moz-range-track {
-      background: rgba(220, 120, 120, 0.4);
-    }
-    .slider-group.val-neg-moderate input[type="range"]::-webkit-slider-track,
-    .slider-group.val-neg-moderate input[type="range"]::-moz-range-track {
-      background: rgba(220, 120, 120, 0.25);
-    }
-    .slider-group.val-neg-slight input[type="range"]::-webkit-slider-track,
-    .slider-group.val-neg-slight input[type="range"]::-moz-range-track {
-      background: rgba(220, 120, 120, 0.15);
-    }
-    .slider-group.val-neutral input[type="range"]::-webkit-slider-track,
-    .slider-group.val-neutral input[type="range"]::-moz-range-track {
-      background: #e5e5e5;
-    }
-    .slider-group.val-pos-slight input[type="range"]::-webkit-slider-track,
-    .slider-group.val-pos-slight input[type="range"]::-moz-range-track {
-      background: rgba(120, 180, 140, 0.15);
-    }
-    .slider-group.val-pos-moderate input[type="range"]::-webkit-slider-track,
-    .slider-group.val-pos-moderate input[type="range"]::-moz-range-track {
-      background: rgba(120, 180, 140, 0.25);
-    }
-    .slider-group.val-pos-strong input[type="range"]::-webkit-slider-track,
-    .slider-group.val-pos-strong input[type="range"]::-moz-range-track {
-      background: rgba(120, 180, 140, 0.4);
     }
     .spectrum-legend {
       background: #f0f7ff;
@@ -1198,18 +1169,6 @@
     // Track slider states (unset vs set)
     const sliderStates = {};
 
-    // Helper function to get color class based on spectrum value
-    function getValueColorClass(val) {
-      if (val <= -4) return 'val-neg-strong';
-      if (val <= -2) return 'val-neg-moderate';
-      if (val === -1) return 'val-neg-slight';
-      if (val === 0) return 'val-neutral';
-      if (val === 1) return 'val-pos-slight';
-      if (val >= 4) return 'val-pos-strong';
-      if (val >= 2) return 'val-pos-moderate';
-      return 'val-neutral';
-    }
-
     function renderTracker() {
       console.log('🎨 Rendering tracker...');
 
@@ -1282,11 +1241,6 @@
           } else {
             valueChip.textContent = val;
           }
-
-          // Apply color class based on value
-          const colorClasses = ['val-neg-strong', 'val-neg-moderate', 'val-neg-slight', 'val-neutral', 'val-pos-slight', 'val-pos-moderate', 'val-pos-strong'];
-          colorClasses.forEach(cls => group.classList.remove(cls));
-          group.classList.add(getValueColorClass(val));
 
           updateCompleteness();
         });
@@ -1620,10 +1574,6 @@
       const input = document.getElementById(sliderId);
       const valueChip = document.getElementById(`val-${sliderId}`);
       const clearBtn = document.getElementById(`clear-${sliderId}`);
-
-      // Remove all color classes
-      const colorClasses = ['val-neg-strong', 'val-neg-moderate', 'val-neg-slight', 'val-neutral', 'val-pos-slight', 'val-pos-moderate', 'val-pos-strong'];
-      colorClasses.forEach(cls => group.classList.remove(cls));
 
       group.classList.remove('set');
       group.classList.add('unset');
