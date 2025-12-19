@@ -198,11 +198,8 @@
       border-radius: 3px;
       pointer-events: none;
       z-index: 0;
-      opacity: 0;
+      opacity: 0.1;
       transition: opacity 0.3s ease;
-    }
-    .slider-group.unset .slider-gradient-bg {
-      opacity: 0 !important;
     }
     .slider-group.set .slider-gradient-bg {
       opacity: 1;
@@ -416,6 +413,26 @@
       border: 1px solid #ddd;
       margin-top: 0.5rem;
       border-radius: 4px;
+      -webkit-overflow-scrolling: touch;
+    }
+    @media (max-width: 768px) {
+      .table-container {
+        font-size: 0.75rem;
+      }
+      .table-container table {
+        min-width: 600px;
+      }
+      .table-container::after {
+        content: '← Scroll to see more →';
+        display: block;
+        text-align: center;
+        padding: 0.5rem;
+        background: #f0f7ff;
+        color: #0066cc;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border-top: 1px solid #ddd;
+      }
     }
     .modal {
       display: none;
@@ -454,6 +471,36 @@
     .modal-header h2 {
       margin: 0;
       border: none;
+    }
+    .settings-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #eee;
+    }
+    .settings-tab {
+      padding: 0.75rem 1rem;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      font-weight: 600;
+      color: #666;
+      transition: all 0.2s;
+    }
+    .settings-tab:hover {
+      color: #0066cc;
+      background: #f0f7ff;
+    }
+    .settings-tab.active {
+      color: #0066cc;
+      border-bottom-color: #0066cc;
+    }
+    .settings-tab-content {
+      display: none;
+    }
+    .settings-tab-content.active {
+      display: block;
     }
     .close-btn {
       font-size: 1.5rem;
@@ -917,107 +964,67 @@
         <button class="close-btn" onclick="closeSettings()">×</button>
       </div>
 
-      <!-- Data Management Section -->
-      <div style="margin-bottom: 2rem; padding: 1rem; background: #f9f9f9; border-radius: 6px;">
-        <h3 style="margin-top: 0;">📦 Data Management</h3>
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
-
-          <div>
-            <button onclick="exportCsv(); closeSettings();" style="width: 100%; padding: 0.75rem;">📥 Export Data (CSV)</button>
-            <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
-              Download all saved entries as CSV for backup or analysis in Excel/Sheets.
-            </small>
-          </div>
-
-          <div>
-            <button onclick="document.getElementById('csvFileInput').click();" style="width: 100%; padding: 0.75rem;">📤 Import Data (CSV)</button>
-            <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
-              Restore previously exported entries or merge data from another device.
-            </small>
-          </div>
-
-          <div>
-            <button onclick="exportConfig();" style="width: 100%; padding: 0.75rem;">📋 Export Settings Template</button>
-            <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
-              Download a JSON template of your sliders, fields, phases, and milestones.
-            </small>
-          </div>
-
-          <div>
-            <button onclick="document.getElementById('configFileInput').click();" style="width: 100%; padding: 0.75rem;">📋 Import Settings Template</button>
-            <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
-              Load a JSON settings template (sliders, fields, phases). Existing entries are not changed.
-            </small>
-          </div>
-
-          <div style="border-top: 2px solid #ddd; padding-top: 1rem; margin-top: 0.5rem;">
-            <button onclick="resetToDefault()" style="width: 100%; padding: 0.75rem; background: #ffc107; border-color: #ffc107;">🔄 Reset Settings to Default</button>
-            <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
-              Restore the default tracker layout (sliders, fields, phases). Saved entries stay.
-            </small>
-          </div>
-
-          <div>
-            <button onclick="clearAllData()" class="danger" style="width: 100%; padding: 0.75rem;">🗑️ Clear All Data</button>
-            <small style="display: block; color: #dc3545; margin-top: 0.25rem; font-style: italic; font-weight: 600;">
-              Delete all saved entries from this browser. Settings and exported files are not affected.
-            </small>
-          </div>
-        </div>
+      <!-- Tab Navigation -->
+      <div class="settings-tabs">
+        <button class="settings-tab active" onclick="switchSettingsTab('general')">General</button>
+        <button class="settings-tab" onclick="switchSettingsTab('tracking')">Tracking Setup</button>
+        <button class="settings-tab" onclick="switchSettingsTab('data')">Data</button>
       </div>
 
-      <!-- Customization Section -->
-      <div style="margin-bottom: 1rem;">
-        <h3>🎨 Customize Tracker</h3>
-        <label><strong>Tracker Title</strong></label>
-        <input type="text" id="configTitle" placeholder="N=1 Daily Tracker" style="width:100%;">
-      </div>
-
-      <!-- Experiment Configuration -->
-      <div style="margin-bottom: 2rem; padding: 1rem; background: #f0f7ff; border-radius: 6px; border-left: 4px solid #0066cc;">
-        <h3 style="margin-top: 0;">🎯 Experiment Progress Tracker</h3>
-
-        <p style="font-size: 0.9rem; color: #666; margin: 0 0 1rem 0;">
-          Optional: turn this on if you want a visual progress bar for a 30/60/90-day experiment.
-        </p>
-
-        <div style="margin-bottom: 1rem;">
-          <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-            <input type="checkbox" id="experimentEnabled" style="width: auto;">
-            <strong>Enable Progress Tracker</strong>
-          </label>
-          <small style="color: #666; display: block; margin-top: 0.25rem;">Show visual progress bar with phases and milestones</small>
+      <!-- General Tab -->
+      <div class="settings-tab-content active" id="settingsTabGeneral">
+        <!-- Customization Section -->
+        <div style="margin-bottom: 1.5rem;">
+          <h3>🎨 Customize Tracker</h3>
+          <label><strong>Tracker Title</strong></label>
+          <input type="text" id="configTitle" placeholder="N=1 Daily Tracker" style="width:100%;">
         </div>
 
-        <div id="experimentConfig" style="margin-top: 1rem;">
+        <!-- Experiment Configuration -->
+        <div style="margin-bottom: 2rem; padding: 1rem; background: #f0f7ff; border-radius: 6px; border-left: 4px solid #0066cc;">
+          <h3 style="margin-top: 0;">🎯 Experiment Progress Tracker</h3>
+
+          <p style="font-size: 0.9rem; color: #666; margin: 0 0 1rem 0;">
+            Optional: turn this on if you want a visual progress bar for a 30/60/90-day experiment.
+          </p>
+
           <div style="margin-bottom: 1rem;">
-            <label><strong>Experiment Goal</strong></label>
-            <input type="text" id="experimentGoal" placeholder="90-Day Carnivore Reset" style="width:100%;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="checkbox" id="experimentEnabled" style="width: auto;">
+              <strong>Enable Progress Tracker</strong>
+            </label>
+            <small style="color: #666; display: block; margin-top: 0.25rem;">Show visual progress bar with phases and milestones</small>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
-            <div>
-              <label><strong>Start Date</strong></label>
-              <input type="date" id="experimentStart" style="width:100%;">
+          <div id="experimentConfig" style="margin-top: 1rem;">
+            <div style="margin-bottom: 1rem;">
+              <label><strong>Experiment Goal</strong></label>
+              <input type="text" id="experimentGoal" placeholder="90-Day Carnivore Reset" style="width:100%;">
             </div>
-            <div>
-              <label><strong>End Date</strong></label>
-              <input type="date" id="experimentEnd" style="width:100%;">
-            </div>
-          </div>
 
-          <div style="background: #fff3cd; border: 1px solid #ffc107; padding: 0.75rem; border-radius: 4px; margin-top: 1rem;">
-            <div style="font-weight: 600; color: #856404; margin-bottom: 0.5rem;">📝 How to Edit Phases & Milestones:</div>
-            <ol style="margin: 0; padding-left: 1.5rem; font-size: 0.85rem; color: #666;">
-              <li>Click "📋 Export Settings Template" above</li>
-              <li>Open the downloaded JSON file in any text editor</li>
-              <li>Find the "experiment" section with "phases" and "milestones" arrays</li>
-              <li>Edit phase names, day ranges, colors, and milestone icons/labels</li>
-              <li>Save the file and click "📋 Import Settings Template"</li>
-            </ol>
-            <details style="margin-top: 0.5rem;">
-              <summary style="cursor: pointer; font-size: 0.8rem; color: #0066cc;">Show JSON structure example</summary>
-              <pre style="background: white; padding: 0.5rem; border-radius: 4px; font-size: 0.7rem; overflow-x: auto; margin-top: 0.5rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+              <div>
+                <label><strong>Start Date</strong></label>
+                <input type="date" id="experimentStart" style="width:100%;">
+              </div>
+              <div>
+                <label><strong>End Date</strong></label>
+                <input type="date" id="experimentEnd" style="width:100%;">
+              </div>
+            </div>
+
+            <details style="background: #fff3cd; border: 1px solid #ffc107; padding: 0.75rem; border-radius: 4px; margin-top: 1rem;">
+              <summary style="cursor: pointer; font-weight: 600; color: #856404;">📝 How to Edit Phases & Milestones</summary>
+              <ol style="margin: 0.75rem 0 0 1.5rem; padding: 0; font-size: 0.85rem; color: #666;">
+                <li style="margin-bottom: 0.25rem;">Click "📋 Export Settings Template" in the Data tab</li>
+                <li style="margin-bottom: 0.25rem;">Open the downloaded JSON file in any text editor</li>
+                <li style="margin-bottom: 0.25rem;">Find the "experiment" section with "phases" and "milestones" arrays</li>
+                <li style="margin-bottom: 0.25rem;">Edit phase names, day ranges, colors, and milestone icons/labels</li>
+                <li style="margin-bottom: 0.25rem;">Save the file and click "📋 Import Settings Template" in the Data tab</li>
+              </ol>
+              <details style="margin-top: 0.75rem;">
+                <summary style="cursor: pointer; font-size: 0.8rem; color: #0066cc;">Show JSON structure example</summary>
+                <pre style="background: white; padding: 0.5rem; border-radius: 4px; font-size: 0.7rem; overflow-x: auto; margin-top: 0.5rem;">
 "phases": [
   { "name": "Adaptation", "endDay": 42, "color": "#ffc107", "message": "..." },
   { "name": "Optimization", "endDay": 70, "color": "#28a745", "message": "..." }
@@ -1026,24 +1033,79 @@
   { "day": 1, "label": "Start!", "icon": "🎬" },
   { "day": 42, "label": "Adapted!", "icon": "💪" }
 ]</pre>
+              </details>
             </details>
           </div>
         </div>
       </div>
 
-      <h3>Slider Metrics (−5 to +5)</h3>
-      <p style="font-size: 0.9rem; color: #666; margin: 0 0 1rem 0;">
-        –5 = top anchor, 0 = in between, +5 = bottom anchor. Only move a slider if you want to track it that day.
-      </p>
-      <div id="sliderConfig"></div>
-      <button onclick="addSlider()" style="margin-bottom:1rem;">+ Add Slider</button>
+      <!-- Tracking Setup Tab -->
+      <div class="settings-tab-content" id="settingsTabTracking">
+        <h3>Slider Metrics (−5 to +5)</h3>
+        <p style="font-size: 0.9rem; color: #666; margin: 0 0 1rem 0;">
+          –5 = top anchor, 0 = in between, +5 = bottom anchor. Only move a slider if you want to track it that day.
+        </p>
+        <div id="sliderConfig"></div>
+        <button onclick="addSlider()" style="margin-bottom:1.5rem;">+ Add Slider</button>
 
-      <h3>Additional Fields (Optional)</h3>
-      <p style="font-size: 0.9rem; color: #666; margin: 0 0 1rem 0;">
-        Additional fields become extra columns in your log (for things like cramps, palpitations, off-plan, ketones). Use "Choice" for buttons, "Text" for notes, and "Number" for numeric values.
-      </p>
-      <div id="fieldConfig"></div>
-      <button onclick="addField()" style="margin-bottom:1rem;">+ Add Field</button>
+        <h3>Additional Fields (Optional)</h3>
+        <p style="font-size: 0.9rem; color: #666; margin: 0 0 1rem 0;">
+          Additional fields become extra columns in your log (for things like cramps, palpitations, off-plan, ketones). Use "Choice" for buttons, "Text" for notes, and "Number" for numeric values.
+        </p>
+        <div id="fieldConfig"></div>
+        <button onclick="addField()" style="margin-bottom:1rem;">+ Add Field</button>
+      </div>
+
+      <!-- Data Tab -->
+      <div class="settings-tab-content" id="settingsTabData">
+        <div style="margin-bottom: 2rem; padding: 1rem; background: #f9f9f9; border-radius: 6px;">
+          <h3 style="margin-top: 0;">📦 Data Management</h3>
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+
+            <div>
+              <button onclick="exportCsv(); closeSettings();" style="width: 100%; padding: 0.75rem;">📥 Export Data (CSV)</button>
+              <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
+                Download all saved entries as CSV for backup or analysis in Excel/Sheets.
+              </small>
+            </div>
+
+            <div>
+              <button onclick="document.getElementById('csvFileInput').click();" style="width: 100%; padding: 0.75rem;">📤 Import Data (CSV)</button>
+              <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
+                Restore previously exported entries or merge data from another device.
+              </small>
+            </div>
+
+            <div>
+              <button onclick="exportConfig();" style="width: 100%; padding: 0.75rem;">📋 Export Settings Template</button>
+              <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
+                Download a JSON template of your sliders, fields, phases, and milestones.
+              </small>
+            </div>
+
+            <div>
+              <button onclick="document.getElementById('configFileInput').click();" style="width: 100%; padding: 0.75rem;">📋 Import Settings Template</button>
+              <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
+                Load a JSON settings template (sliders, fields, phases). Existing entries are not changed.
+              </small>
+            </div>
+
+            <div style="border-top: 2px solid #ddd; padding-top: 1rem; margin-top: 0.5rem;">
+              <button onclick="resetToDefault()" style="width: 100%; padding: 0.75rem; background: #ffc107; border-color: #ffc107;">🔄 Reset Settings to Default</button>
+              <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
+                Restore the default tracker layout (sliders, fields, phases). Saved entries stay.
+              </small>
+            </div>
+
+            <div>
+              <button onclick="clearAllData()" class="danger" style="width: 100%; padding: 0.75rem;">🗑️ Clear All Data</button>
+              <small style="display: block; color: #dc3545; margin-top: 0.25rem; font-style: italic; font-weight: 600;">
+                Delete all saved entries from this browser. Settings and exported files are not affected.
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="buttons">
         <button onclick="saveConfig()" class="primary">Save Settings</button>
@@ -2085,6 +2147,20 @@
 
     function closeSettings() {
       document.getElementById('settingsModal').classList.remove('show');
+    }
+
+    function switchSettingsTab(tabName) {
+      // Update tab buttons
+      document.querySelectorAll('.settings-tab').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+
+      // Update tab content
+      document.querySelectorAll('.settings-tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      document.getElementById('settingsTab' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active');
     }
 
     // Trends rendering (in tab)
