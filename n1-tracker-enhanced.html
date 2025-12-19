@@ -839,10 +839,7 @@
   <div id="stickyBottomBar" class="sticky-bottom-bar">
     <div class="bottom-bar-content">
       <span class="completeness" id="completenessIndicator">Rated: 0/0</span>
-      <button onclick="setAllNeutral()" style="flex: 1; padding: 12px; font-size: 0.9rem; border: 1px solid #0066cc; background: white; color: #0066cc;">
-        Set All Neutral (0)
-      </button>
-      <button id="saveDay" type="button" class="primary" style="flex: 2; padding: 12px; font-size: 1rem; font-weight: bold;">
+      <button id="saveDay" type="button" class="primary" style="flex: 1; padding: 14px; font-size: 1rem; font-weight: bold;">
         💾 Save Day
       </button>
     </div>
@@ -917,42 +914,42 @@
           <div>
             <button onclick="exportCsv(); closeSettings();" style="width: 100%; padding: 0.75rem;">📥 Export Data (CSV)</button>
             <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
-              Download all your daily entries as a CSV file for backup or analysis in Excel/Sheets
+              Download all saved entries as CSV for backup or analysis in Excel/Sheets.
             </small>
           </div>
 
           <div>
             <button onclick="document.getElementById('csvFileInput').click();" style="width: 100%; padding: 0.75rem;">📤 Import Data (CSV)</button>
             <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
-              Restore previously exported entries or merge data from another device
+              Restore previously exported entries or merge data from another device.
             </small>
           </div>
 
           <div>
             <button onclick="exportConfig();" style="width: 100%; padding: 0.75rem;">📋 Export Settings Template</button>
             <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
-              Save your tracker configuration (sliders, fields, phases, milestones) to share or backup
+              Download a JSON template of your sliders, fields, phases, and milestones.
             </small>
           </div>
 
           <div>
             <button onclick="document.getElementById('configFileInput').click();" style="width: 100%; padding: 0.75rem;">📋 Import Settings Template</button>
             <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
-              Load a tracker configuration from a template (won't affect your data)
+              Load a JSON settings template (sliders, fields, phases). Existing entries are not changed.
             </small>
           </div>
 
           <div style="border-top: 2px solid #ddd; padding-top: 1rem; margin-top: 0.5rem;">
             <button onclick="resetToDefault()" style="width: 100%; padding: 0.75rem; background: #ffc107; border-color: #ffc107;">🔄 Reset Settings to Default</button>
             <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
-              Restore default tracker configuration (sliders, fields, etc.). Your saved entries are NOT affected.
+              Restore the default tracker layout (sliders, fields, phases). Saved entries stay.
             </small>
           </div>
 
           <div>
             <button onclick="clearAllData()" class="danger" style="width: 100%; padding: 0.75rem;">🗑️ Clear All Data</button>
             <small style="display: block; color: #dc3545; margin-top: 0.25rem; font-style: italic; font-weight: 600;">
-              ⚠️ DELETES all saved entries permanently. Export a backup first! (Settings are not affected)
+              Delete all saved entries from this browser. Settings and exported files are not affected.
             </small>
           </div>
         </div>
@@ -968,6 +965,10 @@
       <!-- Experiment Configuration -->
       <div style="margin-bottom: 2rem; padding: 1rem; background: #f0f7ff; border-radius: 6px; border-left: 4px solid #0066cc;">
         <h3 style="margin-top: 0;">🎯 Experiment Progress Tracker</h3>
+
+        <p style="font-size: 0.9rem; color: #666; margin: 0 0 1rem 0;">
+          Optional: turn this on if you want a visual progress bar for a 30/60/90-day experiment.
+        </p>
 
         <div style="margin-bottom: 1rem;">
           <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
@@ -1020,10 +1021,16 @@
       </div>
 
       <h3>Slider Metrics (−5 to +5)</h3>
+      <p style="font-size: 0.9rem; color: #666; margin: 0 0 1rem 0;">
+        –5 = top anchor, 0 = in between, +5 = bottom anchor. Only move a slider if you want to track it that day.
+      </p>
       <div id="sliderConfig"></div>
       <button onclick="addSlider()" style="margin-bottom:1rem;">+ Add Slider</button>
 
-      <h3>Additional Fields</h3>
+      <h3>Additional Fields (Optional)</h3>
+      <p style="font-size: 0.9rem; color: #666; margin: 0 0 1rem 0;">
+        Additional fields become extra columns in your log (for things like cramps, palpitations, off-plan, ketones). Use "Choice" for buttons, "Text" for notes, and "Number" for numeric values.
+      </p>
       <div id="fieldConfig"></div>
       <button onclick="addField()" style="margin-bottom:1rem;">+ Add Field</button>
 
@@ -2405,9 +2412,12 @@
         div.className = 'config-item';
         div.innerHTML = `
           <label>Slider ${idx + 1}</label>
-          <input type="text" placeholder="Label" value="${slider.label}" data-idx="${idx}" data-field="label">
-          <input type="text" placeholder="Left label" value="${slider.left}" data-idx="${idx}" data-field="left">
-          <input type="text" placeholder="Right label" value="${slider.right}" data-idx="${idx}" data-field="right">
+          <input type="text" placeholder="Mental Clarity" value="${slider.label}" data-idx="${idx}" data-field="label">
+          <small style="display: block; color: #999; margin: 0.25rem 0 0.5rem 0;">Slider name</small>
+          <input type="text" placeholder="Brain fog" value="${slider.left}" data-idx="${idx}" data-field="left">
+          <small style="display: block; color: #999; margin: 0.25rem 0 0.5rem 0;">Top anchor (–5 side)</small>
+          <input type="text" placeholder="Clear-headed" value="${slider.right}" data-idx="${idx}" data-field="right">
+          <small style="display: block; color: #999; margin: 0.25rem 0 0.5rem 0;">Bottom anchor (+5 side)</small>
           <button onclick="removeSlider(${idx})" class="danger" style="margin-top:0.5rem;">Remove</button>
         `;
         sliderConfig.appendChild(div);
@@ -2420,26 +2430,30 @@
         const div = document.createElement('div');
         div.className = 'config-item';
 
-        let optionsHtml = '';
-        if (field.type === 'select') {
-          optionsHtml = `
-            <label>Options (comma-separated)</label>
-            <input type="text" placeholder="—, None, Mild, Severe" value="${field.options.join(', ')}" data-idx="${idx}" data-field="options">
-          `;
-        }
-
         div.innerHTML = `
           <label>Field ${idx + 1}</label>
-          <input type="text" placeholder="Label" value="${field.label}" data-idx="${idx}" data-field="label">
-          <select data-idx="${idx}" data-field="type">
+          <input type="text" placeholder="Muscle Cramps" value="${field.label}" data-idx="${idx}" data-field="label">
+          <small style="display: block; color: #999; margin: 0.25rem 0 0.5rem 0;">Field label</small>
+          <select data-idx="${idx}" data-field="type" id="fieldType${idx}">
+            <option value="select" ${field.type === 'select' ? 'selected' : ''}>Choice</option>
             <option value="text" ${field.type === 'text' ? 'selected' : ''}>Text</option>
             <option value="number" ${field.type === 'number' ? 'selected' : ''}>Number</option>
-            <option value="select" ${field.type === 'select' ? 'selected' : ''}>Dropdown</option>
           </select>
-          ${optionsHtml}
+          <small style="display: block; color: #999; margin: 0.25rem 0 0.5rem 0;">Field type</small>
+          <div id="choicesContainer${idx}" style="${field.type === 'select' ? '' : 'display: none;'}">
+            <input type="text" placeholder="None, Mild, Wakes-me-up" value="${field.type === 'select' ? field.options.join(', ') : ''}" data-idx="${idx}" data-field="options">
+            <small style="display: block; color: #999; margin: 0.25rem 0 0.5rem 0;">Choices (comma-separated)</small>
+          </div>
           <button onclick="removeField(${idx})" class="danger" style="margin-top:0.5rem;">Remove</button>
         `;
         fieldConfig.appendChild(div);
+
+        // Add event listener to show/hide choices based on type
+        const typeSelect = div.querySelector(`#fieldType${idx}`);
+        const choicesContainer = div.querySelector(`#choicesContainer${idx}`);
+        typeSelect.addEventListener('change', function() {
+          choicesContainer.style.display = this.value === 'select' ? 'block' : 'none';
+        });
       });
     }
 
