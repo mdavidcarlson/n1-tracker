@@ -1601,6 +1601,10 @@
       });
       document.getElementById('content' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active');
 
+      // Hide sticky Save Day button when viewing data tabs
+      const stickyBar = document.getElementById('stickyBottomBar');
+      stickyBar.classList.remove('show');
+
       // Render appropriate content
       if (tabName === 'cards') {
         renderCards();
@@ -1697,7 +1701,7 @@
 
         let html = `
           <div class="entry-card-header">
-            <div class="entry-card-date">${entry.date}</div>
+            <div class="entry-card-date">${formatDateReadable(entry.date)}</div>
             <div class="entry-card-day">Day ${entry.day || '—'}</div>
           </div>
         `;
@@ -2215,10 +2219,27 @@
 
       const range = globalMax - globalMin || 1;
 
+      // Generate legend first
+      let legendHtml = `
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; margin-bottom: 1.5rem; padding: 1rem; background: #f8f9fa; border-radius: 6px;">
+      `;
+
+      metricsData.forEach(metric => {
+        legendHtml += `
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <div style="width: 20px; height: 3px; background: ${metric.color};"></div>
+            <span style="font-size: 0.85rem; color: #555; font-weight: 600;">${metric.label}</span>
+          </div>
+        `;
+      });
+
+      legendHtml += `</div>`;
+
       // Generate SVG
       let svg = `
         <div style="background: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
           <h3 style="margin-top: 0; color: #0066cc; text-align: center;">All Metrics Over Time</h3>
+          ${legendHtml}
           <svg width="100%" viewBox="0 0 ${width} ${height}" style="max-width: 700px; display: block; margin: 0 auto;">
             <!-- Grid lines -->
             <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${padding + chartHeight}" stroke="#ddd" stroke-width="1"/>
@@ -2228,13 +2249,20 @@
             ${globalMin < 0 && globalMax > 0 ? `<line x1="${padding}" y1="${padding + chartHeight - ((-globalMin) / range) * chartHeight}" x2="${padding + chartWidth}" y2="${padding + chartHeight - ((-globalMin) / range) * chartHeight}" stroke="#999" stroke-width="1" stroke-dasharray="4"/>` : ''}
 
             <!-- Y-axis labels -->
-            <text x="${padding - 10}" y="${padding}" font-size="12" fill="#666" text-anchor="end">${globalMax}</text>
-            <text x="${padding - 10}" y="${padding + chartHeight}" font-size="12" fill="#666" text-anchor="end">${globalMin}</text>
-            <text x="${padding - 10}" y="${padding + chartHeight / 2}" font-size="12" fill="#666" text-anchor="end">${((globalMax + globalMin) / 2).toFixed(1)}</text>
+            <text x="${padding - 10}" y="${padding}" font-size="12" fill="#666" text-anchor="end" font-weight="600">${globalMax}</text>
+            <text x="${padding - 10}" y="${padding + chartHeight}" font-size="12" fill="#666" text-anchor="end" font-weight="600">${globalMin}</text>
+            <text x="${padding - 10}" y="${padding + chartHeight / 2}" font-size="12" fill="#666" text-anchor="end" font-weight="600">${((globalMax + globalMin) / 2).toFixed(1)}</text>
 
-            <!-- X-axis labels -->
-            <text x="${padding}" y="${height - 5}" font-size="11" fill="#666">${sorted[0].date}</text>
-            <text x="${padding + chartWidth}" y="${height - 5}" font-size="11" fill="#666" text-anchor="end">${sorted[sorted.length - 1].date}</text>
+            <!-- Y-axis title -->
+            <text x="${padding - 45}" y="${padding + chartHeight / 2}" font-size="12" fill="#333" font-weight="700" text-anchor="middle" transform="rotate(-90, ${padding - 45}, ${padding + chartHeight / 2})">Score</text>
+
+            <!-- X-axis labels with dates -->
+            <text x="${padding}" y="${height - 10}" font-size="11" fill="#666" font-weight="600">${sorted[0].date.substring(5)}</text>
+            ${sorted.length > 2 ? `<text x="${padding + chartWidth / 2}" y="${height - 10}" font-size="11" fill="#666" font-weight="600" text-anchor="middle">${sorted[Math.floor(sorted.length / 2)].date.substring(5)}</text>` : ''}
+            <text x="${padding + chartWidth}" y="${height - 10}" font-size="11" fill="#666" font-weight="600" text-anchor="end">${sorted[sorted.length - 1].date.substring(5)}</text>
+
+            <!-- X-axis title -->
+            <text x="${padding + chartWidth / 2}" y="${height - 30}" font-size="12" fill="#333" font-weight="700" text-anchor="middle">Date</text>
       `;
 
       // Plot each metric
@@ -2260,22 +2288,6 @@
 
       svg += `
           </svg>
-
-          <!-- Legend -->
-          <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #eee;">
-      `;
-
-      metricsData.forEach(metric => {
-        svg += `
-          <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <div style="width: 20px; height: 3px; background: ${metric.color};"></div>
-            <span style="font-size: 0.85rem; color: #555;">${metric.label}</span>
-          </div>
-        `;
-      });
-
-      svg += `
-          </div>
         </div>
       `;
 
@@ -2564,6 +2576,13 @@
       return new Date().toISOString().slice(0, 10);
     }
 
+    function formatDateReadable(dateStr) {
+      // Convert YYYY-MM-DD to "Mon DD, YYYY"
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const [year, month, day] = dateStr.split('-');
+      return `${months[parseInt(month) - 1]} ${parseInt(day)}, ${year}`;
+    }
+
     // Initialize
     setToday();
     renderTracker();
@@ -2575,17 +2594,12 @@
       showStatus('✨ Tracker updated! Your customizations have been preserved.', 'success');
     }
 
-    // Collapse input section if there are existing entries, show sticky bar if open
+    // Always auto-expand input section and show sticky bar on page load
     const entries = loadEntries();
     const stickyBar = document.getElementById('stickyBottomBar');
-    if (entries.length > 0) {
-      document.getElementById('inputFormContent').style.display = 'none';
-      document.getElementById('inputCollapseIcon').classList.remove('open');
-      stickyBar.classList.remove('show');
-    } else {
-      // Show sticky bar on initial load if input section is open
-      stickyBar.classList.add('show');
-    }
+    document.getElementById('inputFormContent').style.display = 'block';
+    document.getElementById('inputCollapseIcon').classList.add('open');
+    stickyBar.classList.add('show');
 
     // Update completeness indicator on load
     updateCompleteness();
