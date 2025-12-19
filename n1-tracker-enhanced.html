@@ -1411,7 +1411,7 @@
       showStatus('CSV exported successfully!', 'success');
     }
 
-    document.getElementById('exportCsv').addEventListener('click', exportCsv);
+    // Note: exportCsv button is now in settings modal with inline onclick handler
 
     // Import CSV file handler
     document.getElementById('csvFileInput').addEventListener('change', (e) => {
