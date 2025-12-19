@@ -146,7 +146,7 @@
     input[type="range"]::-webkit-slider-track {
       width: 100%;
       height: 6px;
-      background: linear-gradient(to right, #dc3545 0%, #ffc107 50%, #28a745 100%);
+      background: #e5e5e5;
       border-radius: 3px;
     }
     input[type="range"]::-webkit-slider-thumb {
@@ -163,7 +163,7 @@
     input[type="range"]::-moz-range-track {
       width: 100%;
       height: 6px;
-      background: linear-gradient(to right, #dc3545 0%, #ffc107 50%, #28a745 100%);
+      background: #e5e5e5;
       border-radius: 3px;
     }
     input[type="range"]::-moz-range-thumb {
@@ -182,6 +182,35 @@
     .slider-group.unset input[type="range"]::-moz-range-thumb {
       border-color: #ccc;
       opacity: 0.5;
+    }
+    /* Color scale for slider tracks based on value */
+    .slider-group.val-neg-strong input[type="range"]::-webkit-slider-track,
+    .slider-group.val-neg-strong input[type="range"]::-moz-range-track {
+      background: rgba(220, 120, 120, 0.4);
+    }
+    .slider-group.val-neg-moderate input[type="range"]::-webkit-slider-track,
+    .slider-group.val-neg-moderate input[type="range"]::-moz-range-track {
+      background: rgba(220, 120, 120, 0.25);
+    }
+    .slider-group.val-neg-slight input[type="range"]::-webkit-slider-track,
+    .slider-group.val-neg-slight input[type="range"]::-moz-range-track {
+      background: rgba(220, 120, 120, 0.15);
+    }
+    .slider-group.val-neutral input[type="range"]::-webkit-slider-track,
+    .slider-group.val-neutral input[type="range"]::-moz-range-track {
+      background: #e5e5e5;
+    }
+    .slider-group.val-pos-slight input[type="range"]::-webkit-slider-track,
+    .slider-group.val-pos-slight input[type="range"]::-moz-range-track {
+      background: rgba(120, 180, 140, 0.15);
+    }
+    .slider-group.val-pos-moderate input[type="range"]::-webkit-slider-track,
+    .slider-group.val-pos-moderate input[type="range"]::-moz-range-track {
+      background: rgba(120, 180, 140, 0.25);
+    }
+    .slider-group.val-pos-strong input[type="range"]::-webkit-slider-track,
+    .slider-group.val-pos-strong input[type="range"]::-moz-range-track {
+      background: rgba(120, 180, 140, 0.4);
     }
     .spectrum-legend {
       background: #f0f7ff;
@@ -781,7 +810,8 @@
 
       <h3 style="font-size: 1.1rem; color: #333; margin-top: 2rem; margin-bottom: 0.75rem;">Spectrum Scores (–5 to +5)</h3>
       <div class="spectrum-legend">
-        –5 = left pole • 0 = neutral • +5 = right pole • Untouched = not tracked
+        Each slider runs between its two labels. –5 = the day felt mostly like the top label, +5 = the day felt mostly like the bottom label, 0 = in between.<br>
+        <strong>Only move a slider if you want to track it today</strong>—unmoved sliders are treated as not recorded.
       </div>
       <div id="slidersContainer"></div>
 
@@ -1161,6 +1191,18 @@
     // Track slider states (unset vs set)
     const sliderStates = {};
 
+    // Helper function to get color class based on spectrum value
+    function getValueColorClass(val) {
+      if (val <= -4) return 'val-neg-strong';
+      if (val <= -2) return 'val-neg-moderate';
+      if (val === -1) return 'val-neg-slight';
+      if (val === 0) return 'val-neutral';
+      if (val === 1) return 'val-pos-slight';
+      if (val >= 4) return 'val-pos-strong';
+      if (val >= 2) return 'val-pos-moderate';
+      return 'val-neutral';
+    }
+
     function renderTracker() {
       console.log('🎨 Rendering tracker...');
 
@@ -1192,7 +1234,7 @@
           <div class="slider-header">
             <span class="metric-name">${slider.label}</span>
             <div style="display: flex; align-items: center;">
-              <span class="value-chip" id="val-${slider.id}">—</span>
+              <span class="value-chip" id="val-${slider.id}">Not tracked</span>
               <button class="clear-btn" id="clear-${slider.id}" style="display: none;" onclick="clearSlider('${slider.id}')">Clear</button>
             </div>
           </div>
@@ -1233,6 +1275,11 @@
           } else {
             valueChip.textContent = val;
           }
+
+          // Apply color class based on value
+          const colorClasses = ['val-neg-strong', 'val-neg-moderate', 'val-neg-slight', 'val-neutral', 'val-pos-slight', 'val-pos-moderate', 'val-pos-strong'];
+          colorClasses.forEach(cls => group.classList.remove(cls));
+          group.classList.add(getValueColorClass(val));
 
           updateCompleteness();
         });
@@ -1354,11 +1401,37 @@
         tbody.innerHTML = '';
         entries.forEach(entry => {
           const tr = document.createElement('tr');
-          tr.innerHTML =
-            `<td>${entry.date || ''}</td><td>${entry.day || ''}</td>` +
-            config.sliders.map(s => `<td>${entry[s.id] ?? ''}</td>`).join('') +
-            config.fields.map(f => `<td>${entry[f.id] ?? ''}</td>`).join('') +
-            `<td>${entry.notes || ''}</td>`;
+
+          // Date and Day cells
+          let html = `<td>${entry.date || ''}</td><td>${entry.day || ''}</td>`;
+
+          // Spectrum metric cells with color background
+          config.sliders.forEach(s => {
+            const val = entry[s.id];
+            let bgColor = '';
+            if (val !== '' && val !== null && val !== undefined) {
+              const numVal = parseInt(val);
+              if (numVal < 0) {
+                // Negative values get warm tint
+                const intensity = Math.min(Math.abs(numVal) / 5, 1);
+                bgColor = `background: rgba(220, 120, 120, ${0.15 + intensity * 0.25});`;
+              } else if (numVal > 0) {
+                // Positive values get cool/green tint
+                const intensity = Math.min(numVal / 5, 1);
+                bgColor = `background: rgba(120, 180, 140, ${0.15 + intensity * 0.25});`;
+              } else {
+                // Zero gets neutral gray
+                bgColor = 'background: #f5f5f5;';
+              }
+            }
+            html += `<td style="${bgColor}">${val ?? ''}</td>`;
+          });
+
+          // Other fields and notes
+          html += config.fields.map(f => `<td>${entry[f.id] ?? ''}</td>`).join('');
+          html += `<td>${entry.notes || ''}</td>`;
+
+          tr.innerHTML = html;
           tbody.appendChild(tr);
         });
       }
@@ -1541,10 +1614,14 @@
       const valueChip = document.getElementById(`val-${sliderId}`);
       const clearBtn = document.getElementById(`clear-${sliderId}`);
 
+      // Remove all color classes
+      const colorClasses = ['val-neg-strong', 'val-neg-moderate', 'val-neg-slight', 'val-neutral', 'val-pos-slight', 'val-pos-moderate', 'val-pos-strong'];
+      colorClasses.forEach(cls => group.classList.remove(cls));
+
       group.classList.remove('set');
       group.classList.add('unset');
       input.value = 0;
-      valueChip.textContent = '—';
+      valueChip.textContent = 'Not tracked';
       clearBtn.style.display = 'none';
 
       updateCompleteness();
