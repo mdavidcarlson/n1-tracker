@@ -986,6 +986,20 @@
     </div>
   </div>
 
+  <!-- Save Empty Confirmation Modal -->
+  <div id="saveEmptyModal" class="modal" style="display: none;">
+    <div class="modal-content" style="max-width: 400px;">
+      <div class="modal-header">
+        <h2>Nothing recorded</h2>
+      </div>
+      <p style="margin: 1.5rem 0;">You haven't recorded any signals for today. Save a blank day anyway?</p>
+      <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+        <button onclick="closeSaveEmptyModal()" style="background: #f5f5f5; color: #333;">Cancel</button>
+        <button onclick="confirmSaveEmpty()" class="primary">Save blank</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Settings Modal -->
   <div id="settingsModal" class="modal">
     <div class="modal-content">
@@ -1433,6 +1447,38 @@
         div.querySelector('[data-level="None"]').click();
       });
 
+      // Render Context section
+      const contextContainer = document.getElementById('contextContainer');
+      contextContainer.innerHTML = '';
+
+      const contextDiv = document.createElement('div');
+      contextDiv.style.cssText = 'display: grid; gap: 1rem;';
+      contextDiv.innerHTML = `
+        <div class="row">
+          <label style="display: flex; align-items: center; gap: 0.5rem;">
+            <input type="checkbox" id="electrolytes_taken" style="width: auto;">
+            <span>Electrolytes taken</span>
+          </label>
+        </div>
+        <div class="row">
+          <label for="movement_load">Movement load</label>
+          <select id="movement_load" style="flex: 1;">
+            <option value="none">None</option>
+            <option value="normal">Normal</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <div class="row">
+          <label for="stress_load">Stress load</label>
+          <select id="stress_load" style="flex: 1;">
+            <option value="none">None</option>
+            <option value="moderate">Moderate</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+      `;
+      contextContainer.appendChild(contextDiv);
+
       // Render non-symptom fields in Additional Fields section
       const fieldsContainer = document.getElementById('fieldsContainer');
       fieldsContainer.innerHTML = '';
@@ -1510,8 +1556,12 @@
           config.sliders.forEach(s => {
             const val = entry[s.id];
             let bgColor = '';
+            let displayVal = '—'; // Default for null/undefined
+
             if (val !== '' && val !== null && val !== undefined) {
               const numVal = parseInt(val);
+              displayVal = val; // Show actual value
+
               if (numVal < 0) {
                 // Negative values get warm tint
                 const intensity = Math.min(Math.abs(numVal) / 5, 1);
@@ -1525,12 +1575,23 @@
                 bgColor = 'background: #f5f5f5;';
               }
             }
-            html += `<td style="${bgColor}">${val ?? ''}</td>`;
+            html += `<td style="${bgColor}">${displayVal}</td>`;
           });
 
           // Other fields and notes
           html += config.fields.map(f => `<td>${entry[f.id] ?? ''}</td>`).join('');
-          html += `<td>${entry.notes || ''}</td>`;
+
+          // Show reflective notes (new) or legacy notes (old entries)
+          let notesText = '';
+          if (entry.influenceNote || entry.tomorrowNote) {
+            const parts = [];
+            if (entry.influenceNote) parts.push(`Influence: ${entry.influenceNote}`);
+            if (entry.tomorrowNote) parts.push(`Tomorrow: ${entry.tomorrowNote}`);
+            notesText = parts.join(' | ');
+          } else if (entry.notes) {
+            notesText = entry.notes; // Legacy
+          }
+          html += `<td>${notesText}</td>`;
 
           tr.innerHTML = html;
           tbody.appendChild(tr);
@@ -1565,26 +1626,58 @@
       // Calculate progress percentage
       const progressPercent = Math.min(100, Math.round((currentDay / totalDays) * 100));
 
-      // Determine current phase
-      let currentPhase = exp.phases[exp.phases.length - 1]; // Default to last phase
-      for (const phase of exp.phases) {
-        if (currentDay <= phase.endDay) {
-          currentPhase = phase;
-          break;
+      // Determine current chapter
+      let currentChapter = exp.chapters ? exp.chapters[exp.chapters.length - 1] : null;
+      if (exp.chapters) {
+        for (const chapter of exp.chapters) {
+          if (currentDay <= chapter.endDay) {
+            currentChapter = chapter;
+            break;
+          }
+        }
+      }
+      // Fallback to phases if chapters don't exist (migration compatibility)
+      if (!currentChapter && exp.phases) {
+        currentChapter = exp.phases[exp.phases.length - 1];
+        for (const phase of exp.phases) {
+          if (currentDay <= phase.endDay) {
+            currentChapter = phase;
+            break;
+          }
         }
       }
 
-      // Find next milestone
+      // Find next milestone (date-based)
       let nextMilestone = null;
-      for (const milestone of exp.milestones) {
-        if (milestone.day >= currentDay) {
-          nextMilestone = milestone;
-          break;
+      if (exp.milestones) {
+        for (const milestone of exp.milestones) {
+          const milestoneDate = milestone.date || milestone.day; // Support both formats
+          if (typeof milestoneDate === 'string') {
+            // Date-based milestone
+            if (milestoneDate >= today) {
+              nextMilestone = milestone;
+              break;
+            }
+          } else {
+            // Day-based milestone (legacy)
+            if (milestoneDate >= currentDay) {
+              nextMilestone = { ...milestone, date: null };
+              break;
+            }
+          }
         }
       }
 
       // Days until next milestone
-      const daysUntilNext = nextMilestone ? nextMilestone.day - currentDay : 0;
+      let daysUntilNext = 0;
+      if (nextMilestone) {
+        if (nextMilestone.date) {
+          const milestoneDate = new Date(nextMilestone.date);
+          daysUntilNext = Math.ceil((milestoneDate - todayDate) / (1000 * 60 * 60 * 24));
+        } else if (nextMilestone.day) {
+          daysUntilNext = nextMilestone.day - currentDay;
+        }
+      }
 
       // Format dates for display
       const formatDate = (dateStr) => {
@@ -1631,17 +1724,20 @@
           </div>
 
           <div class="phase-indicator">
-            <span class="phase-badge" style="background: ${currentPhase.color}; color: white;">
-              ${currentPhase.name} Phase
+            <span class="phase-badge" style="background: ${currentChapter.color}; color: white;">
+              ${currentChapter.name}
             </span>
-            <span style="flex: 1;">${currentPhase.message}</span>
+            <span style="flex: 1;">${currentChapter.message}</span>
           </div>
       `;
 
       if (nextMilestone) {
+        const milestoneDisplay = nextMilestone.date
+          ? formatDate(nextMilestone.date)
+          : `Day ${nextMilestone.day}`;
         html += `
           <div class="next-milestone">
-            Next: Day ${nextMilestone.day} - ${nextMilestone.label}
+            Next: ${milestoneDisplay} - ${nextMilestone.label}
             ${daysUntilNext > 0 ? `(${daysUntilNext} day${daysUntilNext > 1 ? 's' : ''})` : '(Today!)'}
           </div>
         `;
@@ -1806,19 +1902,23 @@
         // Add sliders with trend indicators
         config.sliders.forEach(slider => {
           const value = entry[slider.id];
-          if (value !== undefined && value !== '') {
+          let displayValue = 'N/A';
+          let trendHtml = '';
+
+          if (value !== undefined && value !== null && value !== '') {
             const avg = calculate7DayAverage(entries, slider.id, entry.date);
             const trend = getTrendIndicator(parseFloat(value), avg);
             const trendColor = getTrendColor(trend);
-            const trendHtml = trend ? ` <span style="color: ${trendColor}; font-weight: bold;">${trend}</span>` : '';
-
-            html += `
-              <div class="entry-card-row">
-                <div class="entry-card-label">${slider.label}</div>
-                <div class="entry-card-value">${value}${trendHtml}</div>
-              </div>
-            `;
+            displayValue = value;
+            trendHtml = trend ? ` <span style="color: ${trendColor}; font-weight: bold;">${trend}</span>` : '';
           }
+
+          html += `
+            <div class="entry-card-row">
+              <div class="entry-card-label">${slider.label}</div>
+              <div class="entry-card-value" style="${displayValue === 'N/A' ? 'color: #999;' : ''}">${displayValue}${trendHtml}</div>
+            </div>
+          `;
         });
 
         // Add fields
@@ -1834,8 +1934,24 @@
           }
         });
 
-        // Add notes if present
-        if (entry.notes && entry.notes.trim()) {
+        // Add reflective notes if present (new format)
+        if (entry.influenceNote && entry.influenceNote.trim()) {
+          html += `
+            <div class="entry-card-notes">
+              <strong>What influenced today:</strong> ${entry.influenceNote}
+            </div>
+          `;
+        }
+        if (entry.tomorrowNote && entry.tomorrowNote.trim()) {
+          html += `
+            <div class="entry-card-notes">
+              <strong>For tomorrow:</strong> ${entry.tomorrowNote}
+            </div>
+          `;
+        }
+
+        // Fallback to legacy notes for old entries
+        if (!entry.influenceNote && !entry.tomorrowNote && entry.notes && entry.notes.trim()) {
           html += `
             <div class="entry-card-notes">
               <strong>Notes:</strong> ${entry.notes}
@@ -1913,6 +2029,9 @@
       }
     }
 
+    // Global variable to store pending entry for save-empty modal
+    let pendingEntry = null;
+
     // Save day
     document.getElementById('saveDay').addEventListener('click', () => {
       const dateInput = document.getElementById('date');
@@ -1925,23 +2044,32 @@
         return;
       }
 
+      // Build entry and check if it's empty
+      performSave(false);
+
       const entry = {
         date,
         day: getValue('day') || '', // Allow empty day number
-        notes: getValue('notes')
+        influenceNote: getValue('influenceNote') || '',
+        tomorrowNote: getValue('tomorrowNote') || ''
       };
 
-      // Collect slider values with unset/set state handling
+      // Collect slider values with null for unmoved sliders
       config.sliders.forEach(s => {
         const state = sliderStates[s.id];
         if (state && state.isSet) {
           // Save actual value (including 0) for set sliders
           entry[s.id] = state.value;
         } else {
-          // Save empty string for unset sliders (becomes gap in charts)
-          entry[s.id] = '';
+          // Save null for unmoved sliders
+          entry[s.id] = null;
         }
       });
+
+      // Collect context values
+      entry.electrolytes_taken = document.getElementById('electrolytes_taken')?.checked || false;
+      entry.movement_load = getValue('movement_load') || 'none';
+      entry.stress_load = getValue('stress_load') || 'none';
 
       // Collect symptom values
       ['cramps', 'palps'].forEach(symptomId => {
@@ -1972,6 +2100,17 @@
       const rated = config.sliders.filter(s => sliderStates[s.id].isSet).length;
       const total = config.sliders.length;
 
+      // Check if entry is empty before saving
+      const isEntryEmpty = checkIfEntryEmpty(entry);
+
+      if (isEntryEmpty && !window.confirmingSaveEmpty) {
+        // Show confirmation modal
+        pendingEntry = { entry, entries, idx, rated, total };
+        document.getElementById('saveEmptyModal').style.display = 'flex';
+        return;
+      }
+
+      // Save the entry
       if (idx >= 0) {
         entries[idx] = entry;
         showStatus(`Updated ${date} • Rated: ${rated}/${total}`, 'success');
@@ -1984,7 +2123,58 @@
       saveEntries(entries);
       renderTable();
       checkBackupReminder();
+      window.confirmingSaveEmpty = false;
     });
+
+    function checkIfEntryEmpty(entry) {
+      // Check if all sliders are null
+      const allSlidersNull = config.sliders.every(s => entry[s.id] === null);
+
+      // Check if no symptoms are set (all "None")
+      const symptomsEmpty = ['cramps', 'palps'].every(symptomId => {
+        return !entry[symptomId] || entry[symptomId] === 'None';
+      });
+
+      // Check if context fields are unset
+      const contextEmpty = !entry.electrolytes_taken &&
+                          entry.movement_load === 'none' &&
+                          entry.stress_load === 'none';
+
+      // Check if notes are empty
+      const notesEmpty = !entry.influenceNote && !entry.tomorrowNote;
+
+      return allSlidersNull && symptomsEmpty && contextEmpty && notesEmpty;
+    }
+
+    function closeSaveEmptyModal() {
+      document.getElementById('saveEmptyModal').style.display = 'none';
+      pendingEntry = null;
+    }
+
+    function confirmSaveEmpty() {
+      if (!pendingEntry) return;
+
+      const { entry, entries, idx, rated, total } = pendingEntry;
+      const date = entry.date;
+
+      window.confirmingSaveEmpty = true;
+
+      if (idx >= 0) {
+        entries[idx] = entry;
+        showStatus(`Updated ${date} • Rated: ${rated}/${total}`, 'success');
+      } else {
+        entries.push(entry);
+        entries.sort((a, b) => a.date.localeCompare(b.date));
+        showStatus(`Saved ${date} • Rated: ${rated}/${total}`, 'success');
+      }
+
+      saveEntries(entries);
+      renderTable();
+      checkBackupReminder();
+
+      closeSaveEmptyModal();
+      window.confirmingSaveEmpty = false;
+    }
 
     // Export CSV
     function exportCsv() {
@@ -1997,13 +2187,23 @@
       const headers = ['Date', 'Day#']
         .concat(config.sliders.map(s => s.label.replace(/\s+/g, '_')))
         .concat(config.fields.map(f => f.label.replace(/\s+/g, '_')))
-        .concat(['Notes']);
+        .concat(['Electrolytes_Taken', 'Movement_Load', 'Stress_Load', 'Influence_Note', 'Tomorrow_Note', 'Notes_Legacy']);
 
       const rows = entries.map(e => {
         return [e.date, e.day ?? '']
-          .concat(config.sliders.map(s => e[s.id] ?? ''))
+          .concat(config.sliders.map(s => {
+            const val = e[s.id];
+            return (val === null || val === undefined) ? '' : val;
+          }))
           .concat(config.fields.map(f => e[f.id] ?? ''))
-          .concat([e.notes ?? '']);
+          .concat([
+            e.electrolytes_taken ? 'Yes' : 'No',
+            e.movement_load ?? '',
+            e.stress_load ?? '',
+            e.influenceNote ?? '',
+            e.tomorrowNote ?? '',
+            e.notes ?? ''  // Legacy field for old entries
+          ]);
       });
 
       function escapeCsv(v) {
