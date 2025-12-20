@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>N=1 Daily Tracker – Customizable</title>
+  <title>Signal Calibration – Customizable</title>
   <style>
     * {
       box-sizing: border-box;
@@ -192,15 +192,15 @@
       right: 0;
       height: 6px;
       transform: translateY(-50%);
-      background: linear-gradient(to right, #e89393 0%, #f0f0f0 50%, #93c5b5 100%);
+      background: linear-gradient(to right, #d9e3f0 0%, #f0f0f0 50%, #d9e3f0 100%);
       border-radius: 3px;
       pointer-events: none;
       z-index: 0;
-      opacity: 0.1;
+      opacity: 0.5;
       transition: opacity 0.3s ease;
     }
     .slider-group.set .slider-gradient-bg {
-      opacity: 1;
+      opacity: 0.8;
     }
     .slider-track-wrapper input[type="range"] {
       position: relative;
@@ -841,7 +841,7 @@
 <body>
   <!-- App Header -->
   <div class="app-header">
-    <h1 id="trackerTitle">N=1 Daily Tracker</h1>
+    <h1 id="trackerTitle">Signal Calibration</h1>
     <button class="settings-icon" onclick="openSettings()" title="Settings" style="width: 40px; height: 40px; padding: 8px;">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
@@ -879,15 +879,28 @@
         Day # auto-increments to track your experiment progress (e.g., "Day 30 of 90")
       </p>
 
-      <h3 style="font-size: 1.1rem; color: #333; margin-top: 2rem; margin-bottom: 0.75rem;">Spectrum Scores (–5 to +5)</h3>
+      <h3 style="font-size: 1.1rem; color: #333; margin-top: 2rem; margin-bottom: 0.75rem;">Daily Signals</h3>
       <div class="spectrum-legend">
-        Each slider runs between its two labels. –5 = the day felt mostly like the top label, +5 = the day felt mostly like the bottom label, 0 = in between.<br>
-        <strong>Only move a slider if you want to track it today</strong>—unmoved sliders are treated as not recorded.
+        Move only the sliders you want to track today. Unmoved sliders are not recorded.<br>
+        Left = more like the left side. Right = more like the right side. <strong>0 = in between.</strong>
       </div>
       <div id="slidersContainer"></div>
 
-      <h3 style="font-size: 1.1rem; color: #333; margin-top: 2rem; margin-bottom: 0.75rem;">Symptoms</h3>
-      <div id="symptomsContainer"></div>
+      <h3 style="font-size: 1.1rem; color: #333; margin-top: 2rem; margin-bottom: 0.75rem;">Symptoms (Optional)</h3>
+      <details>
+        <summary style="cursor: pointer; padding: 0.75rem; background: white; border-radius: 4px; margin-bottom: 1rem; font-weight: 600; font-size: 1rem; color: #666;">
+          View Symptoms
+        </summary>
+        <div id="symptomsContainer"></div>
+      </details>
+
+      <h3 style="font-size: 1.1rem; color: #333; margin-top: 2rem; margin-bottom: 0.75rem;">Context (Optional)</h3>
+      <details>
+        <summary style="cursor: pointer; padding: 0.75rem; background: white; border-radius: 4px; margin-bottom: 1rem; font-weight: 600; font-size: 1rem; color: #666;">
+          View Context
+        </summary>
+        <div id="contextContainer"></div>
+      </details>
 
       <!-- Additional Fields (Collapsible) -->
       <details>
@@ -898,8 +911,12 @@
       </details>
 
       <div class="row">
-        <label for="notes">General Notes</label>
-        <textarea id="notes" placeholder="Anything else that stands out today…"></textarea>
+        <label for="influenceNote">What most influenced today's signals?</label>
+        <textarea id="influenceNote" placeholder="Sleep quality? Stress? Food timing? Movement?"></textarea>
+      </div>
+      <div class="row">
+        <label for="tomorrowNote">One thing to repeat or avoid tomorrow:</label>
+        <textarea id="tomorrowNote" placeholder="What worked? What didn't?"></textarea>
       </div>
     </div>
   </div>
@@ -990,7 +1007,7 @@
         <div style="margin-bottom: 1.5rem;">
           <h3>Customize Tracker</h3>
           <label><strong>Tracker Title</strong></label>
-          <input type="text" id="configTitle" placeholder="N=1 Daily Tracker" style="width:100%;">
+          <input type="text" id="configTitle" placeholder="Signal Calibration" style="width:100%;">
         </div>
 
         <!-- Experiment Configuration -->
@@ -1140,31 +1157,31 @@
 
     const DEFAULT_CONFIG = {
       version: CONFIG_VERSION,
-      title: "N=1 Daily Tracker – Carnivore-ish Reset",
+      title: "Signal Calibration — Carnivore-ish Reset",
       experiment: {
         enabled: true,
         startDate: "2025-01-05",
         endDate: "2025-03-31",
         goal: "90-Day Carnivore Reset",
-        phases: [
-          { name: "Adaptation", endDay: 42, color: "#ffc107", message: "Your body is adapting. Stick with it!" },
-          { name: "Optimization", endDay: 70, color: "#28a745", message: "You're adapted! Time to optimize." },
-          { name: "Mastery", endDay: 90, color: "#0066cc", message: "Final stretch! You've got this!" }
+        chapters: [
+          { name: "Orientation", endDay: 7, color: "#0066cc", message: "Getting oriented to the signals" },
+          { name: "Stabilizing", endDay: 21, color: "#0066cc", message: "Stabilizing baseline signals" },
+          { name: "Adapting", endDay: 42, color: "#0066cc", message: "Deep adaptation underway" },
+          { name: "Living", endDay: 999, color: "#0066cc", message: "Living with clarity" }
         ],
         milestones: [
-          { day: 1, label: "HTMA Test #1", icon: "●" },
-          { day: 42, label: "Adapted!", icon: "●" },
-          { day: 70, label: "10 Weeks!", icon: "●" },
-          { day: 90, label: "HTMA Test #2 - Complete!", icon: "●" }
+          { date: "2025-01-05", label: "HTMA Test #1" },
+          { date: "2025-02-16", label: "Day 42 Check" }
         ]
       },
       sliders: [
-        { id: "clarity", label: "Mental Clarity", left: "Brain fog", right: "Clear-headed" },
-        { id: "food", label: "Food Focus", left: "Live to eat", right: "Eat to live" },
-        { id: "sleep", label: "Sleep (Waking State)", left: "Wake by snooze", right: "Ready to start the day" },
-        { id: "gut", label: "Gut State", left: "Bloated and slow", right: "Light and clean" },
-        { id: "energy", label: "Energy Stability", left: "Crashing / wired-tired", right: "Steady / grounded all day" },
-        { id: "joints", label: "Joint Comfort", left: "Stiff and creaky", right: "Free and easy" }
+        { id: "mental_clarity", label: "Mental Clarity", left: "Brain fog", right: "Clear-headed", min: -3, max: 3 },
+        { id: "craving_noise", label: "Craving Noise", left: "Sweet seeking", right: "Satiated", min: -3, max: 3 },
+        { id: "sleep_waking_state", label: "Sleep (Waking State)", left: "Wake by snooze", right: "Ready to start", min: -3, max: 3 },
+        { id: "gut_state", label: "Gut State", left: "Bloated and slow", right: "Light and clean", min: -3, max: 3 },
+        { id: "energy_stability", label: "Energy Stability", left: "Crashing / wired-tired", right: "Steady all day", min: -3, max: 3 },
+        { id: "body_comfort", label: "Body Comfort", left: "Stiff and creaky", right: "Easy to live in", min: -3, max: 3 },
+        { id: "mood_stability", label: "Mood Stability", left: "Reactive", right: "Grounded", min: -3, max: 3 }
       ],
       fields: [
         { id: "cramps", label: "Muscle Cramps", type: "select", options: ["—", "None", "Mild", "Wakes-me-up"] },
@@ -1172,7 +1189,12 @@
         { id: "offnote", label: "Off-plan note", type: "text", placeholder: "cookies, chips, beer…" },
         { id: "ketones", label: "Ketones (mmol/L)", type: "number", step: "0.1", min: "0" },
         { id: "macros", label: "Macros logged?", type: "select", options: ["—", "No", "Yes"] }
-      ]
+      ],
+      context: {
+        electrolytes_taken: false,
+        movement_load: "none",
+        stress_load: "none"
+      }
     };
 
     let config = loadConfig();
@@ -1315,8 +1337,8 @@
           <div class="slider-header">
             <span class="metric-name">${slider.label}</span>
             <div style="display: flex; align-items: center;">
-              <span class="value-chip" id="val-${slider.id}">Not tracked</span>
-              <button class="clear-btn" id="clear-${slider.id}" style="display: none;" onclick="clearSlider('${slider.id}')">Clear</button>
+              <span class="value-chip" id="val-${slider.id}">N/A</span>
+              <button class="clear-btn" id="clear-${slider.id}" style="display: none;" onclick="clearSlider('${slider.id}')">Reset (N/A)</button>
             </div>
           </div>
           <div class="slider-label">
@@ -1325,12 +1347,12 @@
           </div>
           <div class="slider-track-wrapper">
             <div class="slider-gradient-bg"></div>
-            <input type="range" id="${slider.id}" min="-5" max="5" value="0" step="1">
+            <input type="range" id="${slider.id}" min="-3" max="3" value="0" step="1">
           </div>
           <div class="spectrum-ticks">
-            <span>–5</span>
+            <span>–3</span>
             <span>0</span>
-            <span>+5</span>
+            <span>+3</span>
           </div>
         `;
         slidersContainer.appendChild(div);
