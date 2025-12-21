@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Signal Calibration – Customizable</title>
+  <title>Recalibrate</title>
   <style>
     * {
       box-sizing: border-box;
@@ -841,7 +841,7 @@
 <body>
   <!-- App Header -->
   <div class="app-header">
-    <h1 id="trackerTitle">Signal Calibration</h1>
+    <h1 id="trackerTitle">Recalibrate</h1>
     <button class="settings-icon" onclick="openSettings()" title="Settings" style="width: 40px; height: 40px; padding: 8px;">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
@@ -1030,7 +1030,7 @@
         <div style="margin-bottom: 1.5rem;">
           <h3>Customize Tracker</h3>
           <label><strong>Tracker Title</strong></label>
-          <input type="text" id="configTitle" placeholder="Signal Calibration" style="width:100%;">
+          <input type="text" id="configTitle" placeholder="Recalibrate" style="width:100%;">
         </div>
 
         <!-- Experiment Configuration -->
@@ -1244,7 +1244,7 @@
 
     const DEFAULT_CONFIG = {
       version: CONFIG_VERSION,
-      title: "Signal Calibration",
+      title: "Recalibrate",
       experiment: {
         enabled: true,
         startDate: "2026-01-06",
