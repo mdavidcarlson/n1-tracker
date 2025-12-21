@@ -937,10 +937,10 @@
   <div style="margin-top: 2rem;">
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
       <h2 style="margin: 0;">View Your Data</h2>
-      <button onclick="openSettings()" style="padding: 8px 12px; background: transparent; border: none; cursor: pointer; border-radius: 4px; transition: background 0.2s;" title="Configure experiment settings" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='transparent'">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <button onclick="openSettings()" style="padding: 8px; background: transparent; border: none; cursor: pointer; border-radius: 4px; transition: background 0.2s; width: 40px; height: 40px;" title="Configure experiment settings" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='transparent'">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
           <circle cx="12" cy="12" r="3"></circle>
-          <path d="M12 1v6m0 6v6m-6-6h6m6 0h-6m-3.2-6.8l4.24 4.24m4.24 4.24l-4.24-4.24m0 8.48L14.8 17.2m4.24-10.4l-4.24 4.24"></path>
         </svg>
       </button>
     </div>
@@ -1019,6 +1019,7 @@
       <!-- Tab Navigation -->
       <div class="settings-tabs">
         <button class="settings-tab active" onclick="switchSettingsTab('general')">General</button>
+        <button class="settings-tab" onclick="switchSettingsTab('experiment')">Experiment</button>
         <button class="settings-tab" onclick="switchSettingsTab('tracking')">Tracking Setup</button>
         <button class="settings-tab" onclick="switchSettingsTab('data')">Data</button>
       </div>
@@ -1088,6 +1089,70 @@
               </details>
             </details>
           </div>
+        </div>
+      </div>
+
+      <!-- Experiment Tab -->
+      <div class="settings-tab-content" id="settingsTabExperiment">
+        <div style="margin-bottom: 2rem; padding: 1.25rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #0066cc;">
+          <h3 style="margin-top: 0; color: #0066cc;">Understanding Chapters & Milestones</h3>
+
+          <div style="display: grid; gap: 1.25rem; font-size: 0.95rem;">
+            <div>
+              <strong style="color: #333;">📖 Chapters</strong>
+              <p style="margin: 0.5rem 0 0 0; color: #666; line-height: 1.5;">
+                Time <em>periods</em> that divide your experiment into stages (e.g., "Orientation" for Days 1-7, "Adapting" for Days 22-42).
+                Each chapter has a name, end day, color, and motivational message. The app shows which chapter you're currently in.
+              </p>
+            </div>
+
+            <div>
+              <strong style="color: #333;">📍 Milestones</strong>
+              <p style="margin: 0.5rem 0 0 0; color: #666; line-height: 1.5;">
+                Specific <em>point-in-time</em> markers for events (e.g., "HTMA Test #1" on Jan 6, "Day 42 Check" on Feb 17).
+                These appear as dots on the progress bar and show countdown/days remaining in the experiment tracker.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 2rem;">
+          <h3>Experiment Timeline</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+            <div>
+              <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Start Date</label>
+              <input type="date" id="experimentStart" style="width: 100%;">
+              <small style="color: #999; display: block; margin-top: 0.25rem;">
+                Entries before this date show as "countdown days"
+              </small>
+            </div>
+            <div>
+              <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">End Date</label>
+              <input type="date" id="experimentEnd" style="width: 100%;">
+            </div>
+          </div>
+          <div>
+            <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Experiment Goal</label>
+            <input type="text" id="experimentGoal" placeholder="90-Day Carnivore Reset" style="width: 100%;">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 2rem;">
+          <h3>Chapters</h3>
+          <p style="font-size: 0.9rem; color: #666; margin: 0 0 1rem 0;">
+            Define the phases of your experiment. Each chapter lasts until the specified day number.
+          </p>
+          <div id="chaptersConfig"></div>
+          <button onclick="addChapter()" style="margin-top: 0.75rem;">+ Add Chapter</button>
+        </div>
+
+        <div style="margin-bottom: 2rem;">
+          <h3>Milestones</h3>
+          <p style="font-size: 0.9rem; color: #666; margin: 0 0 1rem 0;">
+            Mark specific dates for tests, check-ins, or important events.
+          </p>
+          <div id="milestonesConfig"></div>
+          <button onclick="addMilestone()" style="margin-top: 0.75rem;">+ Add Milestone</button>
         </div>
       </div>
 
@@ -1182,8 +1247,8 @@
       title: "Signal Calibration",
       experiment: {
         enabled: true,
-        startDate: "2025-01-05",
-        endDate: "2025-03-31",
+        startDate: "2026-01-06",
+        endDate: "2026-04-05",
         goal: "90-Day Carnivore Reset",
         chapters: [
           { name: "Orientation", endDay: 7, color: "#0066cc", message: "Getting oriented to the signals" },
@@ -1192,8 +1257,8 @@
           { name: "Living", endDay: 999, color: "#0066cc", message: "Living with clarity" }
         ],
         milestones: [
-          { date: "2025-01-05", label: "HTMA Test #1" },
-          { date: "2025-02-16", label: "Day 42 Check" }
+          { date: "2026-01-06", label: "HTMA Test #1" },
+          { date: "2026-02-17", label: "Day 42 Check" }
         ]
       },
       sliders: [
@@ -2815,6 +2880,46 @@
           choicesContainer.style.display = this.value === 'select' ? 'block' : 'none';
         });
       });
+
+      // Render chapters config
+      const chaptersConfig = document.getElementById('chaptersConfig');
+      if (chaptersConfig && config.experiment && config.experiment.chapters) {
+        chaptersConfig.innerHTML = '';
+        config.experiment.chapters.forEach((chapter, idx) => {
+          const div = document.createElement('div');
+          div.className = 'config-item';
+          div.innerHTML = `
+            <label>Chapter ${idx + 1}</label>
+            <input type="text" placeholder="Orientation" value="${chapter.name}" data-idx="${idx}" data-field="name" class="chapter-field">
+            <small style="display: block; color: #999; margin: 0.25rem 0 0.5rem 0;">Chapter name</small>
+            <input type="number" placeholder="7" value="${chapter.endDay}" data-idx="${idx}" data-field="endDay" class="chapter-field">
+            <small style="display: block; color: #999; margin: 0.25rem 0 0.5rem 0;">End day number</small>
+            <input type="text" placeholder="Getting oriented to the signals" value="${chapter.message}" data-idx="${idx}" data-field="message" class="chapter-field">
+            <small style="display: block; color: #999; margin: 0.25rem 0 0.5rem 0;">Motivational message</small>
+            <button onclick="removeChapter(${idx})" class="danger" style="margin-top:0.5rem;">Remove</button>
+          `;
+          chaptersConfig.appendChild(div);
+        });
+      }
+
+      // Render milestones config
+      const milestonesConfig = document.getElementById('milestonesConfig');
+      if (milestonesConfig && config.experiment && config.experiment.milestones) {
+        milestonesConfig.innerHTML = '';
+        config.experiment.milestones.forEach((milestone, idx) => {
+          const div = document.createElement('div');
+          div.className = 'config-item';
+          div.innerHTML = `
+            <label>Milestone ${idx + 1}</label>
+            <input type="date" value="${milestone.date || ''}" data-idx="${idx}" data-field="date" class="milestone-field">
+            <small style="display: block; color: #999; margin: 0.25rem 0 0.5rem 0;">Date</small>
+            <input type="text" placeholder="HTMA Test #1" value="${milestone.label}" data-idx="${idx}" data-field="label" class="milestone-field">
+            <small style="display: block; color: #999; margin: 0.25rem 0 0.5rem 0;">Event label</small>
+            <button onclick="removeMilestone(${idx})" class="danger" style="margin-top:0.5rem;">Remove</button>
+          `;
+          milestonesConfig.appendChild(div);
+        });
+      }
     }
 
     function addSlider() {
@@ -2846,6 +2951,40 @@
     function removeField(idx) {
       if (confirm('Remove this field?')) {
         config.fields.splice(idx, 1);
+        renderSettingsModal();
+      }
+    }
+
+    function addChapter() {
+      if (!config.experiment.chapters) config.experiment.chapters = [];
+      config.experiment.chapters.push({
+        name: "New Chapter",
+        endDay: 30,
+        color: "#0066cc",
+        message: "Keep going!"
+      });
+      renderSettingsModal();
+    }
+
+    function removeChapter(idx) {
+      if (confirm('Remove this chapter?')) {
+        config.experiment.chapters.splice(idx, 1);
+        renderSettingsModal();
+      }
+    }
+
+    function addMilestone() {
+      if (!config.experiment.milestones) config.experiment.milestones = [];
+      config.experiment.milestones.push({
+        date: "",
+        label: "New Milestone"
+      });
+      renderSettingsModal();
+    }
+
+    function removeMilestone(idx) {
+      if (confirm('Remove this milestone?')) {
+        config.experiment.milestones.splice(idx, 1);
         renderSettingsModal();
       }
     }
@@ -2883,6 +3022,30 @@
           } else {
             config.fields[idx][field] = input.value;
           }
+        }
+      });
+
+      // Update chapters
+      const chapterInputs = document.querySelectorAll('.chapter-field');
+      chapterInputs.forEach(input => {
+        const idx = parseInt(input.dataset.idx);
+        const field = input.dataset.field;
+        if (config.experiment.chapters && config.experiment.chapters[idx]) {
+          if (field === 'endDay') {
+            config.experiment.chapters[idx][field] = parseInt(input.value);
+          } else {
+            config.experiment.chapters[idx][field] = input.value;
+          }
+        }
+      });
+
+      // Update milestones
+      const milestoneInputs = document.querySelectorAll('.milestone-field');
+      milestoneInputs.forEach(input => {
+        const idx = parseInt(input.dataset.idx);
+        const field = input.dataset.field;
+        if (config.experiment.milestones && config.experiment.milestones[idx]) {
+          config.experiment.milestones[idx][field] = input.value;
         }
       });
 
