@@ -935,7 +935,15 @@
 
   <!-- View Your Data Section -->
   <div style="margin-top: 2rem;">
-    <h2 style="margin-bottom: 1rem;">View Your Data</h2>
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+      <h2 style="margin: 0;">View Your Data</h2>
+      <button onclick="openSettings()" style="padding: 8px 12px; background: transparent; border: none; cursor: pointer; border-radius: 4px; transition: background 0.2s;" title="Configure experiment settings" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='transparent'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M12 1v6m0 6v6m-6-6h6m6 0h-6m-3.2-6.8l4.24 4.24m4.24 4.24l-4.24-4.24m0 8.48L14.8 17.2m4.24-10.4l-4.24 4.24"></path>
+        </svg>
+      </button>
+    </div>
 
     <!-- Tab Navigation -->
     <div class="tab-navigation">
@@ -1171,7 +1179,7 @@
 
     const DEFAULT_CONFIG = {
       version: CONFIG_VERSION,
-      title: "Signal Calibration — Carnivore-ish Reset",
+      title: "Signal Calibration",
       experiment: {
         enabled: true,
         startDate: "2025-01-05",
@@ -1452,29 +1460,42 @@
       contextContainer.innerHTML = '';
 
       const contextDiv = document.createElement('div');
-      contextDiv.style.cssText = 'display: grid; gap: 1rem;';
+      contextDiv.style.cssText = 'display: grid; gap: 1.25rem;';
       contextDiv.innerHTML = `
-        <div class="row">
-          <label style="display: flex; align-items: center; gap: 0.5rem;">
-            <input type="checkbox" id="electrolytes_taken" style="width: auto;">
-            <span>Electrolytes taken</span>
-          </label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="row" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
+            <label style="font-weight: 600; font-size: 0.9rem; color: #555;">Physical Load</label>
+            <select id="movement_load" style="width: 100%; padding: 8px;">
+              <option value="none">None</option>
+              <option value="normal">Normal</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+          <div class="row" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
+            <label style="font-weight: 600; font-size: 0.9rem; color: #555;">Mental Load</label>
+            <select id="stress_load" style="width: 100%; padding: 8px;">
+              <option value="none">None</option>
+              <option value="moderate">Moderate</option>
+              <option value="high">High</option>
+            </select>
+          </div>
         </div>
-        <div class="row">
-          <label for="movement_load">Movement load</label>
-          <select id="movement_load" style="flex: 1;">
-            <option value="none">None</option>
-            <option value="normal">Normal</option>
-            <option value="high">High</option>
-          </select>
-        </div>
-        <div class="row">
-          <label for="stress_load">Stress load</label>
-          <select id="stress_load" style="flex: 1;">
-            <option value="none">None</option>
-            <option value="moderate">Moderate</option>
-            <option value="high">High</option>
-          </select>
+
+        <div style="border-top: 1px solid #e5e5e5; padding-top: 1rem;">
+          <label style="font-weight: 600; font-size: 0.9rem; color: #555; display: block; margin-bottom: 0.75rem;">Support Taken</label>
+          <div style="display: grid; gap: 0.75rem;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; padding: 8px 12px; background: #f8f9fa; border-radius: 6px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#e9ecef'" onmouseout="this.style.background='#f8f9fa'">
+              <input type="checkbox" id="electrolytes_taken" style="width: 18px; height: 18px; cursor: pointer;">
+              <span style="font-weight: 500; color: #333;">Electrolytes</span>
+            </label>
+            <div style="display: grid; gap: 0.5rem;">
+              <label style="display: flex; align-items: center; gap: 0.5rem; padding: 8px 12px; background: #f8f9fa; border-radius: 6px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#e9ecef'" onmouseout="this.style.background='#f8f9fa'">
+                <input type="checkbox" id="gut_support_taken" style="width: 18px; height: 18px; cursor: pointer;" onchange="document.getElementById('gut_support_detail').style.display = this.checked ? 'block' : 'none'">
+                <span style="font-weight: 500; color: #333;">Gut health support</span>
+              </label>
+              <input type="text" id="gut_support_detail" placeholder="e.g., homemade yogurt, probiotics, sauerkraut..." style="display: none; margin-left: 2rem; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;">
+            </div>
+          </div>
         </div>
       `;
       contextContainer.appendChild(contextDiv);
@@ -1563,16 +1584,16 @@
               displayVal = val; // Show actual value
 
               if (numVal < 0) {
-                // Negative values get warm tint
-                const intensity = Math.min(Math.abs(numVal) / 5, 1);
-                bgColor = `background: rgba(220, 120, 120, ${0.15 + intensity * 0.25});`;
+                // Negative values get muted amber/warm tint
+                const intensity = Math.min(Math.abs(numVal) / 3, 1);
+                bgColor = `background: rgba(218, 186, 144, ${0.2 + intensity * 0.3});`;
               } else if (numVal > 0) {
-                // Positive values get cool/green tint
-                const intensity = Math.min(numVal / 5, 1);
-                bgColor = `background: rgba(120, 180, 140, ${0.15 + intensity * 0.25});`;
+                // Positive values get muted blue/cool tint
+                const intensity = Math.min(numVal / 3, 1);
+                bgColor = `background: rgba(158, 184, 204, ${0.2 + intensity * 0.3});`;
               } else {
-                // Zero gets neutral gray
-                bgColor = 'background: #f5f5f5;';
+                // Zero gets soft neutral
+                bgColor = 'background: #f8f9fa;';
               }
             }
             html += `<td style="${bgColor}">${displayVal}</td>`;
@@ -1709,16 +1730,29 @@
       `;
 
       // Add milestone markers
-      exp.milestones.forEach(milestone => {
-        const position = (milestone.day / totalDays) * 100;
-        const isPast = currentDay >= milestone.day;
-        const opacity = isPast ? '1' : '0.5';
-        html += `
-          <div class="milestone-marker" style="left: ${position}%; opacity: ${opacity};" title="${milestone.label} (Day ${milestone.day})">
-            ${milestone.icon}
-          </div>
-        `;
-      });
+      if (exp.milestones) {
+        exp.milestones.forEach(milestone => {
+          let milestoneDay;
+          if (milestone.date) {
+            // Date-based milestone
+            const mDate = new Date(milestone.date);
+            milestoneDay = Math.ceil((mDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+          } else {
+            // Legacy day-based
+            milestoneDay = milestone.day;
+          }
+
+          const position = Math.min(100, Math.max(0, (milestoneDay / totalDays) * 100));
+          const isPast = currentDay >= milestoneDay;
+          const iconColor = isPast ? '#0066cc' : '#94a3b8';
+
+          html += `
+            <div class="milestone-marker" style="left: ${position}%;" title="${milestone.label}">
+              <div style="width: 12px; height: 12px; background: ${iconColor}; border: 2px solid white; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.3);"></div>
+            </div>
+          `;
+        });
+      }
 
       html += `
           </div>
@@ -2066,6 +2100,8 @@
 
       // Collect context values
       entry.electrolytes_taken = document.getElementById('electrolytes_taken')?.checked || false;
+      entry.gut_support_taken = document.getElementById('gut_support_taken')?.checked || false;
+      entry.gut_support_detail = getValue('gut_support_detail') || '';
       entry.movement_load = getValue('movement_load') || 'none';
       entry.stress_load = getValue('stress_load') || 'none';
 
@@ -2185,7 +2221,7 @@
       const headers = ['Date', 'Day#']
         .concat(config.sliders.map(s => s.label.replace(/\s+/g, '_')))
         .concat(config.fields.map(f => f.label.replace(/\s+/g, '_')))
-        .concat(['Electrolytes_Taken', 'Movement_Load', 'Stress_Load', 'Influence_Note', 'Tomorrow_Note', 'Notes_Legacy']);
+        .concat(['Electrolytes_Taken', 'Gut_Support_Taken', 'Gut_Support_Detail', 'Movement_Load', 'Stress_Load', 'Influence_Note', 'Tomorrow_Note', 'Notes_Legacy']);
 
       const rows = entries.map(e => {
         return [e.date, e.day ?? '']
@@ -2196,6 +2232,8 @@
           .concat(config.fields.map(f => e[f.id] ?? ''))
           .concat([
             e.electrolytes_taken ? 'Yes' : 'No',
+            e.gut_support_taken ? 'Yes' : 'No',
+            e.gut_support_detail ?? '',
             e.movement_load ?? '',
             e.stress_load ?? '',
             e.influenceNote ?? '',
