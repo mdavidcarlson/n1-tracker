@@ -892,42 +892,33 @@
       <!-- Daily Signals Section -->
       <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 2px solid #e5e5e5;">
         <h3 style="font-size: 1.1rem; color: #333; margin-top: 0; margin-bottom: 0.75rem;">Daily Signals</h3>
-        <div class="spectrum-legend">
-          Move only the sliders you want to track today. Unmoved sliders are not recorded.<br>
-          Left = more like the left side. Right = more like the right side. <strong>0 = in between.</strong>
-        </div>
+        <p style="font-size: 0.85rem; color: #888; margin: 0 0 1rem 0; font-style: italic;">
+          Move only the sliders you want to track today. Unmoved sliders are not recorded.
+        </p>
         <div id="slidersContainer"></div>
       </div>
 
-      <!-- Symptoms Section -->
+      <!-- More Details Section (Consolidated) -->
       <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 2px solid #e5e5e5;">
-        <h3 style="font-size: 1.1rem; color: #333; margin-top: 0; margin-bottom: 0.75rem;">Symptoms (Optional)</h3>
         <details>
-          <summary style="cursor: pointer; padding: 0.75rem; background: white; border-radius: 4px; margin-bottom: 1rem; font-weight: 600; font-size: 1rem; color: #666;">
-            View Symptoms
+          <summary style="cursor: pointer; padding: 0.75rem 1rem; background: #f8f9fa; border-radius: 6px; font-weight: 600; font-size: 1rem; color: #555; border: 1px solid #e0e0e0; transition: background 0.2s;" onmouseover="this.style.background='#e9ecef'" onmouseout="this.style.background='#f8f9fa'">
+            More Details
           </summary>
-          <div id="symptomsContainer"></div>
-        </details>
-      </div>
+          <div style="margin-top: 1rem; display: grid; gap: 1.75rem;">
 
-      <!-- Context Section -->
-      <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 2px solid #e5e5e5;">
-        <h3 style="font-size: 1.1rem; color: #333; margin-top: 0; margin-bottom: 0.75rem;">Context (Optional)</h3>
-        <details>
-          <summary style="cursor: pointer; padding: 0.75rem; background: white; border-radius: 4px; margin-bottom: 1rem; font-weight: 600; font-size: 1rem; color: #666;">
-            View Context
-          </summary>
-          <div id="contextContainer"></div>
-        </details>
-      </div>
+            <!-- Symptoms subsection -->
+            <div>
+              <h4 style="font-size: 0.95rem; color: #666; margin: 0 0 0.75rem 0; font-weight: 600;">Symptoms</h4>
+              <div id="symptomsContainer"></div>
+            </div>
 
-      <!-- Additional Fields Section -->
-      <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 2px solid #e5e5e5;">
-        <details>
-          <summary style="cursor: pointer; padding: 0.75rem; background: white; border-radius: 4px; margin-bottom: 1rem; font-weight: 600; font-size: 1rem; color: #666;">
-            Additional Fields (Optional)
-          </summary>
-          <div id="fieldsContainer"></div>
+            <!-- Context subsection -->
+            <div>
+              <h4 style="font-size: 0.95rem; color: #666; margin: 0 0 0.75rem 0; font-weight: 600;">Context</h4>
+              <div id="contextContainer"></div>
+            </div>
+
+          </div>
         </details>
       </div>
 
@@ -937,10 +928,6 @@
         <div class="row">
           <label for="influenceNote">What most influenced today's signals?</label>
           <textarea id="influenceNote" placeholder="Sleep quality? Stress? Food timing? Movement?"></textarea>
-        </div>
-        <div class="row">
-          <label for="tomorrowNote">One thing to repeat or avoid tomorrow:</label>
-          <textarea id="tomorrowNote" placeholder="What worked? What didn't?"></textarea>
         </div>
       </div>
     </div>
@@ -1304,9 +1291,6 @@
       fields: [
         { id: "cramps", label: "Muscle Cramps", type: "select", options: ["—", "None", "Mild", "Wakes-me-up"] },
         { id: "palps", label: "Palpitations", type: "select", options: ["—", "None", "Mild", "Concerning"] },
-        { id: "offnote", label: "Off-plan note", type: "text", placeholder: "cookies, chips, beer…" },
-        { id: "ketones", label: "Ketones (mmol/L)", type: "number", step: "0.1", min: "0" },
-        { id: "macros", label: "Macros logged?", type: "select", options: ["—", "No", "Yes"] }
       ],
       context: {
         electrolytes_taken: false,
@@ -1510,7 +1494,8 @@
 
       const symptoms = [
         { id: 'cramps', label: 'Muscle Cramps', levels: ['None', 'Mild', 'Moderate', 'Severe'] },
-        { id: 'palps', label: 'Palpitations', levels: ['None', 'Mild', 'Moderate', 'Severe'] }
+        { id: 'palps', label: 'Palpitations', levels: ['None', 'Mild', 'Moderate', 'Severe'] },
+        { id: 'headache', label: 'Headache', levels: ['None', 'Mild', 'Moderate', 'Severe'] }
       ];
 
       symptoms.forEach(symptom => {
@@ -1558,25 +1543,43 @@
       const contextDiv = document.createElement('div');
       contextDiv.style.cssText = 'display: grid; gap: 1.25rem;';
       contextDiv.innerHTML = `
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-          <div class="row" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
-            <label style="font-weight: 600; font-size: 0.9rem; color: #555;">Physical Load</label>
-            <select id="movement_load" style="width: 100%; padding: 8px;">
-              <option value="none">None</option>
-              <option value="normal">Normal</option>
-              <option value="high">High</option>
-            </select>
-          </div>
-          <div class="row" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
-            <label style="font-weight: 600; font-size: 0.9rem; color: #555;">Mental Load</label>
-            <select id="stress_load" style="width: 100%; padding: 8px;">
-              <option value="none">None</option>
-              <option value="moderate">Moderate</option>
-              <option value="high">High</option>
-            </select>
+        <!-- Loads -->
+        <div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="row" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
+              <label style="font-weight: 600; font-size: 0.9rem; color: #555;">Physical Load</label>
+              <select id="movement_load" style="width: 100%; padding: 8px;">
+                <option value="none">None</option>
+                <option value="normal">Normal</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+            <div class="row" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
+              <label style="font-weight: 600; font-size: 0.9rem; color: #555;">Mental Load</label>
+              <select id="stress_load" style="width: 100%; padding: 8px;">
+                <option value="none">None</option>
+                <option value="moderate">Moderate</option>
+                <option value="high">High</option>
+              </select>
+            </div>
           </div>
         </div>
 
+        <!-- Nutrition -->
+        <div style="border-top: 1px solid #e5e5e5; padding-top: 1rem;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="row" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
+              <label style="font-weight: 600; font-size: 0.9rem; color: #555;">Off-plan note</label>
+              <input type="text" id="offnote" placeholder="cookies, chips, beer…" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;">
+            </div>
+            <div class="row" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
+              <label style="font-weight: 600; font-size: 0.9rem; color: #555;">Ketones (mmol/L)</label>
+              <input type="number" id="ketones" step="0.1" min="0" placeholder="0.0" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Support -->
         <div style="border-top: 1px solid #e5e5e5; padding-top: 1rem;">
           <label style="font-weight: 600; font-size: 0.9rem; color: #555; display: block; margin-bottom: 0.75rem;">Support Taken</label>
           <div style="display: grid; gap: 0.75rem;">
@@ -1596,12 +1599,14 @@
       `;
       contextContainer.appendChild(contextDiv);
 
-      // Render non-symptom fields in Additional Fields section
+      // Render any remaining fields (currently none since all are hardcoded)
       const fieldsContainer = document.getElementById('fieldsContainer');
-      fieldsContainer.innerHTML = '';
-      const nonSymptomFields = config.fields.filter(f => f.id !== 'cramps' && f.id !== 'palps');
+      if (fieldsContainer) {
+        fieldsContainer.innerHTML = '';
+        const excludedFields = ['cramps', 'palps', 'headache', 'offnote', 'ketones', 'macros'];
+        const remainingFields = config.fields.filter(f => !excludedFields.includes(f.id));
 
-      nonSymptomFields.forEach(field => {
+        remainingFields.forEach(field => {
         const div = document.createElement('div');
         div.className = 'row';
 
@@ -1634,9 +1639,10 @@
           if (field.type === 'text') input.style.flex = '1';
         }
 
-        div.appendChild(input);
-        fieldsContainer.appendChild(div);
-      });
+          div.appendChild(input);
+          fieldsContainer.appendChild(div);
+        });
+      }
 
       renderTable();
     }
@@ -2207,8 +2213,7 @@
       const entry = {
         date,
         day: getValue('day') || '', // Allow empty day number
-        influenceNote: getValue('influenceNote') || '',
-        tomorrowNote: getValue('tomorrowNote') || ''
+        influenceNote: getValue('influenceNote') || ''
       };
 
       // Collect slider values with null for unmoved sliders
@@ -2229,9 +2234,11 @@
       entry.gut_support_detail = getValue('gut_support_detail') || '';
       entry.movement_load = getValue('movement_load') || 'none';
       entry.stress_load = getValue('stress_load') || 'none';
+      entry.offnote = getValue('offnote') || '';
+      entry.ketones = getValue('ketones') || '';
 
       // Collect symptom values
-      ['cramps', 'palps'].forEach(symptomId => {
+      ['cramps', 'palps', 'headache'].forEach(symptomId => {
         const selectedBtn = document.querySelector(`.severity-btn[data-symptom="${symptomId}"].selected`);
         if (selectedBtn) {
           const level = selectedBtn.dataset.level;
@@ -2247,8 +2254,9 @@
         }
       });
 
-      // Collect non-symptom field values (excluding old cramps/palps if they exist)
-      config.fields.filter(f => f.id !== 'cramps' && f.id !== 'palps').forEach(f => {
+      // Collect any remaining field values (excluding hardcoded ones)
+      const excludedFields = ['cramps', 'palps', 'headache', 'offnote', 'ketones', 'macros'];
+      config.fields.filter(f => !excludedFields.includes(f.id)).forEach(f => {
         entry[f.id] = getValue(f.id);
       });
 
@@ -2290,17 +2298,20 @@
       const allSlidersNull = config.sliders.every(s => entry[s.id] === null);
 
       // Check if no symptoms are set (all "None")
-      const symptomsEmpty = ['cramps', 'palps'].every(symptomId => {
+      const symptomsEmpty = ['cramps', 'palps', 'headache'].every(symptomId => {
         return !entry[symptomId] || entry[symptomId] === 'None';
       });
 
       // Check if context fields are unset
       const contextEmpty = !entry.electrolytes_taken &&
+                          !entry.gut_support_taken &&
                           entry.movement_load === 'none' &&
-                          entry.stress_load === 'none';
+                          entry.stress_load === 'none' &&
+                          !entry.offnote &&
+                          !entry.ketones;
 
       // Check if notes are empty
-      const notesEmpty = !entry.influenceNote && !entry.tomorrowNote;
+      const notesEmpty = !entry.influenceNote;
 
       return allSlidersNull && symptomsEmpty && contextEmpty && notesEmpty;
     }
