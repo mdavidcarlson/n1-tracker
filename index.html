@@ -873,61 +873,75 @@
 
   <!-- Input Section -->
   <div class="input-section" style="margin-top: 1.5rem;">
-    <div class="section-header" onclick="toggleInputSection()">
-      <h2>Save Today's Entry</h2>
-      <span class="collapse-icon open" id="inputCollapseIcon">▶</span>
-    </div>
-
     <div id="inputFormContent">
-      <h3 style="font-size: 1rem; color: #666; margin-top: 0;">Basic Info</h3>
-      <div class="row">
-        <label for="date">Date <span style="color: #dc3545;">*</span></label>
-        <input type="date" id="date" required>
-        <label for="day">Day # <span style="font-size: 0.75rem; font-weight: normal; color: #999;">(experiment day)</span></label>
-        <input type="number" id="day" min="1" max="365" style="width:80px;" placeholder="Auto">
+      <!-- Compact Date/Day Info Strip -->
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 2rem;">
+        <div style="display: flex; align-items: center; gap: 2rem;">
+          <div>
+            <label for="date" style="display: block; font-size: 0.75rem; color: #666; margin-bottom: 0.25rem; font-weight: 600;">Date <span style="color: #dc3545;">*</span></label>
+            <input type="date" id="date" required style="border: 1px solid #ddd; background: white; padding: 0.5rem; border-radius: 4px; font-size: 0.95rem;">
+          </div>
+          <div>
+            <label for="day" style="display: block; font-size: 0.75rem; color: #666; margin-bottom: 0.25rem; font-weight: 600;">Day #</label>
+            <input type="number" id="day" min="1" max="365" style="width:80px; border: 1px solid #ddd; background: white; padding: 0.5rem; border-radius: 4px; font-size: 0.95rem;" placeholder="Auto">
+          </div>
+        </div>
+        <p style="font-size: 0.75rem; color: #999; margin: 0; font-style: italic; max-width: 140px; text-align: right;">Auto-increments with experiment</p>
       </div>
-      <p style="font-size: 0.8rem; color: #666; margin: 0.5rem 0 0 0; font-style: italic;">
-        Day # auto-increments to track your experiment progress (e.g., "Day 30 of 90")
-      </p>
 
-      <h3 style="font-size: 1.1rem; color: #333; margin-top: 2rem; margin-bottom: 0.75rem;">Daily Signals</h3>
-      <div class="spectrum-legend">
-        Move only the sliders you want to track today. Unmoved sliders are not recorded.<br>
-        Left = more like the left side. Right = more like the right side. <strong>0 = in between.</strong>
+      <!-- Daily Signals Section -->
+      <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 2px solid #e5e5e5;">
+        <h3 style="font-size: 1.1rem; color: #333; margin-top: 0; margin-bottom: 0.75rem;">Daily Signals</h3>
+        <div class="spectrum-legend">
+          Move only the sliders you want to track today. Unmoved sliders are not recorded.<br>
+          Left = more like the left side. Right = more like the right side. <strong>0 = in between.</strong>
+        </div>
+        <div id="slidersContainer"></div>
       </div>
-      <div id="slidersContainer"></div>
 
-      <h3 style="font-size: 1.1rem; color: #333; margin-top: 2rem; margin-bottom: 0.75rem;">Symptoms (Optional)</h3>
-      <details>
-        <summary style="cursor: pointer; padding: 0.75rem; background: white; border-radius: 4px; margin-bottom: 1rem; font-weight: 600; font-size: 1rem; color: #666;">
-          View Symptoms
-        </summary>
-        <div id="symptomsContainer"></div>
-      </details>
-
-      <h3 style="font-size: 1.1rem; color: #333; margin-top: 2rem; margin-bottom: 0.75rem;">Context (Optional)</h3>
-      <details>
-        <summary style="cursor: pointer; padding: 0.75rem; background: white; border-radius: 4px; margin-bottom: 1rem; font-weight: 600; font-size: 1rem; color: #666;">
-          View Context
-        </summary>
-        <div id="contextContainer"></div>
-      </details>
-
-      <!-- Additional Fields (Collapsible) -->
-      <details>
-        <summary style="cursor: pointer; padding: 0.75rem; background: white; border-radius: 4px; margin-bottom: 1rem; font-weight: 600; font-size: 1rem; margin-top: 1rem; color: #666;">
-          Additional Fields (Optional)
-        </summary>
-        <div id="fieldsContainer"></div>
-      </details>
-
-      <div class="row">
-        <label for="influenceNote">What most influenced today's signals?</label>
-        <textarea id="influenceNote" placeholder="Sleep quality? Stress? Food timing? Movement?"></textarea>
+      <!-- Symptoms Section -->
+      <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 2px solid #e5e5e5;">
+        <h3 style="font-size: 1.1rem; color: #333; margin-top: 0; margin-bottom: 0.75rem;">Symptoms (Optional)</h3>
+        <details>
+          <summary style="cursor: pointer; padding: 0.75rem; background: white; border-radius: 4px; margin-bottom: 1rem; font-weight: 600; font-size: 1rem; color: #666;">
+            View Symptoms
+          </summary>
+          <div id="symptomsContainer"></div>
+        </details>
       </div>
-      <div class="row">
-        <label for="tomorrowNote">One thing to repeat or avoid tomorrow:</label>
-        <textarea id="tomorrowNote" placeholder="What worked? What didn't?"></textarea>
+
+      <!-- Context Section -->
+      <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 2px solid #e5e5e5;">
+        <h3 style="font-size: 1.1rem; color: #333; margin-top: 0; margin-bottom: 0.75rem;">Context (Optional)</h3>
+        <details>
+          <summary style="cursor: pointer; padding: 0.75rem; background: white; border-radius: 4px; margin-bottom: 1rem; font-weight: 600; font-size: 1rem; color: #666;">
+            View Context
+          </summary>
+          <div id="contextContainer"></div>
+        </details>
+      </div>
+
+      <!-- Additional Fields Section -->
+      <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 2px solid #e5e5e5;">
+        <details>
+          <summary style="cursor: pointer; padding: 0.75rem; background: white; border-radius: 4px; margin-bottom: 1rem; font-weight: 600; font-size: 1rem; color: #666;">
+            Additional Fields (Optional)
+          </summary>
+          <div id="fieldsContainer"></div>
+        </details>
+      </div>
+
+      <!-- Reflection Section -->
+      <div style="margin-bottom: 2rem;">
+        <h3 style="font-size: 1.1rem; color: #333; margin-top: 0; margin-bottom: 0.75rem;">Reflection</h3>
+        <div class="row">
+          <label for="influenceNote">What most influenced today's signals?</label>
+          <textarea id="influenceNote" placeholder="Sleep quality? Stress? Food timing? Movement?"></textarea>
+        </div>
+        <div class="row">
+          <label for="tomorrowNote">One thing to repeat or avoid tomorrow:</label>
+          <textarea id="tomorrowNote" placeholder="What worked? What didn't?"></textarea>
+        </div>
       </div>
     </div>
   </div>
