@@ -2037,22 +2037,6 @@
     }
 
     // Input section collapse function
-    function toggleInputSection() {
-      const content = document.getElementById('inputFormContent');
-      const icon = document.getElementById('inputCollapseIcon');
-      const stickyBar = document.getElementById('stickyBottomBar');
-
-      if (content.style.display === 'none') {
-        content.style.display = 'block';
-        icon.classList.add('open');
-        stickyBar.classList.add('show');
-      } else {
-        content.style.display = 'none';
-        icon.classList.remove('open');
-        stickyBar.classList.remove('show');
-      }
-    }
-
     function renderCards() {
       const entries = loadEntries();
       const container = document.getElementById('cardContainer');
@@ -3200,11 +3184,9 @@
       showStatus('✨ Tracker updated! Your customizations have been preserved.', 'success');
     }
 
-    // Always auto-expand input section and show sticky bar on page load
+    // Always show sticky bar on page load
     const entries = loadEntries();
     const stickyBar = document.getElementById('stickyBottomBar');
-    document.getElementById('inputFormContent').style.display = 'block';
-    document.getElementById('inputCollapseIcon').classList.add('open');
     stickyBar.classList.add('show');
 
     // Update completeness indicator on load
