@@ -907,7 +907,7 @@
     <button class="main-tab active" onclick="switchMainTab('today')" id="mainTabToday" style="flex: 1; padding: 0.75rem 1rem; background: none; border: none; border-bottom: 3px solid #2DD4BF; font-size: 1rem; font-weight: 600; color: #2DD4BF; cursor: pointer; transition: all 0.2s;">
       Today
     </button>
-    <button class="main-tab" onclick="switchMainTab('analysis')" id="mainTabAnalysis" style="flex: 1; padding: 0.75rem 1rem; background: none; border: none; border-bottom: 3px solid transparent; font-size: 1rem; font-weight: 600; color: #666; cursor: pointer; transition: all 0.2s;">
+    <button class="main-tab" onclick="switchMainTab('analysis')" id="mainTabAnalysis" style="flex: 1; padding: 0.75rem 1rem; background: none; border: none; border-bottom: 3px solid transparent; font-size: 1rem; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: all 0.2s;">
       Analysis
     </button>
   </div>
@@ -924,46 +924,46 @@
   <div class="input-section" style="margin-top: 1.5rem;">
     <div id="inputFormContent">
       <!-- Compact Date/Day Info Strip -->
-      <div style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 2rem;">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px; margin-bottom: 2rem;">
         <div style="display: flex; align-items: center; gap: 2rem;">
           <div>
-            <label for="date" style="display: block; font-size: 0.75rem; color: #666; margin-bottom: 0.25rem; font-weight: 600;">Date <span style="color: #dc3545;">*</span></label>
-            <input type="date" id="date" required style="border: 1px solid #ddd; background: white; padding: 0.5rem; border-radius: 4px; font-size: 0.95rem;">
+            <label for="date" style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem; font-weight: 600;">Date <span style="color: #dc3545;">*</span></label>
+            <input type="date" id="date" required style="border: 1px solid var(--border-color); background: var(--input-bg); padding: 0.5rem; border-radius: 4px; font-size: 0.95rem;">
           </div>
           <div>
-            <label for="day" style="display: block; font-size: 0.75rem; color: #666; margin-bottom: 0.25rem; font-weight: 600;">Day #</label>
-            <input type="number" id="day" min="1" max="365" style="width:80px; border: 1px solid #ddd; background: white; padding: 0.5rem; border-radius: 4px; font-size: 0.95rem;" placeholder="Auto">
+            <label for="day" style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem; font-weight: 600;">Day #</label>
+            <input type="number" id="day" min="1" max="365" style="width:80px; border: 1px solid var(--border-color); background: var(--input-bg); padding: 0.5rem; border-radius: 4px; font-size: 0.95rem;" placeholder="Auto">
           </div>
         </div>
-        <p style="font-size: 0.75rem; color: #999; margin: 0; font-style: italic; max-width: 140px; text-align: right;">Auto-increments with experiment</p>
+        <p style="font-size: 0.75rem; color: var(--text-tertiary); margin: 0; font-style: italic; max-width: 140px; text-align: right;">Auto-increments with experiment</p>
       </div>
 
       <!-- Daily Signals Section -->
-      <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 2px solid #e5e5e5;">
-        <h3 style="font-size: 1.1rem; color: #333; margin-top: 0; margin-bottom: 0.75rem;">Daily Signals</h3>
-        <p style="font-size: 0.85rem; color: #888; margin: 0 0 1rem 0; font-style: italic;">
+      <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 2px solid var(--border-light);">
+        <h3 style="font-size: 1.1rem; color: var(--text-primary); margin-top: 0; margin-bottom: 0.75rem;">Daily Signals</h3>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 1rem 0; font-style: italic;">
           Move only the sliders you want to track today. Unmoved sliders are not recorded.
         </p>
         <div id="slidersContainer"></div>
       </div>
 
       <!-- More Details Section (Consolidated) -->
-      <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 2px solid #e5e5e5;">
+      <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 2px solid var(--border-light);">
         <details>
-          <summary style="cursor: pointer; padding: 0.75rem 1rem; background: #f8f9fa; border-radius: 6px; font-weight: 600; font-size: 1rem; color: #555; border: 1px solid #e0e0e0; transition: background 0.2s;" onmouseover="this.style.background='#e9ecef'" onmouseout="this.style.background='#f8f9fa'">
+          <summary style="cursor: pointer; padding: 0.75rem 1rem; background: var(--bg-tertiary); border-radius: 6px; font-weight: 600; font-size: 1rem; color: var(--text-secondary); border: 1px solid var(--border-color); transition: background 0.2s;">
             More Details
           </summary>
           <div style="margin-top: 1rem; display: grid; gap: 1.75rem;">
 
             <!-- Symptoms subsection -->
             <div>
-              <h4 style="font-size: 0.95rem; color: #666; margin: 0 0 0.75rem 0; font-weight: 600;">Symptoms</h4>
+              <h4 style="font-size: 0.95rem; color: var(--text-secondary); margin: 0 0 0.75rem 0; font-weight: 600;">Symptoms</h4>
               <div id="symptomsContainer"></div>
             </div>
 
             <!-- Context subsection -->
             <div>
-              <h4 style="font-size: 0.95rem; color: #666; margin: 0 0 0.75rem 0; font-weight: 600;">Context</h4>
+              <h4 style="font-size: 0.95rem; color: var(--text-secondary); margin: 0 0 0.75rem 0; font-weight: 600;">Context</h4>
               <div id="contextContainer"></div>
             </div>
 
@@ -973,7 +973,7 @@
 
       <!-- Reflection Section -->
       <div style="margin-bottom: 2rem;">
-        <h3 style="font-size: 1.1rem; color: #333; margin-top: 0; margin-bottom: 0.75rem;">Reflection</h3>
+        <h3 style="font-size: 1.1rem; color: var(--text-primary); margin-top: 0; margin-bottom: 0.75rem;">Reflection</h3>
         <div class="row">
           <label for="influenceNote">What most influenced today's signals?</label>
           <textarea id="influenceNote" placeholder="Sleep quality? Stress? Food timing? Movement?"></textarea>
@@ -1016,7 +1016,7 @@
     </div>
 
     <!-- View Switcher -->
-    <div style="display: flex; align-items: center; justify-content: space-between; margin: 1.5rem 0 2rem 0; padding-bottom: 1rem; border-bottom: 2px solid #e5e5e5;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin: 1.5rem 0 2rem 0; padding-bottom: 1rem; border-bottom: 2px solid var(--border-light);">
       <div class="tab-navigation" style="margin: 0;">
         <button class="tab-button active" onclick="switchAnalysisView('individual')" id="viewIndividual">
           Individual Charts
@@ -1039,7 +1039,7 @@
     <!-- Individual Charts View -->
     <div class="analysis-view active" id="contentIndividual">
       <div id="trendsContainer">
-        <p style="text-align: center; color: #999; padding: 3rem;">
+        <p style="text-align: center; color: var(--text-tertiary); padding: 3rem;">
           Need at least 3 days of data to show trends. Keep tracking!
         </p>
       </div>
@@ -1048,7 +1048,7 @@
     <!-- Overlay View -->
     <div class="analysis-view" id="contentOverlay" style="display: none;">
       <div id="overlayContainer">
-        <p style="text-align: center; color: #999; padding: 3rem;">
+        <p style="text-align: center; color: var(--text-tertiary); padding: 3rem;">
           Combined overlay chart will appear here
         </p>
       </div>
@@ -1062,7 +1062,7 @@
           <tbody id="tableBody"></tbody>
         </table>
       </div>
-      <p id="tableEmptyState" style="text-align: center; color: #999; padding: 3rem; display: none;">
+      <p id="tableEmptyState" style="text-align: center; color: var(--text-tertiary); padding: 3rem; display: none;">
         No entries yet. Save your first day above!
       </p>
     </div>
@@ -1076,7 +1076,7 @@
       </div>
       <p style="margin: 1.5rem 0;">You haven't recorded any signals for today. Save a blank day anyway?</p>
       <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-        <button onclick="closeSaveEmptyModal()" style="background: #f5f5f5; color: #333;">Cancel</button>
+        <button onclick="closeSaveEmptyModal()" style="background: var(--bg-tertiary); color: var(--text-primary);">Cancel</button>
         <button onclick="confirmSaveEmpty()" class="primary">Save blank</button>
       </div>
     </div>
@@ -1111,10 +1111,10 @@
         </div>
 
         <!-- Experiment Configuration -->
-        <div style="margin-bottom: 2rem; padding: 1rem; background: #f0f7ff; border-radius: 6px; border-left: 4px solid #2DD4BF;">
+        <div style="margin-bottom: 2rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 6px; border-left: 4px solid var(--accent-primary);">
           <h3 style="margin-top: 0;">Experiment Progress Tracker</h3>
 
-          <p style="font-size: 0.9rem; color: #666; margin: 0 0 1rem 0;">
+          <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0 0 1rem 0;">
             Optional: turn this on if you want a visual progress bar for a 30/60/90-day experiment.
           </p>
 
@@ -1123,7 +1123,7 @@
               <input type="checkbox" id="experimentEnabled" style="width: auto;">
               <strong>Enable Progress Tracker</strong>
             </label>
-            <small style="color: #666; display: block; margin-top: 0.25rem;">Show visual progress bar with phases and milestones</small>
+            <small style="color: var(--text-secondary); display: block; margin-top: 0.25rem;">Show visual progress bar with phases and milestones</small>
           </div>
 
           <div id="experimentConfig" style="margin-top: 1rem;">
@@ -1143,9 +1143,9 @@
               </div>
             </div>
 
-            <details style="background: #f9f9f9; padding: 0.75rem; border-radius: 4px; margin-top: 1rem; border-left: 3px solid #2DD4BF;">
-              <summary style="cursor: pointer; font-weight: 600; color: #333;">How to Edit Phases & Milestones</summary>
-              <ol style="margin: 0.75rem 0 0 1.5rem; padding: 0; font-size: 0.85rem; color: #666;">
+            <details style="background: var(--bg-tertiary); padding: 0.75rem; border-radius: 4px; margin-top: 1rem; border-left: 3px solid var(--accent-primary);">
+              <summary style="cursor: pointer; font-weight: 600; color: var(--text-primary);">How to Edit Phases & Milestones</summary>
+              <ol style="margin: 0.75rem 0 0 1.5rem; padding: 0; font-size: 0.85rem; color: var(--text-secondary);">
                 <li style="margin-bottom: 0.25rem;">Click "Export Settings Template" in the Data tab</li>
                 <li style="margin-bottom: 0.25rem;">Open the downloaded JSON file in any text editor</li>
                 <li style="margin-bottom: 0.25rem;">Find the "experiment" section with "phases" and "milestones" arrays</li>
@@ -1153,8 +1153,8 @@
                 <li style="margin-bottom: 0.25rem;">Save the file and click "Import Settings Template" in the Data tab</li>
               </ol>
               <details style="margin-top: 0.75rem;">
-                <summary style="cursor: pointer; font-size: 0.8rem; color: #2DD4BF;">Show JSON structure example</summary>
-                <pre style="background: white; padding: 0.5rem; border-radius: 4px; font-size: 0.7rem; overflow-x: auto; margin-top: 0.5rem;">
+                <summary style="cursor: pointer; font-size: 0.8rem; color: var(--accent-primary);">Show JSON structure example</summary>
+                <pre style="background: var(--card-bg); padding: 0.5rem; border-radius: 4px; font-size: 0.7rem; overflow-x: auto; margin-top: 0.5rem;">
 "phases": [
   { "name": "Adaptation", "endDay": 42, "color": "#ffc107", "message": "..." },
   { "name": "Optimization", "endDay": 70, "color": "#28a745", "message": "..." }
@@ -1171,21 +1171,21 @@
 
       <!-- Experiment Tab -->
       <div class="settings-tab-content" id="settingsTabExperiment">
-        <div style="margin-bottom: 2rem; padding: 1.25rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #2DD4BF;">
-          <h3 style="margin-top: 0; color: #2DD4BF;">Understanding Chapters & Milestones</h3>
+        <div style="margin-bottom: 2rem; padding: 1.25rem; background: var(--bg-tertiary); border-radius: 8px; border-left: 4px solid var(--accent-primary);">
+          <h3 style="margin-top: 0; color: var(--accent-primary);">Understanding Chapters & Milestones</h3>
 
           <div style="display: grid; gap: 1.25rem; font-size: 0.95rem;">
             <div>
-              <strong style="color: #333;">📖 Chapters</strong>
-              <p style="margin: 0.5rem 0 0 0; color: #666; line-height: 1.5;">
+              <strong style="color: var(--text-primary);">📖 Chapters</strong>
+              <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary); line-height: 1.5;">
                 Time <em>periods</em> that divide your experiment into stages (e.g., "Orientation" for Days 1-7, "Adapting" for Days 22-42).
                 Each chapter has a name, end day, color, and motivational message. The app shows which chapter you're currently in.
               </p>
             </div>
 
             <div>
-              <strong style="color: #333;">📍 Milestones</strong>
-              <p style="margin: 0.5rem 0 0 0; color: #666; line-height: 1.5;">
+              <strong style="color: var(--text-primary);">📍 Milestones</strong>
+              <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary); line-height: 1.5;">
                 Specific <em>point-in-time</em> markers for events (e.g., "HTMA Test #1" on Jan 6, "Day 42 Check" on Feb 17).
                 These appear as dots on the progress bar and show countdown/days remaining in the experiment tracker.
               </p>
@@ -1199,7 +1199,7 @@
             <div>
               <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Start Date</label>
               <input type="date" id="experimentStart" style="width: 100%;">
-              <small style="color: #999; display: block; margin-top: 0.25rem;">
+              <small style="color: var(--text-tertiary); display: block; margin-top: 0.25rem;">
                 Entries before this date show as "countdown days"
               </small>
             </div>
@@ -1216,7 +1216,7 @@
 
         <div style="margin-bottom: 2rem;">
           <h3>Chapters</h3>
-          <p style="font-size: 0.9rem; color: #666; margin: 0 0 1rem 0;">
+          <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0 0 1rem 0;">
             Define the phases of your experiment. Each chapter lasts until the specified day number.
           </p>
           <div id="chaptersConfig"></div>
@@ -1225,7 +1225,7 @@
 
         <div style="margin-bottom: 2rem;">
           <h3>Milestones</h3>
-          <p style="font-size: 0.9rem; color: #666; margin: 0 0 1rem 0;">
+          <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0 0 1rem 0;">
             Mark specific dates for tests, check-ins, or important events.
           </p>
           <div id="milestonesConfig"></div>
@@ -1236,14 +1236,14 @@
       <!-- Tracking Setup Tab -->
       <div class="settings-tab-content" id="settingsTabTracking">
         <h3>Slider Metrics (−5 to +5)</h3>
-        <p style="font-size: 0.9rem; color: #666; margin: 0 0 1rem 0;">
+        <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0 0 1rem 0;">
           –5 = top anchor, 0 = in between, +5 = bottom anchor. Only move a slider if you want to track it that day.
         </p>
         <div id="sliderConfig"></div>
         <button onclick="addSlider()" style="margin-bottom:1.5rem;">+ Add Slider</button>
 
         <h3>Additional Fields (Optional)</h3>
-        <p style="font-size: 0.9rem; color: #666; margin: 0 0 1rem 0;">
+        <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0 0 1rem 0;">
           Additional fields become extra columns in your log (for things like cramps, palpitations, off-plan, ketones). Use "Choice" for buttons, "Text" for notes, and "Number" for numeric values.
         </p>
         <div id="fieldConfig"></div>
@@ -1258,35 +1258,35 @@
 
             <div>
               <button onclick="exportCsv(); closeSettings();" style="width: 100%; padding: 0.75rem;">Export Data (CSV)</button>
-              <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
+              <small style="display: block; color: var(--text-secondary); margin-top: 0.25rem; font-style: italic;">
                 Download all saved entries as CSV for backup or analysis in Excel/Sheets.
               </small>
             </div>
 
             <div>
               <button onclick="document.getElementById('csvFileInput').click();" style="width: 100%; padding: 0.75rem;">Import Data (CSV)</button>
-              <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
+              <small style="display: block; color: var(--text-secondary); margin-top: 0.25rem; font-style: italic;">
                 Restore previously exported entries or merge data from another device.
               </small>
             </div>
 
             <div>
               <button onclick="exportConfig();" style="width: 100%; padding: 0.75rem;">Export Settings Template</button>
-              <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
+              <small style="display: block; color: var(--text-secondary); margin-top: 0.25rem; font-style: italic;">
                 Download a JSON template of your sliders, fields, phases, and milestones.
               </small>
             </div>
 
             <div>
               <button onclick="document.getElementById('configFileInput').click();" style="width: 100%; padding: 0.75rem;">Import Settings Template</button>
-              <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
+              <small style="display: block; color: var(--text-secondary); margin-top: 0.25rem; font-style: italic;">
                 Load a JSON settings template (sliders, fields, phases). Existing entries are not changed.
               </small>
             </div>
 
             <div style="border-top: 2px solid #ddd; padding-top: 1rem; margin-top: 0.5rem;">
               <button onclick="resetToDefault()" class="warning" style="width: 100%; padding: 0.75rem;">Reset Settings to Default</button>
-              <small style="display: block; color: #666; margin-top: 0.25rem; font-style: italic;">
+              <small style="display: block; color: var(--text-secondary); margin-top: 0.25rem; font-style: italic;">
                 Restore the default tracker layout (sliders, fields, phases). Saved entries stay.
               </small>
             </div>
@@ -1503,8 +1503,8 @@
             </div>
           </div>
           <div class="slider-label">
-            <span style="font-size: 0.85rem; color: #999;">${slider.left}</span>
-            <span style="font-size: 0.85rem; color: #999;">${slider.right}</span>
+            <span style="font-size: 0.85rem; color: var(--text-tertiary);">${slider.left}</span>
+            <span style="font-size: 0.85rem; color: var(--text-tertiary);">${slider.right}</span>
           </div>
           <div class="slider-track-wrapper">
             <div class="slider-gradient-bg"></div>
@@ -1606,7 +1606,7 @@
         <div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
             <div class="row" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
-              <label style="font-weight: 600; font-size: 0.9rem; color: #555;">Physical Load</label>
+              <label style="font-weight: 600; font-size: 0.9rem; color: var(--text-secondary);">Physical Load</label>
               <select id="movement_load" style="width: 100%; padding: 8px;">
                 <option value="none">None</option>
                 <option value="normal">Normal</option>
@@ -1614,7 +1614,7 @@
               </select>
             </div>
             <div class="row" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
-              <label style="font-weight: 600; font-size: 0.9rem; color: #555;">Mental Load</label>
+              <label style="font-weight: 600; font-size: 0.9rem; color: var(--text-secondary);">Mental Load</label>
               <select id="stress_load" style="width: 100%; padding: 8px;">
                 <option value="none">None</option>
                 <option value="moderate">Moderate</option>
@@ -1628,34 +1628,34 @@
         <div style="border-top: 1px solid #e5e5e5; padding-top: 1rem;">
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
             <div class="row" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
-              <label style="font-weight: 600; font-size: 0.9rem; color: #555;">Off-plan note</label>
-              <input type="text" id="offnote" placeholder="cookies, chips, beer…" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;">
+              <label style="font-weight: 600; font-size: 0.9rem; color: var(--text-secondary);">Off-plan note</label>
+              <input type="text" id="offnote" placeholder="cookies, chips, beer…" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.9rem; background: var(--input-bg);">
             </div>
             <div class="row" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
-              <label style="font-weight: 600; font-size: 0.9rem; color: #555;">Ketones (mmol/L)</label>
-              <input type="number" id="ketones" step="0.1" min="0" placeholder="0.0" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;">
+              <label style="font-weight: 600; font-size: 0.9rem; color: var(--text-secondary);">Ketones (mmol/L)</label>
+              <input type="number" id="ketones" step="0.1" min="0" placeholder="0.0" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.9rem; background: var(--input-bg);">
             </div>
           </div>
         </div>
 
         <!-- Support -->
         <div style="border-top: 1px solid #e5e5e5; padding-top: 1rem;">
-          <label style="font-weight: 600; font-size: 0.9rem; color: #555; display: block; margin-bottom: 0.75rem;">Supports Used</label>
+          <label style="font-weight: 600; font-size: 0.9rem; color: var(--text-secondary); display: block; margin-bottom: 0.75rem;">Supports Used</label>
           <div style="display: grid; gap: 0.75rem;">
-            <label style="display: flex; align-items: center; gap: 0.5rem; padding: 8px 12px; background: #f8f9fa; border-radius: 6px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#e9ecef'" onmouseout="this.style.background='#f8f9fa'">
+            <label style="display: flex; align-items: center; gap: 0.5rem; padding: 8px 12px; background: var(--bg-tertiary); border-radius: 6px; cursor: pointer; transition: background 0.2s;">
               <input type="checkbox" id="electrolytes_taken" style="width: 18px; height: 18px; cursor: pointer;">
-              <span style="font-weight: 500; color: #333;">Electrolytes</span>
+              <span style="font-weight: 500; color: var(--text-primary);">Electrolytes</span>
             </label>
-            <label style="display: flex; align-items: center; gap: 0.5rem; padding: 8px 12px; background: #f8f9fa; border-radius: 6px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#e9ecef'" onmouseout="this.style.background='#f8f9fa'">
+            <label style="display: flex; align-items: center; gap: 0.5rem; padding: 8px 12px; background: var(--bg-tertiary); border-radius: 6px; cursor: pointer; transition: background 0.2s;">
               <input type="checkbox" id="breathwork_taken" style="width: 18px; height: 18px; cursor: pointer;">
-              <span style="font-weight: 500; color: #333;">Breathwork</span>
+              <span style="font-weight: 500; color: var(--text-primary);">Breathwork</span>
             </label>
             <div style="display: grid; gap: 0.5rem;">
-              <label style="display: flex; align-items: center; gap: 0.5rem; padding: 8px 12px; background: #f8f9fa; border-radius: 6px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#e9ecef'" onmouseout="this.style.background='#f8f9fa'">
+              <label style="display: flex; align-items: center; gap: 0.5rem; padding: 8px 12px; background: var(--bg-tertiary); border-radius: 6px; cursor: pointer; transition: background 0.2s;">
                 <input type="checkbox" id="gut_support_taken" style="width: 18px; height: 18px; cursor: pointer;" onchange="document.getElementById('gut_support_detail').style.display = this.checked ? 'block' : 'none'">
-                <span style="font-weight: 500; color: #333;">Gut health support</span>
+                <span style="font-weight: 500; color: var(--text-primary);">Gut health support</span>
               </label>
-              <input type="text" id="gut_support_detail" placeholder="e.g., homemade yogurt, probiotics, sauerkraut..." style="display: none; margin-left: 2rem; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;">
+              <input type="text" id="gut_support_detail" placeholder="e.g., homemade yogurt, probiotics, sauerkraut..." style="display: none; margin-left: 2rem; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.9rem; background: var(--input-bg);">
             </div>
           </div>
         </div>
@@ -1829,7 +1829,7 @@
                 <div class="experiment-dates">${formatDate(exp.startDate)} - ${formatDate(exp.endDate)}</div>
               </div>
               <div style="text-align: right;">
-                <div style="font-size: 1.5rem; font-weight: bold; color: #666;">Starts in ${daysUntilStart} day${daysUntilStart !== 1 ? 's' : ''}</div>
+                <div style="font-size: 1.5rem; font-weight: bold; color: var(--text-secondary);">Starts in ${daysUntilStart} day${daysUntilStart !== 1 ? 's' : ''}</div>
                 <div style="font-size: 0.85rem; opacity: 0.9;">${totalDays} days total</div>
               </div>
             </div>
@@ -2569,7 +2569,7 @@
       const container = document.getElementById('trendsContainer');
 
       if (entries.length < 3) {
-        container.innerHTML = '<p style="text-align:center; color:#999; padding:3rem;">Need at least 3 days of data to show trends. Keep tracking!</p>';
+        container.innerHTML = '<p style="text-align:center; color:var(--text-tertiary); padding:3rem;">Need at least 3 days of data to show trends. Keep tracking!</p>';
         return;
       }
 
@@ -2581,7 +2581,7 @@
       const entries = loadEntries();
 
       if (entries.length < 3) {
-        container.innerHTML = '<p style="text-align:center; color:#999; padding:3rem;">Need at least 3 days of data to show overlay chart. Keep tracking!</p>';
+        container.innerHTML = '<p style="text-align:center; color:var(--text-tertiary); padding:3rem;">Need at least 3 days of data to show overlay chart. Keep tracking!</p>';
         return;
       }
 
@@ -2605,12 +2605,12 @@
           const metricColor = getMetricColor(slider.id);
 
           html += `
-            <div style="padding: 1rem; background: white; border-left: 4px solid ${metricColor}; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-              <div style="font-weight: 600; color: #555; margin-bottom: 0.5rem;">${slider.label}</div>
+            <div style="padding: 1rem; background: var(--card-bg); border-left: 4px solid ${metricColor}; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+              <div style="font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem;">${slider.label}</div>
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
                   <div style="font-size: 1.5rem; font-weight: bold; color: ${trendColor};">${current} ${trend}</div>
-                  <div style="font-size: 0.75rem; color: #999;">Avg: ${avg.toFixed(1)}</div>
+                  <div style="font-size: 0.75rem; color: var(--text-tertiary);">Avg: ${avg.toFixed(1)}</div>
                 </div>
               </div>
             </div>
@@ -2627,7 +2627,7 @@
       const container = document.getElementById('trendsContainer');
 
       if (entries.length < 3) {
-        container.innerHTML = '<p style="text-align:center; color:#999; padding:3rem;">Need at least 3 days of data to show trends. Keep tracking!</p>';
+        container.innerHTML = '<p style="text-align:center; color:var(--text-tertiary); padding:3rem;">Need at least 3 days of data to show trends. Keep tracking!</p>';
         return;
       }
 
@@ -2653,12 +2653,12 @@
             const metricColor = getMetricColor(slider.id);
 
             html += `
-              <div style="padding: 1rem; background: white; border-left: 4px solid ${metricColor}; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                <div style="font-weight: 600; color: #555; margin-bottom: 0.5rem;">${slider.label}</div>
+              <div style="padding: 1rem; background: var(--card-bg); border-left: 4px solid ${metricColor}; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <div style="font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem;">${slider.label}</div>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                   <div>
                     <div style="font-size: 1.5rem; font-weight: bold; color: ${trendColor};">${current} ${trend}</div>
-                    <div style="font-size: 0.75rem; color: #999;">Avg: ${avg.toFixed(1)}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-tertiary);">Avg: ${avg.toFixed(1)}</div>
                   </div>
                 </div>
               </div>
@@ -2734,48 +2734,55 @@
 
       // Generate legend first
       let legendHtml = `
-        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; margin-bottom: 1.5rem; padding: 1rem; background: #f8f9fa; border-radius: 6px;">
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 6px;">
       `;
 
       metricsData.forEach(metric => {
         legendHtml += `
           <div style="display: flex; align-items: center; gap: 0.5rem;">
             <div style="width: 20px; height: 3px; background: ${metric.color};"></div>
-            <span style="font-size: 0.85rem; color: #555; font-weight: 600;">${metric.label}</span>
+            <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">${metric.label}</span>
           </div>
         `;
       });
 
       legendHtml += `</div>`;
 
+      // Get current theme colors for SVG
+      const styles = getComputedStyle(document.body);
+      const borderColor = styles.getPropertyValue('--border-light').trim();
+      const textSecondary = styles.getPropertyValue('--text-secondary').trim();
+      const textPrimary = styles.getPropertyValue('--text-primary').trim();
+      const cardBg = styles.getPropertyValue('--card-bg').trim();
+
       // Generate SVG
       let svg = `
-        <div style="background: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
-          <h3 style="margin-top: 0; color: #2DD4BF; text-align: center;">All Metrics Over Time</h3>
+        <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+          <h3 style="margin-top: 0; color: var(--accent-primary); text-align: center;">All Metrics Over Time</h3>
           ${legendHtml}
           <svg width="100%" viewBox="0 0 ${width} ${height}" style="max-width: 700px; display: block; margin: 0 auto;">
             <!-- Grid lines -->
-            <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${padding + chartHeight}" stroke="#ddd" stroke-width="1"/>
-            <line x1="${padding}" y1="${padding + chartHeight}" x2="${padding + chartWidth}" y2="${padding + chartHeight}" stroke="#ddd" stroke-width="1"/>
+            <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${padding + chartHeight}" stroke="${borderColor}" stroke-width="1"/>
+            <line x1="${padding}" y1="${padding + chartHeight}" x2="${padding + chartWidth}" y2="${padding + chartHeight}" stroke="${borderColor}" stroke-width="1"/>
 
             <!-- Zero line if applicable -->
-            ${globalMin < 0 && globalMax > 0 ? `<line x1="${padding}" y1="${padding + chartHeight - ((-globalMin) / range) * chartHeight}" x2="${padding + chartWidth}" y2="${padding + chartHeight - ((-globalMin) / range) * chartHeight}" stroke="#999" stroke-width="1" stroke-dasharray="4"/>` : ''}
+            ${globalMin < 0 && globalMax > 0 ? `<line x1="${padding}" y1="${padding + chartHeight - ((-globalMin) / range) * chartHeight}" x2="${padding + chartWidth}" y2="${padding + chartHeight - ((-globalMin) / range) * chartHeight}" stroke="${textSecondary}" stroke-width="1" stroke-dasharray="4"/>` : ''}
 
             <!-- Y-axis labels -->
-            <text x="${padding - 10}" y="${padding}" font-size="12" fill="#666" text-anchor="end" font-weight="600">${globalMax}</text>
-            <text x="${padding - 10}" y="${padding + chartHeight}" font-size="12" fill="#666" text-anchor="end" font-weight="600">${globalMin}</text>
-            <text x="${padding - 10}" y="${padding + chartHeight / 2}" font-size="12" fill="#666" text-anchor="end" font-weight="600">${((globalMax + globalMin) / 2).toFixed(1)}</text>
+            <text x="${padding - 10}" y="${padding}" font-size="12" fill="${textSecondary}" text-anchor="end" font-weight="600">${globalMax}</text>
+            <text x="${padding - 10}" y="${padding + chartHeight}" font-size="12" fill="${textSecondary}" text-anchor="end" font-weight="600">${globalMin}</text>
+            <text x="${padding - 10}" y="${padding + chartHeight / 2}" font-size="12" fill="${textSecondary}" text-anchor="end" font-weight="600">${((globalMax + globalMin) / 2).toFixed(1)}</text>
 
             <!-- Y-axis title -->
-            <text x="${padding - 45}" y="${padding + chartHeight / 2}" font-size="12" fill="#333" font-weight="700" text-anchor="middle" transform="rotate(-90, ${padding - 45}, ${padding + chartHeight / 2})">Score</text>
+            <text x="${padding - 45}" y="${padding + chartHeight / 2}" font-size="12" fill="${textPrimary}" font-weight="700" text-anchor="middle" transform="rotate(-90, ${padding - 45}, ${padding + chartHeight / 2})">Score</text>
 
             <!-- X-axis labels with dates -->
-            <text x="${padding}" y="${height - 10}" font-size="11" fill="#666" font-weight="600">${sorted[0].date.substring(5)}</text>
-            ${sorted.length > 2 ? `<text x="${padding + chartWidth / 2}" y="${height - 10}" font-size="11" fill="#666" font-weight="600" text-anchor="middle">${sorted[Math.floor(sorted.length / 2)].date.substring(5)}</text>` : ''}
-            <text x="${padding + chartWidth}" y="${height - 10}" font-size="11" fill="#666" font-weight="600" text-anchor="end">${sorted[sorted.length - 1].date.substring(5)}</text>
+            <text x="${padding}" y="${height - 10}" font-size="11" fill="${textSecondary}" font-weight="600">${sorted[0].date.substring(5)}</text>
+            ${sorted.length > 2 ? `<text x="${padding + chartWidth / 2}" y="${height - 10}" font-size="11" fill="${textSecondary}" font-weight="600" text-anchor="middle">${sorted[Math.floor(sorted.length / 2)].date.substring(5)}</text>` : ''}
+            <text x="${padding + chartWidth}" y="${height - 10}" font-size="11" fill="${textSecondary}" font-weight="600" text-anchor="end">${sorted[sorted.length - 1].date.substring(5)}</text>
 
             <!-- X-axis title -->
-            <text x="${padding + chartWidth / 2}" y="${height - 30}" font-size="12" fill="#333" font-weight="700" text-anchor="middle">Date</text>
+            <text x="${padding + chartWidth / 2}" y="${height - 30}" font-size="12" fill="${textPrimary}" font-weight="700" text-anchor="middle">Date</text>
       `;
 
       // Plot each metric
@@ -2795,7 +2802,7 @@
           const dateIndex = sorted.findIndex(e => e.date === v.date);
           const x = padding + (dateIndex / (sorted.length - 1)) * chartWidth;
           const y = padding + chartHeight - ((v.value - globalMin) / range) * chartHeight;
-          svg += `<circle cx="${x}" cy="${y}" r="5" fill="${metric.color}" stroke="white" stroke-width="2"/>`;
+          svg += `<circle cx="${x}" cy="${y}" r="5" fill="${metric.color}" stroke="${cardBg}" stroke-width="2"/>`;
         });
       });
 
@@ -2828,29 +2835,29 @@
       const chart = generateSVGChart(values, slider.label);
 
       return `
-        <div style="margin-bottom: 2rem; padding: 1rem; background: #f9f9f9; border-radius: 8px;">
-          <h3 style="margin-top: 0; color: #2DD4BF;">${slider.label} <span style="color: ${trendColor};">${trend}</span></h3>
+        <div style="margin-bottom: 2rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
+          <h3 style="margin-top: 0; color: var(--accent-primary);">${slider.label} <span style="color: ${trendColor};">${trend}</span></h3>
 
           ${chart}
 
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1rem;">
-            <div style="text-align: center; padding: 0.5rem; background: white; border-radius: 4px;">
-              <div style="font-size: 0.75rem; color: #666;">Current</div>
+            <div style="text-align: center; padding: 0.5rem; background: var(--card-bg); border-radius: 4px;">
+              <div style="font-size: 0.75rem; color: var(--text-secondary);">Current</div>
               <div style="font-size: 1.25rem; font-weight: bold; color: ${trendColor};">${current}</div>
             </div>
-            <div style="text-align: center; padding: 0.5rem; background: white; border-radius: 4px;">
-              <div style="font-size: 0.75rem; color: #666;">7-Day Avg</div>
+            <div style="text-align: center; padding: 0.5rem; background: var(--card-bg); border-radius: 4px;">
+              <div style="font-size: 0.75rem; color: var(--text-secondary);">7-Day Avg</div>
               <div style="font-size: 1.25rem; font-weight: bold;">${avg.toFixed(1)}</div>
             </div>
-            <div style="text-align: center; padding: 0.5rem; background: white; border-radius: 4px;">
-              <div style="font-size: 0.75rem; color: #666;">Best</div>
+            <div style="text-align: center; padding: 0.5rem; background: var(--card-bg); border-radius: 4px;">
+              <div style="font-size: 0.75rem; color: var(--text-secondary);">Best</div>
               <div style="font-size: 1.25rem; font-weight: bold; color: #28a745;">${max}</div>
-              <div style="font-size: 0.7rem; color: #999;">${maxEntry.date}</div>
+              <div style="font-size: 0.7rem; color: var(--text-tertiary);">${maxEntry.date}</div>
             </div>
-            <div style="text-align: center; padding: 0.5rem; background: white; border-radius: 4px;">
-              <div style="font-size: 0.75rem; color: #666;">Worst</div>
+            <div style="text-align: center; padding: 0.5rem; background: var(--card-bg); border-radius: 4px;">
+              <div style="font-size: 0.75rem; color: var(--text-secondary);">Worst</div>
               <div style="font-size: 1.25rem; font-weight: bold; color: #dc3545;">${min}</div>
-              <div style="font-size: 0.7rem; color: #999;">${minEntry.date}</div>
+              <div style="font-size: 0.7rem; color: var(--text-tertiary);">${minEntry.date}</div>
             </div>
           </div>
         </div>
@@ -2869,6 +2876,12 @@
       const maxVal = Math.max(...allValues);
       const range = maxVal - minVal || 1;
 
+      // Get current theme colors for SVG
+      const styles = getComputedStyle(document.body);
+      const borderColor = styles.getPropertyValue('--border-light').trim();
+      const textSecondary = styles.getPropertyValue('--text-secondary').trim();
+      const accentPrimary = styles.getPropertyValue('--accent-primary').trim();
+
       // Generate points for the line
       const points = values.map((v, i) => {
         const x = padding + (i / (values.length - 1)) * chartWidth;
@@ -2882,30 +2895,30 @@
       return `
         <svg width="100%" viewBox="0 0 ${width} ${height}" style="max-width: 600px; display: block; margin: 0 auto;">
           <!-- Grid lines -->
-          <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${padding + chartHeight}" stroke="#ddd" stroke-width="1"/>
-          <line x1="${padding}" y1="${padding + chartHeight}" x2="${padding + chartWidth}" y2="${padding + chartHeight}" stroke="#ddd" stroke-width="1"/>
+          <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${padding + chartHeight}" stroke="${borderColor}" stroke-width="1"/>
+          <line x1="${padding}" y1="${padding + chartHeight}" x2="${padding + chartWidth}" y2="${padding + chartHeight}" stroke="${borderColor}" stroke-width="1"/>
 
           <!-- Zero line if range includes zero -->
-          ${minVal < 0 && maxVal > 0 ? `<line x1="${padding}" y1="${padding + chartHeight - ((-minVal) / range) * chartHeight}" x2="${padding + chartWidth}" y2="${padding + chartHeight - ((-minVal) / range) * chartHeight}" stroke="#999" stroke-width="1" stroke-dasharray="4"/>` : ''}
+          ${minVal < 0 && maxVal > 0 ? `<line x1="${padding}" y1="${padding + chartHeight - ((-minVal) / range) * chartHeight}" x2="${padding + chartWidth}" y2="${padding + chartHeight - ((-minVal) / range) * chartHeight}" stroke="${textSecondary}" stroke-width="1" stroke-dasharray="4"/>` : ''}
 
           <!-- Area fill -->
-          <polygon points="${areaPoints}" fill="#2DD4BF" fill-opacity="0.1"/>
+          <polygon points="${areaPoints}" fill="${accentPrimary}" fill-opacity="0.1"/>
 
           <!-- Line -->
-          <polyline points="${points}" fill="none" stroke="#2DD4BF" stroke-width="2"/>
+          <polyline points="${points}" fill="none" stroke="${accentPrimary}" stroke-width="2"/>
 
           <!-- Data points -->
           ${values.map((v, i) => {
             const x = padding + (i / (values.length - 1)) * chartWidth;
             const y = padding + chartHeight - ((v.value - minVal) / range) * chartHeight;
-            return `<circle cx="${x}" cy="${y}" r="3" fill="#2DD4BF"/>`;
+            return `<circle cx="${x}" cy="${y}" r="3" fill="${accentPrimary}"/>`;
           }).join('')}
 
           <!-- Labels -->
-          <text x="${padding}" y="${height - 5}" font-size="10" fill="#666">${values[0].date}</text>
-          <text x="${padding + chartWidth}" y="${height - 5}" font-size="10" fill="#666" text-anchor="end">${values[values.length - 1].date}</text>
-          <text x="${5}" y="${padding}" font-size="10" fill="#666">${maxVal}</text>
-          <text x="${5}" y="${padding + chartHeight}" font-size="10" fill="#666">${minVal}</text>
+          <text x="${padding}" y="${height - 5}" font-size="10" fill="${textSecondary}">${values[0].date}</text>
+          <text x="${padding + chartWidth}" y="${height - 5}" font-size="10" fill="${textSecondary}" text-anchor="end">${values[values.length - 1].date}</text>
+          <text x="${5}" y="${padding}" font-size="10" fill="${textSecondary}">${maxVal}</text>
+          <text x="${5}" y="${padding + chartHeight}" font-size="10" fill="${textSecondary}">${minVal}</text>
         </svg>
       `;
     }
@@ -2939,11 +2952,11 @@
         div.innerHTML = `
           <label>Slider ${idx + 1}</label>
           <input type="text" placeholder="Mental Clarity" value="${slider.label}" data-idx="${idx}" data-field="label">
-          <small style="display: block; color: #999; margin: 0.25rem 0 0.5rem 0;">Slider name</small>
+          <small style="display: block; color: var(--text-tertiary); margin: 0.25rem 0 0.5rem 0;">Slider name</small>
           <input type="text" placeholder="Brain fog" value="${slider.left}" data-idx="${idx}" data-field="left">
-          <small style="display: block; color: #999; margin: 0.25rem 0 0.5rem 0;">Top anchor (–5 side)</small>
+          <small style="display: block; color: var(--text-tertiary); margin: 0.25rem 0 0.5rem 0;">Top anchor (–5 side)</small>
           <input type="text" placeholder="Clear-headed" value="${slider.right}" data-idx="${idx}" data-field="right">
-          <small style="display: block; color: #999; margin: 0.25rem 0 0.5rem 0;">Bottom anchor (+5 side)</small>
+          <small style="display: block; color: var(--text-tertiary); margin: 0.25rem 0 0.5rem 0;">Bottom anchor (+5 side)</small>
           <button onclick="removeSlider(${idx})" class="danger" style="margin-top:0.5rem;">Remove</button>
         `;
         sliderConfig.appendChild(div);
@@ -2959,16 +2972,16 @@
         div.innerHTML = `
           <label>Field ${idx + 1}</label>
           <input type="text" placeholder="Muscle Cramps" value="${field.label}" data-idx="${idx}" data-field="label">
-          <small style="display: block; color: #999; margin: 0.25rem 0 0.5rem 0;">Field label</small>
+          <small style="display: block; color: var(--text-tertiary); margin: 0.25rem 0 0.5rem 0;">Field label</small>
           <select data-idx="${idx}" data-field="type" id="fieldType${idx}">
             <option value="select" ${field.type === 'select' ? 'selected' : ''}>Choice</option>
             <option value="text" ${field.type === 'text' ? 'selected' : ''}>Text</option>
             <option value="number" ${field.type === 'number' ? 'selected' : ''}>Number</option>
           </select>
-          <small style="display: block; color: #999; margin: 0.25rem 0 0.5rem 0;">Field type</small>
+          <small style="display: block; color: var(--text-tertiary); margin: 0.25rem 0 0.5rem 0;">Field type</small>
           <div id="choicesContainer${idx}" style="${field.type === 'select' ? '' : 'display: none;'}">
             <input type="text" placeholder="None, Mild, Wakes-me-up" value="${field.type === 'select' ? field.options.join(', ') : ''}" data-idx="${idx}" data-field="options">
-            <small style="display: block; color: #999; margin: 0.25rem 0 0.5rem 0;">Choices (comma-separated)</small>
+            <small style="display: block; color: var(--text-tertiary); margin: 0.25rem 0 0.5rem 0;">Choices (comma-separated)</small>
           </div>
           <button onclick="removeField(${idx})" class="danger" style="margin-top:0.5rem;">Remove</button>
         `;
@@ -2992,11 +3005,11 @@
           div.innerHTML = `
             <label>Chapter ${idx + 1}</label>
             <input type="text" placeholder="Orientation" value="${chapter.name}" data-idx="${idx}" data-field="name" class="chapter-field">
-            <small style="display: block; color: #999; margin: 0.25rem 0 0.5rem 0;">Chapter name</small>
+            <small style="display: block; color: var(--text-tertiary); margin: 0.25rem 0 0.5rem 0;">Chapter name</small>
             <input type="number" placeholder="7" value="${chapter.endDay}" data-idx="${idx}" data-field="endDay" class="chapter-field">
-            <small style="display: block; color: #999; margin: 0.25rem 0 0.5rem 0;">End day number</small>
+            <small style="display: block; color: var(--text-tertiary); margin: 0.25rem 0 0.5rem 0;">End day number</small>
             <input type="text" placeholder="Getting oriented to the signals" value="${chapter.message}" data-idx="${idx}" data-field="message" class="chapter-field">
-            <small style="display: block; color: #999; margin: 0.25rem 0 0.5rem 0;">Motivational message</small>
+            <small style="display: block; color: var(--text-tertiary); margin: 0.25rem 0 0.5rem 0;">Motivational message</small>
             <button onclick="removeChapter(${idx})" class="danger" style="margin-top:0.5rem;">Remove</button>
           `;
           chaptersConfig.appendChild(div);
@@ -3013,9 +3026,9 @@
           div.innerHTML = `
             <label>Milestone ${idx + 1}</label>
             <input type="date" value="${milestone.date || ''}" data-idx="${idx}" data-field="date" class="milestone-field">
-            <small style="display: block; color: #999; margin: 0.25rem 0 0.5rem 0;">Date</small>
+            <small style="display: block; color: var(--text-tertiary); margin: 0.25rem 0 0.5rem 0;">Date</small>
             <input type="text" placeholder="HTMA Test #1" value="${milestone.label}" data-idx="${idx}" data-field="label" class="milestone-field">
-            <small style="display: block; color: #999; margin: 0.25rem 0 0.5rem 0;">Event label</small>
+            <small style="display: block; color: var(--text-tertiary); margin: 0.25rem 0 0.5rem 0;">Event label</small>
             <button onclick="removeMilestone(${idx})" class="danger" style="margin-top:0.5rem;">Remove</button>
           `;
           milestonesConfig.appendChild(div);
