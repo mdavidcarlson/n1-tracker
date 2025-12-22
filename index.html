@@ -962,7 +962,24 @@
   <!-- Analysis Tab Content -->
   <div class="main-tab-content" id="contentAnalysis" style="display: none; margin-top: 1.5rem;">
 
-    <div style="display: flex; align-items: center; justify-content: flex-end; margin-bottom: 1rem;">
+    <!-- Experiment Progress (shown in all views) -->
+    <div id="experimentProgress" style="display: none;">
+      <!-- Progress bar will be rendered here by JavaScript -->
+    </div>
+
+    <!-- View Switcher -->
+    <div style="display: flex; align-items: center; justify-content: space-between; margin: 1.5rem 0 2rem 0; padding-bottom: 1rem; border-bottom: 2px solid #e5e5e5;">
+      <div class="tab-navigation" style="margin: 0;">
+        <button class="tab-button active" onclick="switchAnalysisView('individual')" id="viewIndividual">
+          Individual Charts
+        </button>
+        <button class="tab-button" onclick="switchAnalysisView('overlay')" id="viewOverlay">
+          Overlay
+        </button>
+        <button class="tab-button" onclick="switchAnalysisView('table')" id="viewTable">
+          Table
+        </button>
+      </div>
       <button onclick="openSettings()" style="padding: 8px; background: transparent; border: none; cursor: pointer; border-radius: 4px; transition: background 0.2s; width: 40px; height: 40px;" title="Configure experiment settings" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='transparent'">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
@@ -971,23 +988,8 @@
       </button>
     </div>
 
-    <!-- Sub-Tab Navigation -->
-    <div class="tab-navigation">
-      <button class="tab-button active" onclick="switchTab('trends')" id="tabTrends">
-        Trends
-      </button>
-      <button class="tab-button" onclick="switchTab('table')" id="tabTable">
-        Table
-      </button>
-    </div>
-
-    <!-- Experiment Progress (shown in all tabs) -->
-    <div id="experimentProgress" style="display: none;">
-      <!-- Progress bar will be rendered here by JavaScript -->
-    </div>
-
-    <!-- Trends Tab Content -->
-    <div class="tab-content active" id="contentTrends">
+    <!-- Individual Charts View -->
+    <div class="analysis-view active" id="contentIndividual">
       <div id="trendsContainer">
         <p style="text-align: center; color: #999; padding: 3rem;">
           Need at least 3 days of data to show trends. Keep tracking!
@@ -995,8 +997,17 @@
       </div>
     </div>
 
-    <!-- Table Tab Content -->
-    <div class="tab-content" id="contentTable">
+    <!-- Overlay View -->
+    <div class="analysis-view" id="contentOverlay" style="display: none;">
+      <div id="overlayContainer">
+        <p style="text-align: center; color: #999; padding: 3rem;">
+          Combined overlay chart will appear here
+        </p>
+      </div>
+    </div>
+
+    <!-- Table View -->
+    <div class="analysis-view" id="contentTable" style="display: none;">
       <div class="table-container" id="tableContainer">
         <table id="logTable">
           <thead id="tableHeader"></thead>
@@ -1581,11 +1592,15 @@
 
         <!-- Support -->
         <div style="border-top: 1px solid #e5e5e5; padding-top: 1rem;">
-          <label style="font-weight: 600; font-size: 0.9rem; color: #555; display: block; margin-bottom: 0.75rem;">Support Taken</label>
+          <label style="font-weight: 600; font-size: 0.9rem; color: #555; display: block; margin-bottom: 0.75rem;">Supports Used</label>
           <div style="display: grid; gap: 0.75rem;">
             <label style="display: flex; align-items: center; gap: 0.5rem; padding: 8px 12px; background: #f8f9fa; border-radius: 6px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#e9ecef'" onmouseout="this.style.background='#f8f9fa'">
               <input type="checkbox" id="electrolytes_taken" style="width: 18px; height: 18px; cursor: pointer;">
               <span style="font-weight: 500; color: #333;">Electrolytes</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; padding: 8px 12px; background: #f8f9fa; border-radius: 6px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#e9ecef'" onmouseout="this.style.background='#f8f9fa'">
+              <input type="checkbox" id="breathwork_taken" style="width: 18px; height: 18px; cursor: pointer;">
+              <span style="font-weight: 500; color: #333;">Breathwork</span>
             </label>
             <div style="display: grid; gap: 0.5rem;">
               <label style="display: flex; align-items: center; gap: 0.5rem; padding: 8px 12px; background: #f8f9fa; border-radius: 6px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#e9ecef'" onmouseout="this.style.background='#f8f9fa'">
@@ -1962,8 +1977,8 @@
       const stickyBar = document.getElementById('stickyBottomBar');
       if (tabName === 'analysis') {
         stickyBar.classList.remove('show');
-        // Render table by default when switching to Analysis
-        renderTable();
+        // Render individual charts by default when switching to Analysis
+        renderTrendsInTab();
       } else {
         stickyBar.classList.add('show');
         // Hide success message when returning to Today tab
@@ -1974,28 +1989,26 @@
       }
     }
 
-    function switchTab(tabName) {
-      currentTab = tabName;
-
-      // Update tab buttons
-      document.querySelectorAll('.tab-button').forEach(btn => {
+    function switchAnalysisView(viewName) {
+      // Update view buttons
+      document.querySelectorAll('#contentAnalysis .tab-button').forEach(btn => {
         btn.classList.remove('active');
       });
-      document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active');
+      document.getElementById('view' + viewName.charAt(0).toUpperCase() + viewName.slice(1)).classList.add('active');
 
-      // Update tab content
-      document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
+      // Update view content
+      document.querySelectorAll('.analysis-view').forEach(view => {
+        view.style.display = 'none';
       });
-      document.getElementById('content' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active');
-
-      // Hide sticky Save Day button when viewing data tabs
-      const stickyBar = document.getElementById('stickyBottomBar');
-      stickyBar.classList.remove('show');
+      document.getElementById('content' + viewName.charAt(0).toUpperCase() + viewName.slice(1)).style.display = 'block';
 
       // Render appropriate content
-      if (tabName === 'trends') {
+      if (viewName === 'individual') {
         renderTrendsInTab();
+      } else if (viewName === 'overlay') {
+        renderOverlayChart();
+      } else if (viewName === 'table') {
+        renderTable();
       }
     }
 
@@ -2149,6 +2162,7 @@
 
       // Collect context values
       entry.electrolytes_taken = document.getElementById('electrolytes_taken')?.checked || false;
+      entry.breathwork_taken = document.getElementById('breathwork_taken')?.checked || false;
       entry.gut_support_taken = document.getElementById('gut_support_taken')?.checked || false;
       entry.gut_support_detail = getValue('gut_support_detail') || '';
       entry.movement_load = getValue('movement_load') || 'none';
@@ -2232,6 +2246,7 @@
 
       // Check if context fields are unset
       const contextEmpty = !entry.electrolytes_taken &&
+                          !entry.breathwork_taken &&
                           !entry.gut_support_taken &&
                           entry.movement_load === 'none' &&
                           entry.stress_load === 'none' &&
@@ -2511,6 +2526,19 @@
       }
 
       renderTrends();
+    }
+
+    function renderOverlayChart() {
+      const container = document.getElementById('overlayContainer');
+      const entries = loadEntries();
+
+      if (entries.length < 3) {
+        container.innerHTML = '<p style="text-align:center; color:#999; padding:3rem;">Need at least 3 days of data to show overlay chart. Keep tracking!</p>';
+        return;
+      }
+
+      // TODO: Implement combined overlay chart
+      container.innerHTML = '<p style="text-align:center; color:#999; padding:3rem;">Combined overlay chart coming soon!</p>';
     }
 
     function renderTrends() {
