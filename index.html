@@ -973,14 +973,11 @@
 
     <!-- Sub-Tab Navigation -->
     <div class="tab-navigation">
-      <button class="tab-button active" onclick="switchTab('table')" id="tabTable">
-        Table
-      </button>
-      <button class="tab-button" onclick="switchTab('cards')" id="tabCards">
-        Cards
-      </button>
-      <button class="tab-button" onclick="switchTab('trends')" id="tabTrends">
+      <button class="tab-button active" onclick="switchTab('trends')" id="tabTrends">
         Trends
+      </button>
+      <button class="tab-button" onclick="switchTab('table')" id="tabTable">
+        Table
       </button>
     </div>
 
@@ -989,8 +986,17 @@
       <!-- Progress bar will be rendered here by JavaScript -->
     </div>
 
+    <!-- Trends Tab Content -->
+    <div class="tab-content active" id="contentTrends">
+      <div id="trendsContainer">
+        <p style="text-align: center; color: #999; padding: 3rem;">
+          Need at least 3 days of data to show trends. Keep tracking!
+        </p>
+      </div>
+    </div>
+
     <!-- Table Tab Content -->
-    <div class="tab-content active" id="contentTable">
+    <div class="tab-content" id="contentTable">
       <div class="table-container" id="tableContainer">
         <table id="logTable">
           <thead id="tableHeader"></thead>
@@ -1000,23 +1006,6 @@
       <p id="tableEmptyState" style="text-align: center; color: #999; padding: 3rem; display: none;">
         No entries yet. Save your first day above!
       </p>
-    </div>
-
-    <!-- Cards Tab Content -->
-    <div class="tab-content" id="contentCards">
-      <div id="cardContainer"></div>
-      <p id="cardsEmptyState" style="text-align: center; color: #999; padding: 3rem; display: none;">
-        No entries yet. Save your first day above!
-      </p>
-    </div>
-
-    <!-- Trends Tab Content -->
-    <div class="tab-content" id="contentTrends">
-      <div id="trendsContainer">
-        <p style="text-align: center; color: #999; padding: 3rem;">
-          Need at least 3 days of data to show trends. Keep tracking!
-        </p>
-      </div>
     </div>
   </div>
 
@@ -1755,6 +1744,37 @@
       // Calculate total days and current day
       const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
       let currentDay = Math.ceil((todayDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+
+      // Format dates for display
+      const formatDate = (dateStr) => {
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      };
+
+      // Check if experiment hasn't started yet
+      const experimentStarted = todayDate >= startDate;
+      const experimentEnded = todayDate > endDate;
+
+      if (!experimentStarted) {
+        // Show days until start
+        const daysUntilStart = Math.ceil((startDate - todayDate) / (1000 * 60 * 60 * 24));
+        container.innerHTML = `
+          <div class="experiment-progress">
+            <div class="experiment-header">
+              <div>
+                <div class="experiment-title">${exp.goal}</div>
+                <div class="experiment-dates">${formatDate(exp.startDate)} - ${formatDate(exp.endDate)}</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 1.5rem; font-weight: bold; color: #666;">Starts in ${daysUntilStart} day${daysUntilStart !== 1 ? 's' : ''}</div>
+                <div style="font-size: 0.85rem; opacity: 0.9;">${totalDays} days total</div>
+              </div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
       currentDay = Math.max(1, Math.min(currentDay, totalDays));
 
       // Calculate progress percentage
@@ -1812,12 +1832,6 @@
           daysUntilNext = nextMilestone.day - currentDay;
         }
       }
-
-      // Format dates for display
-      const formatDate = (dateStr) => {
-        const d = new Date(dateStr);
-        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-      };
 
       // Build HTML
       let html = `
@@ -1980,9 +1994,7 @@
       stickyBar.classList.remove('show');
 
       // Render appropriate content
-      if (tabName === 'cards') {
-        renderCards();
-      } else if (tabName === 'trends') {
+      if (tabName === 'trends') {
         renderTrendsInTab();
       }
     }
@@ -2034,99 +2046,6 @@
       });
 
       updateCompleteness();
-    }
-
-    // Input section collapse function
-    function renderCards() {
-      const entries = loadEntries();
-      const container = document.getElementById('cardContainer');
-      const emptyState = document.getElementById('cardsEmptyState');
-      container.innerHTML = '';
-
-      if (entries.length === 0) {
-        emptyState.style.display = 'block';
-        return;
-      }
-
-      emptyState.style.display = 'none';
-
-      // Reverse to show most recent first
-      const sortedEntries = [...entries].sort((a, b) => b.date.localeCompare(a.date));
-
-      sortedEntries.forEach(entry => {
-        const card = document.createElement('div');
-        card.className = 'entry-card';
-
-        let html = `
-          <div class="entry-card-header">
-            <div class="entry-card-date">${formatDateReadable(entry.date)}</div>
-            <div class="entry-card-day">Day ${entry.day || '—'}</div>
-          </div>
-        `;
-
-        // Add sliders with trend indicators
-        config.sliders.forEach(slider => {
-          const value = entry[slider.id];
-          let displayValue = 'N/A';
-          let trendHtml = '';
-
-          if (value !== undefined && value !== null && value !== '') {
-            const avg = calculate7DayAverage(entries, slider.id, entry.date);
-            const trend = getTrendIndicator(parseFloat(value), avg);
-            const trendColor = getTrendColor(trend);
-            displayValue = value;
-            trendHtml = trend ? ` <span style="color: ${trendColor}; font-weight: bold;">${trend}</span>` : '';
-          }
-
-          html += `
-            <div class="entry-card-row">
-              <div class="entry-card-label">${slider.label}</div>
-              <div class="entry-card-value" style="${displayValue === 'N/A' ? 'color: #999;' : ''}">${displayValue}${trendHtml}</div>
-            </div>
-          `;
-        });
-
-        // Add fields
-        config.fields.forEach(field => {
-          const value = entry[field.id];
-          if (value !== undefined && value !== '') {
-            html += `
-              <div class="entry-card-row">
-                <div class="entry-card-label">${field.label}</div>
-                <div class="entry-card-value">${value}</div>
-              </div>
-            `;
-          }
-        });
-
-        // Add reflective notes if present (new format)
-        if (entry.influenceNote && entry.influenceNote.trim()) {
-          html += `
-            <div class="entry-card-notes">
-              <strong>What influenced today:</strong> ${entry.influenceNote}
-            </div>
-          `;
-        }
-        if (entry.tomorrowNote && entry.tomorrowNote.trim()) {
-          html += `
-            <div class="entry-card-notes">
-              <strong>For tomorrow:</strong> ${entry.tomorrowNote}
-            </div>
-          `;
-        }
-
-        // Fallback to legacy notes for old entries
-        if (!entry.influenceNote && !entry.tomorrowNote && entry.notes && entry.notes.trim()) {
-          html += `
-            <div class="entry-card-notes">
-              <strong>Notes:</strong> ${entry.notes}
-            </div>
-          `;
-        }
-
-        card.innerHTML = html;
-        container.appendChild(card);
-      });
     }
 
     function getValue(id) {
