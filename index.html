@@ -222,11 +222,20 @@
       0%, 100% {
         box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.4);
         transform: scale(1);
+        background: var(--bg-secondary);
       }
       50% {
         box-shadow: 0 0 0 8px rgba(45, 212, 191, 0);
         transform: scale(1.05);
+        background: rgba(255, 255, 255, 0.95);
       }
+    }
+    /* Light mode: make the white pulse more visible */
+    body:not(.dark-mode) .slider-group.unset input[type="range"]::-webkit-slider-thumb {
+      border-width: 3px;
+    }
+    body:not(.dark-mode) .slider-group.unset input[type="range"]::-moz-range-thumb {
+      border-width: 3px;
     }
     .slider-group.unset input[type="range"]::-webkit-slider-thumb {
       border-color: var(--border-color);
@@ -1778,16 +1787,18 @@
               displayVal = val; // Show actual value
 
               if (numVal < 0) {
-                // Negative values get muted amber/warm tint
+                // Negative values: slate/cool gray gradient (darker = worse)
                 const intensity = Math.min(Math.abs(numVal) / 3, 1);
-                bgColor = `background: rgba(218, 186, 144, ${0.2 + intensity * 0.3});`;
+                // Using slate tones from cosmic ocean theme
+                bgColor = `background: rgba(100, 116, 139, ${0.15 + intensity * 0.35});`; // Neutral gray
               } else if (numVal > 0) {
-                // Positive values get muted blue/cool tint
+                // Positive values: teal/ocean blue gradient (brighter = better)
                 const intensity = Math.min(numVal / 3, 1);
-                bgColor = `background: rgba(158, 184, 204, ${0.2 + intensity * 0.3});`;
+                // Using transformative teal from cosmic ocean theme
+                bgColor = `background: rgba(45, 212, 191, ${0.1 + intensity * 0.25});`; // Teal
               } else {
-                // Zero gets soft neutral
-                bgColor = 'background: #f8f9fa;';
+                // Zero gets soft neutral from theme
+                bgColor = 'background: var(--bg-tertiary);';
               }
             }
             html += `<td style="${bgColor}">${displayVal}</td>`;
