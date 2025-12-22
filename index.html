@@ -5,6 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Recalibrate</title>
   <style>
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8f9fa;
+      --bg-tertiary: #e9ecef;
+      --text-primary: #333;
+      --text-secondary: #666;
+      --text-tertiary: #999;
+      --border-color: #ddd;
+      --border-light: #e5e5e5;
+      --card-bg: #ffffff;
+      --input-bg: #ffffff;
+      --modal-bg: #ffffff;
+    }
+
+    body.dark-mode {
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #2d2d2d;
+      --bg-tertiary: #3a3a3a;
+      --text-primary: #e0e0e0;
+      --text-secondary: #b0b0b0;
+      --text-tertiary: #808080;
+      --border-color: #444;
+      --border-light: #333;
+      --card-bg: #2d2d2d;
+      --input-bg: #3a3a3a;
+      --modal-bg: #2d2d2d;
+    }
+
     * {
       box-sizing: border-box;
     }
@@ -15,6 +43,9 @@
       max-width: 1000px;
       margin: 0 auto;
       line-height: 1.4;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      transition: background 0.3s ease, color 0.3s ease;
     }
     h1 {
       font-size: 1.5rem;
@@ -844,14 +875,21 @@
   <div class="app-header">
     <div style="flex: 1;">
       <h1 id="trackerTitle" style="margin: 0;">Recalibrate</h1>
-      <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem; color: #666; font-weight: 400;">Notice what returns when you strip away the noise</p>
+      <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem; color: var(--text-secondary); font-weight: 400;">Notice what returns when you strip away the noise</p>
     </div>
-    <button class="settings-icon" onclick="openSettings()" title="Settings" style="width: 40px; height: 40px; padding: 8px;">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
-        <circle cx="12" cy="12" r="3"></circle>
-      </svg>
-    </button>
+    <div style="display: flex; gap: 0.5rem; align-items: center;">
+      <button id="darkModeToggle" onclick="toggleDarkMode()" title="Toggle dark mode" style="width: 40px; height: 40px; padding: 8px; background: transparent; border: none; cursor: pointer; border-radius: 4px; transition: background 0.2s; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
+        <svg id="darkModeIcon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+      <button class="settings-icon" onclick="openSettings()" title="Settings" style="width: 40px; height: 40px; padding: 8px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+      </button>
+    </div>
   </div>
 
   <!-- Main Navigation Tabs -->
@@ -2635,12 +2673,13 @@
 
     function getMetricColor(metricId) {
       const colors = {
-        'clarity': '#0066cc',   // Blue
-        'food': '#28a745',      // Green
-        'sleep': '#6f42c1',     // Purple
-        'gut': '#fd7e14',       // Orange
-        'energy': '#dc3545',    // Red
-        'joints': '#17a2b8'     // Teal
+        'mental_clarity': '#0066cc',        // Blue
+        'craving_noise': '#10b981',         // Emerald green
+        'sleep_waking_state': '#8b5cf6',    // Vivid purple
+        'gut_state': '#f97316',             // Bright orange
+        'energy_stability': '#ef4444',      // Bright red
+        'body_comfort': '#06b6d4',          // Cyan
+        'mood_stability': '#ec4899'         // Pink
       };
       return colors[metricId] || '#6c757d';
     }
@@ -2738,14 +2777,14 @@
         }).join(' ');
 
         // Draw line
-        svg += `<polyline points="${points}" fill="none" stroke="${metric.color}" stroke-width="2.5" opacity="0.8"/>`;
+        svg += `<polyline points="${points}" fill="none" stroke="${metric.color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`;
 
         // Draw points
         metric.values.forEach((v, i) => {
           const dateIndex = sorted.findIndex(e => e.date === v.date);
           const x = padding + (dateIndex / (sorted.length - 1)) * chartWidth;
           const y = padding + chartHeight - ((v.value - globalMin) / range) * chartHeight;
-          svg += `<circle cx="${x}" cy="${y}" r="4" fill="${metric.color}" opacity="0.9"/>`;
+          svg += `<circle cx="${x}" cy="${y}" r="5" fill="${metric.color}" stroke="white" stroke-width="2"/>`;
         });
       });
 
@@ -3162,6 +3201,33 @@
 
     // Update completeness indicator on load
     updateCompleteness();
+
+    // Dark mode toggle
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+
+      // Update icon
+      const icon = document.getElementById('darkModeIcon');
+      if (isDark) {
+        // Show sun icon for light mode option
+        icon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+      } else {
+        // Show moon icon for dark mode option
+        icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+      }
+
+      // Save preference
+      localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+    }
+
+    // Load dark mode preference on page load
+    const darkModePreference = localStorage.getItem('darkMode');
+    if (darkModePreference === 'enabled') {
+      document.body.classList.add('dark-mode');
+      const icon = document.getElementById('darkModeIcon');
+      icon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+    }
   </script>
 </body>
 </html>
