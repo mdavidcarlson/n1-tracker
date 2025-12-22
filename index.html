@@ -999,6 +999,10 @@
       <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem; color: var(--text-secondary); font-weight: 400;">Notice what returns when you strip away the noise</p>
     </div>
     <div style="display: flex; gap: 0.5rem; align-items: center;">
+      <!-- Sync Status Indicator -->
+      <div id="headerSyncStatus" title="Sync status" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+        <span id="headerSyncIndicator" style="width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 0 2px var(--bg-primary), 0 0 4px rgba(16, 185, 129, 0.5);"></span>
+      </div>
       <button id="darkModeToggle" onclick="toggleDarkMode()" title="Toggle dark mode" style="width: 40px; height: 40px; padding: 8px; background: transparent; border: none; cursor: pointer; border-radius: 4px; transition: background 0.2s; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
         <svg id="darkModeIcon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -1413,6 +1417,46 @@
         </div>
       </div>
 
+      <!-- Account Tab -->
+      <div class="settings-tab-content" id="settingsTabAccount">
+        <div style="margin-bottom: 2rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 6px;">
+          <h3 style="margin-top: 0;">Account Information</h3>
+
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-secondary);">Email</label>
+            <div id="userEmail" style="padding: 0.75rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 6px; font-family: monospace;">
+              Loading...
+            </div>
+          </div>
+
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-secondary);">Sync Status</label>
+            <div style="padding: 0.75rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 6px; display: flex; align-items: center; gap: 0.5rem;">
+              <span id="syncStatusIndicator" style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span>
+              <span id="syncStatusText">Connected & Syncing</span>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 1.5rem;">
+            <button onclick="forceSyncAll()" style="width: 100%; padding: 0.75rem; background: var(--accent-primary); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+              🔄 Sync All Data Now
+            </button>
+            <small style="display: block; color: var(--text-secondary); margin-top: 0.5rem; font-style: italic;">
+              Manually sync all your data with the cloud
+            </small>
+          </div>
+
+          <div style="border-top: 2px solid var(--border-color); padding-top: 1.5rem; margin-top: 1.5rem;">
+            <button onclick="handleLogout()" style="width: 100%; padding: 0.75rem; background: transparent; color: var(--text-primary); border: 2px solid var(--border-color); border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
+              Log Out
+            </button>
+            <small style="display: block; color: var(--text-secondary); margin-top: 0.5rem; font-style: italic;">
+              Your data is safe in the cloud and on this device
+            </small>
+          </div>
+        </div>
+      </div>
+
       <div class="buttons">
         <button onclick="saveConfig()" class="primary">Save Settings</button>
         <button onclick="closeSettings()">Cancel</button>
@@ -1622,8 +1666,114 @@
 
         // Update completeness indicator on load
         updateCompleteness();
+
+        // Update account info and sync status
+        updateAccountInfo();
+        updateSyncStatus();
       }
     }
+
+    // Handle logout
+    async function handleLogout() {
+      if (!confirm('Are you sure you want to log out? Your data is synced and safe.')) {
+        return;
+      }
+
+      await sb.auth.signOut();
+      // Clear local data
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(CONFIG_KEY);
+      // Reload to show auth screen
+      window.location.reload();
+    }
+
+    // Force sync all data
+    async function forceSyncAll() {
+      if (!currentUser) {
+        showStatus('Please log in to sync data', 'error');
+        return;
+      }
+
+      try {
+        showStatus('Syncing all data to cloud...', 'info');
+
+        // Sync config
+        const localConfig = loadConfigFromLocal();
+        if (localConfig) {
+          await saveConfigToSupabase(localConfig);
+        }
+
+        // Sync all entries
+        const localEntries = loadEntriesFromLocal();
+        for (const entry of localEntries) {
+          await saveEntryToSupabase(entry);
+        }
+
+        // Reload from Supabase to confirm
+        await loadDataFromSupabase();
+
+        showStatus(`✅ Synced ${localEntries.length} entries successfully!`, 'success');
+      } catch (error) {
+        console.error('Sync error:', error);
+        showStatus('Sync failed. Please try again.', 'error');
+      }
+    }
+
+    // Update sync status indicator
+    function updateSyncStatus() {
+      const indicator = document.getElementById('syncStatusIndicator');
+      const text = document.getElementById('syncStatusText');
+      const headerIndicator = document.getElementById('headerSyncIndicator');
+      const headerStatus = document.getElementById('headerSyncStatus');
+
+      let color, statusText, tooltip;
+
+      if (!currentUser) {
+        color = '#ef4444';
+        statusText = 'Not logged in';
+        tooltip = 'Not logged in - Click to log in';
+      } else if (!isOnline) {
+        color = '#f59e0b';
+        statusText = 'Offline (will sync when online)';
+        tooltip = 'Offline - Changes will sync when online';
+      } else {
+        color = '#10b981';
+        statusText = 'Connected & Syncing';
+        tooltip = 'Connected & syncing';
+      }
+
+      // Update Account tab indicators
+      if (indicator) indicator.style.background = color;
+      if (text) text.textContent = statusText;
+
+      // Update header indicator
+      if (headerIndicator) {
+        headerIndicator.style.background = color;
+        headerIndicator.style.boxShadow = `0 0 0 2px var(--bg-primary), 0 0 4px ${color}80`;
+      }
+      if (headerStatus) headerStatus.title = tooltip;
+    }
+
+    // Update user email in Account tab
+    function updateAccountInfo() {
+      const emailEl = document.getElementById('userEmail');
+      if (emailEl && currentUser) {
+        emailEl.textContent = currentUser.email;
+      }
+    }
+
+    // Listen for online/offline events
+    window.addEventListener('online', () => {
+      isOnline = true;
+      updateSyncStatus();
+      showStatus('Back online! Syncing...', 'success');
+    });
+
+    window.addEventListener('offline', () => {
+      isOnline = false;
+      updateSyncStatus();
+      showStatus('Offline mode - changes will sync when online', 'info');
+    });
 
     // Migrate local data to Supabase
     async function migrateLocalDataToSupabase() {
