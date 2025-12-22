@@ -917,8 +917,81 @@
       }
     }
   </style>
+
+  <!-- Supabase Client Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+  <!-- Authentication Screen -->
+  <div id="authScreen" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-primary); z-index: 9999; overflow-y: auto;">
+    <div style="max-width: 420px; margin: 0 auto; padding: 2rem; min-height: 100vh; display: flex; flex-direction: column; justify-content: center;">
+      <!-- Logo/Title -->
+      <div style="text-align: center; margin-bottom: 3rem;">
+        <h1 style="font-size: 2.5rem; margin: 0 0 0.5rem 0; color: var(--accent-primary);">Recalibrate</h1>
+        <p style="color: var(--text-secondary); margin: 0; font-size: 1rem;">Notice what returns when you strip away the noise</p>
+      </div>
+
+      <!-- Auth Card -->
+      <div style="background: var(--card-bg); padding: 2.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <!-- Toggle between Login/Signup -->
+        <div style="display: flex; gap: 0; border-bottom: 2px solid var(--border-light); margin-bottom: 2rem;">
+          <button id="loginTabBtn" onclick="switchAuthTab('login')" style="flex: 1; padding: 0.75rem; background: none; border: none; border-bottom: 3px solid var(--accent-primary); font-size: 1rem; font-weight: 600; color: var(--accent-primary); cursor: pointer;">
+            Log In
+          </button>
+          <button id="signupTabBtn" onclick="switchAuthTab('signup')" style="flex: 1; padding: 0.75rem; background: none; border: none; border-bottom: 3px solid transparent; font-size: 1rem; font-weight: 600; color: var(--text-secondary); cursor: pointer;">
+            Sign Up
+          </button>
+        </div>
+
+        <!-- Login Form -->
+        <div id="loginForm" style="display: block;">
+          <div style="margin-bottom: 1.5rem;">
+            <label for="loginEmail" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-primary);">Email</label>
+            <input type="email" id="loginEmail" placeholder="you@example.com" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px; font-size: 1rem; background: var(--input-bg); color: var(--text-primary);">
+          </div>
+          <div style="margin-bottom: 1.5rem;">
+            <label for="loginPassword" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-primary);">Password</label>
+            <input type="password" id="loginPassword" placeholder="••••••••" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px; font-size: 1rem; background: var(--input-bg); color: var(--text-primary);">
+          </div>
+          <button onclick="handleLogin()" style="width: 100%; padding: 0.875rem; background: var(--accent-primary); color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+            Log In
+          </button>
+          <p style="text-align: center; margin: 1rem 0 0 0; font-size: 0.9rem; color: var(--text-secondary);">
+            Forgot password? <a href="#" onclick="handlePasswordReset(); return false;" style="color: var(--accent-primary); text-decoration: none;">Reset it</a>
+          </p>
+        </div>
+
+        <!-- Signup Form -->
+        <div id="signupForm" style="display: none;">
+          <div style="margin-bottom: 1.5rem;">
+            <label for="signupEmail" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-primary);">Email</label>
+            <input type="email" id="signupEmail" placeholder="you@example.com" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px; font-size: 1rem; background: var(--input-bg); color: var(--text-primary);">
+          </div>
+          <div style="margin-bottom: 1.5rem;">
+            <label for="signupPassword" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-primary);">Password</label>
+            <input type="password" id="signupPassword" placeholder="••••••••" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px; font-size: 1rem; background: var(--input-bg); color: var(--text-primary);">
+            <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; color: var(--text-secondary);">Minimum 6 characters</p>
+          </div>
+          <button onclick="handleSignup()" style="width: 100%; padding: 0.875rem; background: var(--accent-primary); color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+            Create Account
+          </button>
+        </div>
+
+        <!-- Auth Messages -->
+        <div id="authMessage" style="margin-top: 1.5rem; padding: 0.75rem; border-radius: 6px; display: none;"></div>
+      </div>
+
+      <!-- Info Footer -->
+      <div style="text-align: center; margin-top: 2rem; color: var(--text-secondary); font-size: 0.9rem;">
+        <p style="margin: 0;">🔒 Your data is encrypted and private</p>
+        <p style="margin: 0.5rem 0 0 0;">Syncs across all your devices</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App (hidden until authenticated) -->
+  <div id="mainApp" style="display: none;">
+
   <!-- App Header -->
   <div class="app-header">
     <div style="flex: 1;">
@@ -1137,6 +1210,7 @@
         <button class="settings-tab" onclick="switchSettingsTab('experiment')">Experiment</button>
         <button class="settings-tab" onclick="switchSettingsTab('tracking')">Tracking Setup</button>
         <button class="settings-tab" onclick="switchSettingsTab('data')">Data</button>
+        <button class="settings-tab" onclick="switchSettingsTab('account')">Account</button>
       </div>
 
       <!-- General Tab -->
@@ -1351,6 +1425,438 @@
   <input type="file" id="configFileInput" accept=".json" style="display:none;">
 
   <script>
+    // ============================================================================
+    // SUPABASE CONFIGURATION
+    // ============================================================================
+    const SUPABASE_URL = 'https://npszsifoxxmiviqpaiog.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_YmWUA5oX1feLgmAao9QDMw_A7Zu-YKp';
+    const { createClient } = supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Auth state
+    let currentUser = null;
+    let isOnline = navigator.onLine;
+
+    // Track pending sync operations
+    let pendingSync = [];
+
+    // ============================================================================
+    // AUTHENTICATION FUNCTIONS
+    // ============================================================================
+
+    // Initialize app - check auth state
+    async function initializeApp() {
+      // Check current session
+      const { data: { session } } = await sb.auth.getSession();
+
+      if (session) {
+        currentUser = session.user;
+        await onAuthStateChange(true);
+      } else {
+        // Show auth screen
+        document.getElementById('authScreen').style.display = 'block';
+        document.getElementById('mainApp').style.display = 'none';
+      }
+
+      // Listen for auth changes
+      sb.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+          currentUser = session.user;
+          await onAuthStateChange(true);
+        } else if (event === 'SIGNED_OUT') {
+          currentUser = null;
+          document.getElementById('authScreen').style.display = 'block';
+          document.getElementById('mainApp').style.display = 'none';
+        }
+      });
+    }
+
+    // Switch between login/signup tabs
+    function switchAuthTab(tab) {
+      const loginBtn = document.getElementById('loginTabBtn');
+      const signupBtn = document.getElementById('signupTabBtn');
+      const loginForm = document.getElementById('loginForm');
+      const signupForm = document.getElementById('signupForm');
+
+      if (tab === 'login') {
+        loginBtn.style.borderBottom = '3px solid var(--accent-primary)';
+        loginBtn.style.color = 'var(--accent-primary)';
+        signupBtn.style.borderBottom = '3px solid transparent';
+        signupBtn.style.color = 'var(--text-secondary)';
+        loginForm.style.display = 'block';
+        signupForm.style.display = 'none';
+      } else {
+        signupBtn.style.borderBottom = '3px solid var(--accent-primary)';
+        signupBtn.style.color = 'var(--accent-primary)';
+        loginBtn.style.borderBottom = '3px solid transparent';
+        loginBtn.style.color = 'var(--text-secondary)';
+        signupForm.style.display = 'block';
+        loginForm.style.display = 'none';
+      }
+
+      // Clear messages
+      document.getElementById('authMessage').style.display = 'none';
+    }
+
+    // Handle login
+    async function handleLogin() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      if (!email || !password) {
+        showAuthMessage('Please enter email and password', 'error');
+        return;
+      }
+
+      showAuthMessage('Logging in...', 'info');
+
+      const { data, error } = await sb.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        showAuthMessage(error.message, 'error');
+      } else {
+        showAuthMessage('Success! Loading your data...', 'success');
+        // Auth state change will handle the rest
+      }
+    }
+
+    // Handle signup
+    async function handleSignup() {
+      const email = document.getElementById('signupEmail').value.trim();
+      const password = document.getElementById('signupPassword').value;
+
+      if (!email || !password) {
+        showAuthMessage('Please enter email and password', 'error');
+        return;
+      }
+
+      if (password.length < 6) {
+        showAuthMessage('Password must be at least 6 characters', 'error');
+        return;
+      }
+
+      showAuthMessage('Creating your account...', 'info');
+
+      const { data, error } = await sb.auth.signUp({
+        email,
+        password
+      });
+
+      if (error) {
+        showAuthMessage(error.message, 'error');
+      } else {
+        showAuthMessage('Account created! Check your email to confirm.', 'success');
+        // Switch to login tab after a delay
+        setTimeout(() => switchAuthTab('login'), 3000);
+      }
+    }
+
+    // Handle password reset
+    async function handlePasswordReset() {
+      const email = prompt('Enter your email address:');
+      if (!email) return;
+
+      showAuthMessage('Sending reset email...', 'info');
+
+      const { error } = await sb.auth.resetPasswordForEmail(email);
+
+      if (error) {
+        showAuthMessage(error.message, 'error');
+      } else {
+        showAuthMessage('Password reset email sent! Check your inbox.', 'success');
+      }
+    }
+
+    // Show auth message
+    function showAuthMessage(message, type) {
+      const msgEl = document.getElementById('authMessage');
+      msgEl.textContent = message;
+      msgEl.style.display = 'block';
+
+      if (type === 'error') {
+        msgEl.style.background = '#fee2e2';
+        msgEl.style.color = '#991b1b';
+        msgEl.style.border = '1px solid #fecaca';
+      } else if (type === 'success') {
+        msgEl.style.background = '#d1fae5';
+        msgEl.style.color = '#065f46';
+        msgEl.style.border = '1px solid #a7f3d0';
+      } else {
+        msgEl.style.background = '#dbeafe';
+        msgEl.style.color = '#1e40af';
+        msgEl.style.border = '1px solid #bfdbfe';
+      }
+    }
+
+    // Handle auth state change
+    async function onAuthStateChange(signedIn) {
+      if (signedIn) {
+        document.getElementById('authScreen').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+
+        // Migrate localStorage data to Supabase if this is first login
+        await migrateLocalDataToSupabase();
+
+        // Load data from Supabase
+        await loadDataFromSupabase();
+
+        // Initialize the app
+        config = loadConfig();
+        setToday();
+        renderTracker();
+        renderTable();
+        checkBackupReminder();
+
+        // Show migration notice if config was upgraded
+        const savedConfigVersion = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}').version || 1;
+        if (savedConfigVersion < CONFIG_VERSION && loadEntries().length > 0) {
+          showStatus('✨ Tracker updated! Your customizations have been preserved.', 'success');
+        }
+
+        // Always show sticky bar on page load
+        const stickyBar = document.getElementById('stickyBottomBar');
+        if (stickyBar) stickyBar.classList.add('show');
+
+        // Update completeness indicator on load
+        updateCompleteness();
+      }
+    }
+
+    // Migrate local data to Supabase
+    async function migrateLocalDataToSupabase() {
+      try {
+        console.log('Checking for local data to migrate...');
+
+        // Check if user already has data in Supabase
+        const { data: existingEntries } = await sb
+          .from('daily_entries')
+          .select('id')
+          .limit(1);
+
+        // If user already has cloud data, skip migration
+        if (existingEntries && existingEntries.length > 0) {
+          console.log('User already has cloud data, skipping migration');
+          return;
+        }
+
+        // Get localStorage data
+        const localEntries = loadEntriesFromLocal();
+        const localConfig = loadConfigFromLocal();
+
+        if (localEntries.length === 0 && !localConfig) {
+          console.log('No local data to migrate');
+          return;
+        }
+
+        console.log(`Migrating ${localEntries.length} entries to Supabase...`);
+
+        // Migrate config first
+        if (localConfig) {
+          await saveConfigToSupabase(localConfig);
+        }
+
+        // Migrate entries
+        if (localEntries.length > 0) {
+          for (const entry of localEntries) {
+            await saveEntryToSupabase(entry);
+          }
+        }
+
+        console.log('✅ Migration complete!');
+        showStatus('Your data has been synced to the cloud!', 'success');
+      } catch (error) {
+        console.error('Migration error:', error);
+        showStatus('Warning: Some data may not have synced. Your local data is safe.', 'error');
+      }
+    }
+
+    // Load data from Supabase
+    async function loadDataFromSupabase() {
+      try {
+        console.log('Loading data from Supabase...');
+
+        // Load config
+        const { data: configData, error: configError } = await sb
+          .from('user_config')
+          .select('*')
+          .eq('user_id', currentUser.id)
+          .single();
+
+        if (configData && !configError) {
+          // Save to localStorage for offline access
+          localStorage.setItem(CONFIG_KEY, JSON.stringify({
+            version: configData.version,
+            title: configData.title,
+            experiment: configData.experiment,
+            sliders: configData.sliders,
+            fields: configData.fields,
+            context: configData.context
+          }));
+        }
+
+        // Load entries
+        const { data: entriesData, error: entriesError } = await sb
+          .from('daily_entries')
+          .select('*')
+          .eq('user_id', currentUser.id)
+          .order('date', { ascending: false });
+
+        if (entriesData && !entriesError) {
+          // Convert from Supabase format to localStorage format
+          const entries = entriesData.map(e => convertSupabaseToLocalEntry(e));
+          // Save to localStorage for offline access
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+          console.log(`Loaded ${entries.length} entries from Supabase`);
+        }
+      } catch (error) {
+        console.error('Error loading from Supabase:', error);
+      }
+    }
+
+    // Helper: Load entries from local storage only
+    function loadEntriesFromLocal() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    // Helper: Load config from local storage only
+    function loadConfigFromLocal() {
+      try {
+        const saved = localStorage.getItem(CONFIG_KEY);
+        return saved ? JSON.parse(saved) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // Helper: Save entry to Supabase
+    async function saveEntryToSupabase(entry) {
+      // Convert entry format to Supabase schema
+      const supabaseEntry = {
+        user_id: currentUser.id,
+        date: entry.date,
+        day: entry.day || null,
+        influence_note: entry.influenceNote || null,
+
+        // Extract slider values
+        slider_values: {},
+
+        // Context values
+        electrolytes_taken: entry.electrolytes_taken || false,
+        breathwork_taken: entry.breathwork_taken || false,
+        gut_support_taken: entry.gut_support_taken || false,
+        gut_support_detail: entry.gut_support_detail || null,
+        movement_load: entry.movement_load || null,
+        stress_load: entry.stress_load || null,
+        offnote: entry.offnote || null,
+        ketones: entry.ketones || null,
+
+        // Symptoms
+        symptoms: {},
+        symptom_contexts: {}
+      };
+
+      // Extract slider values
+      config.sliders.forEach(s => {
+        if (entry[s.id] !== undefined) {
+          supabaseEntry.slider_values[s.id] = entry[s.id];
+        }
+      });
+
+      // Extract symptoms
+      ['cramps', 'palps', 'headache'].forEach(symptom => {
+        if (entry[symptom]) {
+          supabaseEntry.symptoms[symptom] = entry[symptom];
+        }
+        const contextKey = `${symptom}-context`;
+        if (entry[contextKey]) {
+          supabaseEntry.symptom_contexts[contextKey] = entry[contextKey];
+        }
+      });
+
+      // Upsert to Supabase
+      const { error } = await sb
+        .from('daily_entries')
+        .upsert(supabaseEntry, { onConflict: 'user_id,date' });
+
+      if (error) {
+        console.error('Error saving entry to Supabase:', error);
+        throw error;
+      }
+    }
+
+    // Helper: Save config to Supabase
+    async function saveConfigToSupabase(configData) {
+      const { error } = await sb
+        .from('user_config')
+        .upsert({
+          user_id: currentUser.id,
+          version: configData.version,
+          title: configData.title,
+          experiment: configData.experiment,
+          sliders: configData.sliders,
+          fields: configData.fields,
+          context: configData.context
+        }, { onConflict: 'user_id' });
+
+      if (error) {
+        console.error('Error saving config to Supabase:', error);
+        throw error;
+      }
+    }
+
+    // Helper: Convert Supabase entry back to local format
+    function convertSupabaseToLocalEntry(supabaseEntry) {
+      const localEntry = {
+        date: supabaseEntry.date,
+        day: supabaseEntry.day || '',
+        influenceNote: supabaseEntry.influence_note || '',
+        electrolytes_taken: supabaseEntry.electrolytes_taken || false,
+        breathwork_taken: supabaseEntry.breathwork_taken || false,
+        gut_support_taken: supabaseEntry.gut_support_taken || false,
+        gut_support_detail: supabaseEntry.gut_support_detail || '',
+        movement_load: supabaseEntry.movement_load || '',
+        stress_load: supabaseEntry.stress_load || '',
+        offnote: supabaseEntry.offnote || '',
+        ketones: supabaseEntry.ketones || ''
+      };
+
+      // Add slider values
+      if (supabaseEntry.slider_values) {
+        Object.keys(supabaseEntry.slider_values).forEach(key => {
+          localEntry[key] = supabaseEntry.slider_values[key];
+        });
+      }
+
+      // Add symptoms
+      if (supabaseEntry.symptoms) {
+        Object.keys(supabaseEntry.symptoms).forEach(key => {
+          localEntry[key] = supabaseEntry.symptoms[key];
+        });
+      }
+
+      // Add symptom contexts
+      if (supabaseEntry.symptom_contexts) {
+        Object.keys(supabaseEntry.symptom_contexts).forEach(key => {
+          localEntry[key] = supabaseEntry.symptom_contexts[key];
+        });
+      }
+
+      return localEntry;
+    }
+
+    // ============================================================================
+    // LOCALSTORAGE KEYS (kept for offline support)
+    // ============================================================================
     const STORAGE_KEY = 'n1_daily_log_entries_v2';
     const CONFIG_KEY = 'n1_tracker_config_v2';
     const EXPORT_KEY = 'n1_last_export_date';
@@ -1498,8 +2004,19 @@
       return config;
     }
 
-    function saveConfigToStorage() {
+    async function saveConfigToStorage() {
+      // Save to localStorage (for offline support)
       localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+
+      // Sync to Supabase if user is logged in
+      if (currentUser && isOnline) {
+        try {
+          await saveConfigToSupabase(config);
+        } catch (error) {
+          console.error('Failed to sync config to Supabase:', error);
+          // Don't block the UI - the data is safe in localStorage
+        }
+      }
     }
 
     // Track slider states (unset vs set)
@@ -2166,8 +2683,24 @@
       }
     }
 
-    function saveEntries(entries) {
+    async function saveEntries(entries) {
+      // Save to localStorage (for offline support)
       localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+
+      // Sync to Supabase if user is logged in
+      if (currentUser && isOnline) {
+        // Find the most recently modified entry and sync it
+        // This assumes the last entry in the array was just saved
+        const lastEntry = entries[entries.length - 1];
+        if (lastEntry) {
+          try {
+            await saveEntryToSupabase(lastEntry);
+          } catch (error) {
+            console.error('Failed to sync entry to Supabase:', error);
+            // Don't block the UI - the data is safe in localStorage
+          }
+        }
+      }
     }
 
     function showStatus(msg, type = 'success') {
@@ -3247,24 +3780,8 @@
       return `${months[parseInt(month) - 1]} ${parseInt(day)}, ${year}`;
     }
 
-    // Initialize
-    setToday();
-    renderTracker();
-    checkBackupReminder();
-
-    // Show migration notice if config was upgraded
-    const savedConfigVersion = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}').version || 1;
-    if (savedConfigVersion < CONFIG_VERSION && loadEntries().length > 0) {
-      showStatus('✨ Tracker updated! Your customizations have been preserved.', 'success');
-    }
-
-    // Always show sticky bar on page load
-    const entries = loadEntries();
-    const stickyBar = document.getElementById('stickyBottomBar');
-    stickyBar.classList.add('show');
-
-    // Update completeness indicator on load
-    updateCompleteness();
+    // Initialize app with authentication
+    initializeApp();
 
     // Dark mode toggle
     function toggleDarkMode() {
@@ -3293,5 +3810,8 @@
       icon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
     }
   </script>
+
+  </div> <!-- End mainApp -->
+
 </body>
 </html>
