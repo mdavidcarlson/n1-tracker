@@ -2514,7 +2514,7 @@
     }
 
     // Trends rendering (in tab)
-    let trendsViewMode = 'combined'; // or 'individual'
+    let trendsViewMode = 'individual'; // Default to individual charts
 
     function renderTrendsInTab() {
       const entries = loadEntries();
@@ -2537,8 +2537,41 @@
         return;
       }
 
-      // TODO: Implement combined overlay chart
-      container.innerHTML = '<p style="text-align:center; color:#999; padding:3rem;">Combined overlay chart coming soon!</p>';
+      // Show combined chart with all metrics
+      let html = '';
+      html += generateCombinedChart(entries);
+
+      // Show summary stats grid
+      html += '<h3 style="margin-top: 2rem; color: #0066cc;">Metric Summary</h3>';
+      html += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">';
+
+      config.sliders.forEach(slider => {
+        const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
+        const values = sorted.map(e => parseFloat(e[slider.id])).filter(v => !isNaN(v));
+
+        if (values.length > 0) {
+          const avg = values.reduce((sum, v) => sum + v, 0) / values.length;
+          const current = values[values.length - 1];
+          const trend = getTrendIndicator(current, avg);
+          const trendColor = getTrendColor(trend);
+          const metricColor = getMetricColor(slider.id);
+
+          html += `
+            <div style="padding: 1rem; background: white; border-left: 4px solid ${metricColor}; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+              <div style="font-weight: 600; color: #555; margin-bottom: 0.5rem;">${slider.label}</div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-size: 1.5rem; font-weight: bold; color: ${trendColor};">${current} ${trend}</div>
+                  <div style="font-size: 0.75rem; color: #999;">Avg: ${avg.toFixed(1)}</div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      });
+      html += '</div>';
+
+      container.innerHTML = html;
     }
 
     function renderTrends() {
@@ -2551,15 +2584,6 @@
       }
 
       let html = '';
-
-      // Toggle button
-      html += `
-        <div style="text-align: center; margin-bottom: 1.5rem;">
-          <button onclick="toggleTrendsView()" class="primary" style="padding: 0.5rem 1.5rem;">
-            ${trendsViewMode === 'combined' ? 'View Individual Charts' : 'View Combined Overview'}
-          </button>
-        </div>
-      `;
 
       if (trendsViewMode === 'combined') {
         // Show combined chart
