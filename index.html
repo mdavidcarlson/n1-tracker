@@ -6,31 +6,41 @@
   <title>Recalibrate</title>
   <style>
     :root {
-      --bg-primary: #ffffff;
-      --bg-secondary: #f8f9fa;
-      --bg-tertiary: #e9ecef;
-      --text-primary: #333;
-      --text-secondary: #666;
-      --text-tertiary: #999;
-      --border-color: #ddd;
-      --border-light: #e5e5e5;
-      --card-bg: #ffffff;
-      --input-bg: #ffffff;
-      --modal-bg: #ffffff;
+      /* Light Mode - Clean Canvas */
+      --bg-primary: #F8FAFC;
+      --bg-secondary: #FFFFFF;
+      --bg-tertiary: #F1F5F9;
+      --text-primary: #1E293B;
+      --text-secondary: #475569;
+      --text-tertiary: #64748B;
+      --border-color: #CBD5E1;
+      --border-light: #E2E8F0;
+      --card-bg: #FFFFFF;
+      --input-bg: #FFFFFF;
+      --modal-bg: #FFFFFF;
+      --accent-primary: #2DD4BF;
+      --accent-blue: #1E3A8A;
+      --success-color: #94A3B8;
+      --neutral-gray: #64748B;
     }
 
     body.dark-mode {
-      --bg-primary: #1a1a1a;
-      --bg-secondary: #2d2d2d;
-      --bg-tertiary: #3a3a3a;
-      --text-primary: #e0e0e0;
-      --text-secondary: #b0b0b0;
-      --text-tertiary: #808080;
-      --border-color: #444;
-      --border-light: #333;
-      --card-bg: #2d2d2d;
-      --input-bg: #3a3a3a;
-      --modal-bg: #2d2d2d;
+      /* Dark Mode - Deep Cosmic Ocean */
+      --bg-primary: #0F172A;
+      --bg-secondary: #1E293B;
+      --bg-tertiary: #334155;
+      --text-primary: #F1F5F9;
+      --text-secondary: #CBD5E1;
+      --text-tertiary: #94A3B8;
+      --border-color: #334155;
+      --border-light: #1E293B;
+      --card-bg: #1E293B;
+      --input-bg: #334155;
+      --modal-bg: #1E293B;
+      --accent-primary: #2DD4BF;
+      --accent-blue: #60A5FA;
+      --success-color: #99E6D8;
+      --neutral-gray: #64748B;
     }
 
     * {
@@ -148,7 +158,7 @@
       color: #999;
     }
     .slider-group.set .value-chip {
-      background: #0066cc;
+      background: #2DD4BF;
       color: white;
     }
     .clear-btn {
@@ -185,7 +195,7 @@
       width: 24px;
       border-radius: 50%;
       background: white;
-      border: 2px solid #0066cc;
+      border: 2px solid #2DD4BF;
       cursor: pointer;
       margin-top: -9px;
       box-shadow: 0 1px 4px rgba(0,0,0,0.15);
@@ -201,7 +211,7 @@
       width: 24px;
       border-radius: 50%;
       background: white;
-      border: 2px solid #0066cc;
+      border: 2px solid #2DD4BF;
       cursor: pointer;
       box-shadow: 0 1px 4px rgba(0,0,0,0.15);
     }
@@ -244,7 +254,7 @@
       padding: 0.75rem 1rem;
       margin-bottom: 1.5rem;
       font-size: 0.85rem;
-      color: #0066cc;
+      color: #2DD4BF;
       text-align: left;
       font-weight: 600;
     }
@@ -320,7 +330,7 @@
       background: #e8e8e8;
     }
     .severity-btn.selected {
-      background: #0066cc;
+      background: #2DD4BF;
       color: white;
     }
     .symptom-context {
@@ -359,7 +369,7 @@
       color: #333;
     }
     button.primary {
-      background: #0066cc;
+      background: #2DD4BF;
       color: white;
       font-weight: 600;
     }
@@ -443,7 +453,7 @@
       background: #f0f7ff;
       padding: 0.75rem;
       border-radius: 4px;
-      border-left: 3px solid #0066cc;
+      border-left: 3px solid #2DD4BF;
       margin: 1rem 0;
     }
     .table-container {
@@ -467,7 +477,7 @@
         text-align: center;
         padding: 0.5rem;
         background: #f0f7ff;
-        color: #0066cc;
+        color: #2DD4BF;
         font-size: 0.75rem;
         font-weight: 600;
         border-top: 1px solid #ddd;
@@ -528,12 +538,12 @@
       transition: all 0.2s;
     }
     .settings-tab:hover {
-      color: #0066cc;
+      color: #2DD4BF;
       background: #f0f7ff;
     }
     .settings-tab.active {
-      color: #0066cc;
-      border-bottom-color: #0066cc;
+      color: #2DD4BF;
+      border-bottom-color: #2DD4BF;
     }
     .settings-tab-content {
       display: none;
@@ -572,7 +582,7 @@
     }
     .backup-warning {
       background: #f9f9f9;
-      border-left: 3px solid #0066cc;
+      border-left: 3px solid #2DD4BF;
       padding: 1rem;
       border-radius: 4px;
       margin: 1rem 0;
@@ -598,7 +608,7 @@
     .entry-card-date {
       font-size: 1.1rem;
       font-weight: bold;
-      color: #0066cc;
+      color: #2DD4BF;
     }
     .entry-card-day {
       font-size: 0.9rem;
@@ -660,7 +670,7 @@
     }
     .settings-icon:hover {
       box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-      color: #0066cc;
+      color: #2DD4BF;
     }
 
     /* Tab navigation styles */
@@ -688,11 +698,11 @@
     }
     .tab-button:hover {
       background: #f9f9f9;
-      color: #0066cc;
+      color: #2DD4BF;
     }
     .tab-button.active {
-      color: #0066cc;
-      border-bottom-color: #0066cc;
+      color: #2DD4BF;
+      border-bottom-color: #2DD4BF;
       background: #f0f7ff;
     }
     .tab-content {
@@ -767,7 +777,7 @@
     }
     .progress-bar-fill {
       height: 100%;
-      background: #0066cc;
+      background: #2DD4BF;
       border-radius: 4px;
       transition: width 0.5s ease;
       display: flex;
@@ -775,7 +785,7 @@
       justify-content: flex-end;
       padding-right: 10px;
       font-weight: 600;
-      color: #0066cc;
+      color: #2DD4BF;
       font-size: 0.85rem;
     }
     .progress-milestones {
@@ -788,7 +798,7 @@
       top: 0;
       transform: translateX(-50%);
       font-size: 1rem;
-      color: #0066cc;
+      color: #2DD4BF;
       cursor: pointer;
       transition: opacity 0.2s;
     }
@@ -803,14 +813,14 @@
       padding: 0.75rem;
       background: #f9f9f9;
       border-radius: 6px;
-      border-left: 3px solid #0066cc;
+      border-left: 3px solid #2DD4BF;
     }
     .phase-badge {
       padding: 0.25rem 0.75rem;
       border-radius: 4px;
       font-weight: 600;
       font-size: 0.85rem;
-      background: #0066cc;
+      background: #2DD4BF;
       color: white;
     }
     .next-milestone {
@@ -894,7 +904,7 @@
 
   <!-- Main Navigation Tabs -->
   <div class="main-tab-navigation" style="display: flex; gap: 0; border-bottom: 2px solid #e5e5e5; margin: 1.5rem 0 0 0;">
-    <button class="main-tab active" onclick="switchMainTab('today')" id="mainTabToday" style="flex: 1; padding: 0.75rem 1rem; background: none; border: none; border-bottom: 3px solid #0066cc; font-size: 1rem; font-weight: 600; color: #0066cc; cursor: pointer; transition: all 0.2s;">
+    <button class="main-tab active" onclick="switchMainTab('today')" id="mainTabToday" style="flex: 1; padding: 0.75rem 1rem; background: none; border: none; border-bottom: 3px solid #2DD4BF; font-size: 1rem; font-weight: 600; color: #2DD4BF; cursor: pointer; transition: all 0.2s;">
       Today
     </button>
     <button class="main-tab" onclick="switchMainTab('analysis')" id="mainTabAnalysis" style="flex: 1; padding: 0.75rem 1rem; background: none; border: none; border-bottom: 3px solid transparent; font-size: 1rem; font-weight: 600; color: #666; cursor: pointer; transition: all 0.2s;">
@@ -1101,7 +1111,7 @@
         </div>
 
         <!-- Experiment Configuration -->
-        <div style="margin-bottom: 2rem; padding: 1rem; background: #f0f7ff; border-radius: 6px; border-left: 4px solid #0066cc;">
+        <div style="margin-bottom: 2rem; padding: 1rem; background: #f0f7ff; border-radius: 6px; border-left: 4px solid #2DD4BF;">
           <h3 style="margin-top: 0;">Experiment Progress Tracker</h3>
 
           <p style="font-size: 0.9rem; color: #666; margin: 0 0 1rem 0;">
@@ -1133,7 +1143,7 @@
               </div>
             </div>
 
-            <details style="background: #f9f9f9; padding: 0.75rem; border-radius: 4px; margin-top: 1rem; border-left: 3px solid #0066cc;">
+            <details style="background: #f9f9f9; padding: 0.75rem; border-radius: 4px; margin-top: 1rem; border-left: 3px solid #2DD4BF;">
               <summary style="cursor: pointer; font-weight: 600; color: #333;">How to Edit Phases & Milestones</summary>
               <ol style="margin: 0.75rem 0 0 1.5rem; padding: 0; font-size: 0.85rem; color: #666;">
                 <li style="margin-bottom: 0.25rem;">Click "Export Settings Template" in the Data tab</li>
@@ -1143,7 +1153,7 @@
                 <li style="margin-bottom: 0.25rem;">Save the file and click "Import Settings Template" in the Data tab</li>
               </ol>
               <details style="margin-top: 0.75rem;">
-                <summary style="cursor: pointer; font-size: 0.8rem; color: #0066cc;">Show JSON structure example</summary>
+                <summary style="cursor: pointer; font-size: 0.8rem; color: #2DD4BF;">Show JSON structure example</summary>
                 <pre style="background: white; padding: 0.5rem; border-radius: 4px; font-size: 0.7rem; overflow-x: auto; margin-top: 0.5rem;">
 "phases": [
   { "name": "Adaptation", "endDay": 42, "color": "#ffc107", "message": "..." },
@@ -1161,8 +1171,8 @@
 
       <!-- Experiment Tab -->
       <div class="settings-tab-content" id="settingsTabExperiment">
-        <div style="margin-bottom: 2rem; padding: 1.25rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #0066cc;">
-          <h3 style="margin-top: 0; color: #0066cc;">Understanding Chapters & Milestones</h3>
+        <div style="margin-bottom: 2rem; padding: 1.25rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #2DD4BF;">
+          <h3 style="margin-top: 0; color: #2DD4BF;">Understanding Chapters & Milestones</h3>
 
           <div style="display: grid; gap: 1.25rem; font-size: 0.95rem;">
             <div>
@@ -1318,10 +1328,10 @@
         endDate: "2026-04-05",
         goal: "90-Day Carnivore Reset",
         chapters: [
-          { name: "Orientation", endDay: 7, color: "#0066cc", message: "Getting oriented to the signals" },
-          { name: "Stabilizing", endDay: 21, color: "#0066cc", message: "Stabilizing baseline signals" },
-          { name: "Adapting", endDay: 42, color: "#0066cc", message: "Deep adaptation underway" },
-          { name: "Living", endDay: 999, color: "#0066cc", message: "Living with clarity" }
+          { name: "Orientation", endDay: 7, color: "#2DD4BF", message: "Getting oriented to the signals" },
+          { name: "Stabilizing", endDay: 21, color: "#2DD4BF", message: "Stabilizing baseline signals" },
+          { name: "Adapting", endDay: 42, color: "#2DD4BF", message: "Deep adaptation underway" },
+          { name: "Living", endDay: 999, color: "#2DD4BF", message: "Living with clarity" }
         ],
         milestones: [
           { date: "2026-01-06", label: "HTMA Test #1" },
@@ -1924,7 +1934,7 @@
 
           const position = Math.min(100, Math.max(0, (milestoneDay / totalDays) * 100));
           const isPast = currentDay >= milestoneDay;
-          const iconColor = isPast ? '#0066cc' : '#94a3b8';
+          const iconColor = isPast ? '#2DD4BF' : '#94a3b8';
 
           html += `
             <div class="milestone-marker" style="left: ${position}%;" title="${milestone.label}">
@@ -2002,8 +2012,8 @@
       });
       const activeTab = document.getElementById('mainTab' + tabName.charAt(0).toUpperCase() + tabName.slice(1));
       activeTab.classList.add('active');
-      activeTab.style.borderBottom = '3px solid #0066cc';
-      activeTab.style.color = '#0066cc';
+      activeTab.style.borderBottom = '3px solid #2DD4BF';
+      activeTab.style.color = '#2DD4BF';
 
       // Update main tab content
       document.querySelectorAll('.main-tab-content').forEach(content => {
@@ -2580,7 +2590,7 @@
       html += generateCombinedChart(entries);
 
       // Show summary stats grid
-      html += '<h3 style="margin-top: 2rem; color: #0066cc;">Metric Summary</h3>';
+      html += '<h3 style="margin-top: 2rem; color: #2DD4BF;">Metric Summary</h3>';
       html += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">';
 
       config.sliders.forEach(slider => {
@@ -2628,7 +2638,7 @@
         html += generateCombinedChart(entries);
 
         // Show summary stats grid
-        html += '<h3 style="margin-top: 2rem; color: #0066cc;">Metric Summary</h3>';
+        html += '<h3 style="margin-top: 2rem; color: #2DD4BF;">Metric Summary</h3>';
         html += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">';
 
         config.sliders.forEach(slider => {
@@ -2672,16 +2682,17 @@
     }
 
     function getMetricColor(metricId) {
+      // Colors optimized for cosmic ocean theme
       const colors = {
-        'mental_clarity': '#0066cc',        // Blue
-        'craving_noise': '#10b981',         // Emerald green
-        'sleep_waking_state': '#8b5cf6',    // Vivid purple
-        'gut_state': '#f97316',             // Bright orange
-        'energy_stability': '#ef4444',      // Bright red
-        'body_comfort': '#06b6d4',          // Cyan
-        'mood_stability': '#ec4899'         // Pink
+        'mental_clarity': '#1E3A8A',        // Deep Cosmic Blue
+        'craving_noise': '#2DD4BF',         // Transformative Teal (accent)
+        'sleep_waking_state': '#60A5FA',    // Light Blue
+        'gut_state': '#99E6D8',             // Light Teal (success)
+        'energy_stability': '#94A3B8',      // Muted Slate
+        'body_comfort': '#CBD5E1',          // Soft Gray-Blue
+        'mood_stability': '#475569'         // Mid Slate
       };
-      return colors[metricId] || '#6c757d';
+      return colors[metricId] || '#64748B';
     }
 
     function generateCombinedChart(entries) {
@@ -2740,7 +2751,7 @@
       // Generate SVG
       let svg = `
         <div style="background: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
-          <h3 style="margin-top: 0; color: #0066cc; text-align: center;">All Metrics Over Time</h3>
+          <h3 style="margin-top: 0; color: #2DD4BF; text-align: center;">All Metrics Over Time</h3>
           ${legendHtml}
           <svg width="100%" viewBox="0 0 ${width} ${height}" style="max-width: 700px; display: block; margin: 0 auto;">
             <!-- Grid lines -->
@@ -2818,7 +2829,7 @@
 
       return `
         <div style="margin-bottom: 2rem; padding: 1rem; background: #f9f9f9; border-radius: 8px;">
-          <h3 style="margin-top: 0; color: #0066cc;">${slider.label} <span style="color: ${trendColor};">${trend}</span></h3>
+          <h3 style="margin-top: 0; color: #2DD4BF;">${slider.label} <span style="color: ${trendColor};">${trend}</span></h3>
 
           ${chart}
 
@@ -2878,16 +2889,16 @@
           ${minVal < 0 && maxVal > 0 ? `<line x1="${padding}" y1="${padding + chartHeight - ((-minVal) / range) * chartHeight}" x2="${padding + chartWidth}" y2="${padding + chartHeight - ((-minVal) / range) * chartHeight}" stroke="#999" stroke-width="1" stroke-dasharray="4"/>` : ''}
 
           <!-- Area fill -->
-          <polygon points="${areaPoints}" fill="#0066cc" fill-opacity="0.1"/>
+          <polygon points="${areaPoints}" fill="#2DD4BF" fill-opacity="0.1"/>
 
           <!-- Line -->
-          <polyline points="${points}" fill="none" stroke="#0066cc" stroke-width="2"/>
+          <polyline points="${points}" fill="none" stroke="#2DD4BF" stroke-width="2"/>
 
           <!-- Data points -->
           ${values.map((v, i) => {
             const x = padding + (i / (values.length - 1)) * chartWidth;
             const y = padding + chartHeight - ((v.value - minVal) / range) * chartHeight;
-            return `<circle cx="${x}" cy="${y}" r="3" fill="#0066cc"/>`;
+            return `<circle cx="${x}" cy="${y}" r="3" fill="#2DD4BF"/>`;
           }).join('')}
 
           <!-- Labels -->
@@ -3050,7 +3061,7 @@
       config.experiment.chapters.push({
         name: "New Chapter",
         endDay: 30,
-        color: "#0066cc",
+        color: "#2DD4BF",
         message: "Keep going!"
       });
       renderSettingsModal();
