@@ -841,7 +841,10 @@
 <body>
   <!-- App Header -->
   <div class="app-header">
-    <h1 id="trackerTitle">Recalibrate</h1>
+    <div style="flex: 1;">
+      <h1 id="trackerTitle" style="margin: 0;">Recalibrate</h1>
+      <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem; color: #666; font-weight: 400;">Notice what returns when you strip away the noise</p>
+    </div>
     <button class="settings-icon" onclick="openSettings()" title="Settings" style="width: 40px; height: 40px; padding: 8px;">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
@@ -850,18 +853,26 @@
     </button>
   </div>
 
-  <p class="hint">
-    <strong>Quick Start:</strong> Track daily metrics, save your progress, and analyze trends over time.
-    <strong style="color: #666;">Export data regularly to prevent loss.</strong>
-  </p>
+  <!-- Main Navigation Tabs -->
+  <div class="main-tab-navigation" style="display: flex; gap: 0; border-bottom: 2px solid #e5e5e5; margin: 1.5rem 0 0 0;">
+    <button class="main-tab active" onclick="switchMainTab('today')" id="mainTabToday" style="flex: 1; padding: 0.75rem 1rem; background: none; border: none; border-bottom: 3px solid #0066cc; font-size: 1rem; font-weight: 600; color: #0066cc; cursor: pointer; transition: all 0.2s;">
+      Today
+    </button>
+    <button class="main-tab" onclick="switchMainTab('analysis')" id="mainTabAnalysis" style="flex: 1; padding: 0.75rem 1rem; background: none; border: none; border-bottom: 3px solid transparent; font-size: 1rem; font-weight: 600; color: #666; cursor: pointer; transition: all 0.2s;">
+      Analysis
+    </button>
+  </div>
 
   <div class="backup-warning" id="backupWarning" style="display:none;">
     <strong>Backup Reminder:</strong> You haven't exported data in <span id="daysSinceExport">0</span> days.
     <button onclick="exportCsv()" class="primary" style="margin-left: 10px;">Export Now</button>
   </div>
 
-  <!-- Input Section (Collapsible) -->
-  <div class="input-section">
+  <!-- Today Tab Content -->
+  <div class="main-tab-content active" id="contentToday" style="display: block;">
+
+  <!-- Input Section -->
+  <div class="input-section" style="margin-top: 1.5rem;">
     <div class="section-header" onclick="toggleInputSection()">
       <h2>Save Today's Entry</h2>
       <span class="collapse-icon open" id="inputCollapseIcon">▶</span>
@@ -933,10 +944,13 @@
     </div>
   </div>
 
-  <!-- View Your Data Section -->
-  <div style="margin-top: 2rem;">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-      <h2 style="margin: 0;">View Your Data</h2>
+  </div>
+  <!-- End Today Tab Content -->
+
+  <!-- Analysis Tab Content -->
+  <div class="main-tab-content" id="contentAnalysis" style="display: none; margin-top: 1.5rem;">
+
+    <div style="display: flex; align-items: center; justify-content: flex-end; margin-bottom: 1rem;">
       <button onclick="openSettings()" style="padding: 8px; background: transparent; border: none; cursor: pointer; border-radius: 4px; transition: background 0.2s; width: 40px; height: 40px;" title="Configure experiment settings" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='transparent'">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
@@ -945,7 +959,7 @@
       </button>
     </div>
 
-    <!-- Tab Navigation -->
+    <!-- Sub-Tab Navigation -->
     <div class="tab-navigation">
       <button class="tab-button active" onclick="switchTab('table')" id="tabTable">
         Table
@@ -1007,6 +1021,9 @@
       </div>
     </div>
   </div>
+
+  </div>
+  <!-- End Analysis Tab Content -->
 
   <!-- Settings Modal -->
   <div id="settingsModal" class="modal">
@@ -1878,6 +1895,35 @@
     let currentTab = 'table';
 
     // Tab switching function
+    function switchMainTab(tabName) {
+      // Update main tab buttons
+      document.querySelectorAll('.main-tab').forEach(btn => {
+        btn.classList.remove('active');
+        btn.style.borderBottom = '3px solid transparent';
+        btn.style.color = '#666';
+      });
+      const activeTab = document.getElementById('mainTab' + tabName.charAt(0).toUpperCase() + tabName.slice(1));
+      activeTab.classList.add('active');
+      activeTab.style.borderBottom = '3px solid #0066cc';
+      activeTab.style.color = '#0066cc';
+
+      // Update main tab content
+      document.querySelectorAll('.main-tab-content').forEach(content => {
+        content.style.display = 'none';
+      });
+      document.getElementById('content' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).style.display = 'block';
+
+      // Hide sticky Save Day button when in Analysis tab
+      const stickyBar = document.getElementById('stickyBottomBar');
+      if (tabName === 'analysis') {
+        stickyBar.classList.remove('show');
+        // Render table by default when switching to Analysis
+        renderTable();
+      } else {
+        stickyBar.classList.add('show');
+      }
+    }
+
     function switchTab(tabName) {
       currentTab = tabName;
 
