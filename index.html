@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Recalibrate</title>
 
   <!-- Favicon -->
@@ -1497,6 +1500,38 @@
   <input type="file" id="configFileInput" accept=".json" style="display:none;">
 
   <script>
+    // ============================================================================
+    // VERSION CHECK & CACHE MANAGEMENT
+    // ============================================================================
+    const APP_VERSION = '1.3.0'; // Update this when making breaking changes
+
+    // Check version and clear cache if needed
+    (function checkVersion() {
+      const storedVersion = localStorage.getItem('appVersion');
+      if (storedVersion !== APP_VERSION) {
+        console.log(`App updated from ${storedVersion} to ${APP_VERSION}. Clearing cache...`);
+        // Clear all localStorage except Supabase auth tokens
+        const authKeys = Object.keys(localStorage).filter(key =>
+          key.startsWith('sb-') || key.includes('supabase')
+        );
+        const authData = {};
+        authKeys.forEach(key => authData[key] = localStorage.getItem(key));
+
+        localStorage.clear();
+
+        // Restore auth tokens
+        Object.keys(authData).forEach(key => localStorage.setItem(key, authData[key]));
+        localStorage.setItem('appVersion', APP_VERSION);
+
+        // Force reload from server
+        if (storedVersion) {
+          location.reload(true);
+        }
+      } else {
+        localStorage.setItem('appVersion', APP_VERSION);
+      }
+    })();
+
     // ============================================================================
     // SUPABASE CONFIGURATION
     // ============================================================================
