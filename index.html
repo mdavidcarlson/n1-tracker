@@ -47,6 +47,25 @@
       --neutral-gray: #64748B;
     }
 
+    body.dusk-mode {
+      /* Dusk Mode - Twilight Hour */
+      --bg-primary: #1E1B4B;
+      --bg-secondary: #312E81;
+      --bg-tertiary: #4C1D95;
+      --text-primary: #E9D5FF;
+      --text-secondary: #C4B5FD;
+      --text-tertiary: #A78BFA;
+      --border-color: #4C1D95;
+      --border-light: #312E81;
+      --card-bg: #312E81;
+      --input-bg: #4C1D95;
+      --modal-bg: #312E81;
+      --accent-primary: #2DD4BF;
+      --accent-blue: #818CF8;
+      --success-color: #99E6D8;
+      --neutral-gray: #8B5CF6;
+    }
+
     * {
       box-sizing: border-box;
     }
@@ -3937,29 +3956,56 @@
     // Initialize app with authentication
     initializeApp();
 
-    // Dark mode toggle
+    // Three-theme toggle: Light → Dark → Dusk
     function toggleDarkMode() {
-      document.body.classList.toggle('dark-mode');
-      const isDark = document.body.classList.contains('dark-mode');
+      // Get current theme (default to dark if not set)
+      const currentTheme = localStorage.getItem('theme') || 'dark';
+      let nextTheme;
 
-      // Update icon
-      const icon = document.getElementById('darkModeIcon');
-      if (isDark) {
-        // Show sun icon for light mode option
-        icon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+      // Cycle through themes
+      if (currentTheme === 'light') {
+        nextTheme = 'dark';
+      } else if (currentTheme === 'dark') {
+        nextTheme = 'dusk';
       } else {
-        // Show moon icon for dark mode option
+        nextTheme = 'light';
+      }
+
+      // Remove all theme classes
+      document.body.classList.remove('dark-mode', 'dusk-mode');
+
+      // Add appropriate class
+      if (nextTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+      } else if (nextTheme === 'dusk') {
+        document.body.classList.add('dusk-mode');
+      }
+
+      // Update icon based on next theme
+      const icon = document.getElementById('darkModeIcon');
+      if (nextTheme === 'light') {
+        // Moon icon (shows what clicking will give you - dark mode)
         icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+      } else if (nextTheme === 'dark') {
+        // Twilight icon (shows dusk mode is next)
+        icon.innerHTML = '<circle cx="12" cy="12" r="4"></circle><circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"></circle>';
+      } else {
+        // Sun icon (shows light mode is next)
+        icon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
       }
 
       // Save preference
-      localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+      localStorage.setItem('theme', nextTheme);
     }
 
-    // Load dark mode preference on page load
-    const darkModePreference = localStorage.getItem('darkMode');
-    if (darkModePreference === 'enabled') {
+    // Load theme preference on page load - DEFAULT TO DARK
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    if (savedTheme === 'dark') {
       document.body.classList.add('dark-mode');
+      const icon = document.getElementById('darkModeIcon');
+      icon.innerHTML = '<circle cx="12" cy="12" r="4"></circle><circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"></circle>';
+    } else if (savedTheme === 'dusk') {
+      document.body.classList.add('dusk-mode');
       const icon = document.getElementById('darkModeIcon');
       icon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
     }
