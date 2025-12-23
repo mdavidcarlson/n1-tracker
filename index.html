@@ -1291,24 +1291,24 @@
             </div>
 
             <details style="background: var(--bg-tertiary); padding: 0.75rem; border-radius: 4px; margin-top: 1rem; border-left: 3px solid var(--accent-primary);">
-              <summary style="cursor: pointer; font-weight: 600; color: var(--text-primary);">How to Edit Phases & Milestones</summary>
+              <summary style="cursor: pointer; font-weight: 600; color: var(--text-primary);">How to Edit Chapters & Milestones</summary>
               <ol style="margin: 0.75rem 0 0 1.5rem; padding: 0; font-size: 0.85rem; color: var(--text-secondary);">
                 <li style="margin-bottom: 0.25rem;">Click "Export Settings Template" in the Data tab</li>
                 <li style="margin-bottom: 0.25rem;">Open the downloaded JSON file in any text editor</li>
-                <li style="margin-bottom: 0.25rem;">Find the "experiment" section with "phases" and "milestones" arrays</li>
-                <li style="margin-bottom: 0.25rem;">Edit phase names, day ranges, colors, and milestone icons/labels</li>
+                <li style="margin-bottom: 0.25rem;">Find the "experiment" section with "chapters" and "milestones" arrays</li>
+                <li style="margin-bottom: 0.25rem;">Edit chapter names, day ranges, colors, and milestone dates/labels</li>
                 <li style="margin-bottom: 0.25rem;">Save the file and click "Import Settings Template" in the Data tab</li>
               </ol>
               <details style="margin-top: 0.75rem;">
                 <summary style="cursor: pointer; font-size: 0.8rem; color: var(--accent-primary);">Show JSON structure example</summary>
                 <pre style="background: var(--card-bg); padding: 0.5rem; border-radius: 4px; font-size: 0.7rem; overflow-x: auto; margin-top: 0.5rem;">
-"phases": [
-  { "name": "Adaptation", "endDay": 42, "color": "#ffc107", "message": "..." },
-  { "name": "Optimization", "endDay": 70, "color": "#28a745", "message": "..." }
+"chapters": [
+  { "name": "Orientation", "endDay": 7, "color": "#2DD4BF", "message": "Getting oriented" },
+  { "name": "Adapting", "endDay": 42, "color": "#2DD4BF", "message": "Deep adaptation" }
 ],
 "milestones": [
-  { "day": 1, "label": "Start!", "icon": "●" },
-  { "day": 42, "label": "Adapted!", "icon": "●" }
+  { "date": "2026-01-06", "label": "HTMA Test #1" },
+  { "date": "2026-02-17", "label": "Day 42 Check" }
 ]</pre>
               </details>
             </details>
