@@ -431,7 +431,32 @@ const entry = {
 
 **Location:** Lines ~1100-1200 in `index.html`
 
-### 4. Settings Modal
+### 4. Protein Calculator
+
+**Function:** `calculateProtein()`
+
+**Purpose:** Reality-check tool for carnivore/elimination dieters to understand safe protein ranges
+
+**Features:**
+- Simple inputs: body weight (lb/kg toggle) + optional body fat %
+- Calculates three protein zones based on reference mass:
+  - **Working Range:** 1.6-2.2 g/kg (sensible daily protein)
+  - **Experiment Range:** 2.2-2.6 g/kg (higher, but safe)
+  - **Ceiling:** 3.0 g/kg (danger zone for rabbit starvation with low fat)
+- Shows results in both grams and meat equivalents (~7g protein per oz cooked beef)
+- Uses lean mass if body fat % provided, otherwise total body weight
+- Descriptive, not prescriptive (no "should" language)
+
+**UI/UX:**
+- Dedicated "Calculator" tab in main navigation
+- Clean card-based layout with color-coded zones
+- Warning emphasis on ceiling (red card with explicit "NOT a target" text)
+- Mobile-friendly, theme-compatible
+- Results scroll into view on calculation
+
+**Location:** Lines ~1250-1375 (HTML), ~2915-3078 (JavaScript) in `index.html`
+
+### 5. Settings Modal
 
 **Tabs:**
 - **General:** Tracker title customization
@@ -440,7 +465,7 @@ const entry = {
 - **Data:** Import/export config, reset data
 - **Account:** Email display, sync status, logout button
 
-**Location:** Lines ~1250-1480 in `index.html`
+**Location:** Lines ~1377-1580 in `index.html`
 
 ---
 
@@ -914,6 +939,29 @@ body.new-theme {
 2. Update `toggleDarkMode()` function to include new theme in cycle
 
 3. (Optional) Update `site.webmanifest` `theme_color`
+
+#### Customizing Protein Calculator Ranges
+
+To adjust the protein zone multipliers in `calculateProtein()` function:
+
+```javascript
+// Find these lines in calculateProtein() (around line 2980)
+const workingMin = Math.round(referenceMassKg * 1.6);   // Change 1.6
+const workingMax = Math.round(referenceMassKg * 2.2);   // Change 2.2
+const experimentMin = Math.round(referenceMassKg * 2.2); // Change 2.2
+const experimentMax = Math.round(referenceMassKg * 2.6); // Change 2.6
+const ceiling = Math.round(referenceMassKg * 3.0);      // Change 3.0
+```
+
+To change the protein-to-meat conversion (~7g protein per oz):
+
+```javascript
+// Find gramsToMeat() function (around line 2987)
+function gramsToMeat(grams) {
+  const ounces = grams / 7;  // Change 7 to different g/oz ratio
+  // ...
+}
+```
 
 #### Changing Default Experiment
 
