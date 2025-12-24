@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>Recalibrate</title>
+  <title>Recalibration</title>
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="/Favicon/favicon-96x96.png" sizes="96x96" />
@@ -958,8 +958,9 @@
     <div style="max-width: 420px; margin: 0 auto; padding: 2rem; min-height: 100vh; display: flex; flex-direction: column; justify-content: center;">
       <!-- Logo/Title -->
       <div style="text-align: center; margin-bottom: 3rem;">
-        <h1 style="font-size: 2.5rem; margin: 0 0 0.5rem 0; color: var(--accent-primary);">Recalibrate</h1>
-        <p style="color: var(--text-secondary); margin: 0; font-size: 1rem;">Remember yourself when you strip away the noise</p>
+        <h1 style="font-size: 2.5rem; margin: 0 0 0.5rem 0; color: var(--accent-primary);">Recalibration</h1>
+        <p style="color: var(--text-secondary); margin: 0 0 0.25rem 0; font-size: 1rem;">Strip away the noise and see what your body says without it.</p>
+        <p style="color: var(--text-tertiary); margin: 0; font-size: 0.9rem; font-style: italic;">Signals, not scores.</p>
       </div>
 
       <!-- Auth Card -->
@@ -1026,8 +1027,8 @@
   <!-- App Header -->
   <div class="app-header">
     <div style="flex: 1;">
-      <h1 id="trackerTitle" style="margin: 0;">Recalibrate</h1>
-      <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem; color: var(--text-secondary); font-weight: 400;">Remember yourself when you strip away the noise</p>
+      <h1 id="trackerTitle" style="margin: 0;">Recalibration</h1>
+      <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem; color: var(--text-secondary); font-weight: 400;">Strip away the noise and see what your body says without it. <span style="font-style: italic; color: var(--text-tertiary);">Signals, not scores.</span></p>
     </div>
     <div style="display: flex; gap: 0.5rem; align-items: center;">
       <!-- Sync Status Indicator -->
@@ -1254,7 +1255,7 @@
         <div style="margin-bottom: 1.5rem;">
           <h3>Customize Tracker</h3>
           <label><strong>Tracker Title</strong></label>
-          <input type="text" id="configTitle" placeholder="Recalibrate" style="width:100%;">
+          <input type="text" id="configTitle" placeholder="Recalibration" style="width:100%;">
         </div>
       </div>
 
@@ -1456,7 +1457,7 @@
     // ============================================================================
     // VERSION CHECK & CACHE MANAGEMENT
     // ============================================================================
-    const APP_VERSION = '1.4.0'; // Update this when making breaking changes
+    const APP_VERSION = '1.4.1'; // Update this when making breaking changes
 
     // Check version and clear cache if needed
     (function checkVersion() {
@@ -2031,7 +2032,7 @@
 
     const DEFAULT_CONFIG = {
       version: CONFIG_VERSION,
-      title: "Recalibrate",
+      title: "Recalibration",
       experiment: {
         enabled: true,
         startDate: "2026-01-06",
