@@ -1181,7 +1181,7 @@
     <div style="display: flex; align-items: center; justify-content: space-between; margin: 1.5rem 0 2rem 0; padding-bottom: 1rem; border-bottom: 2px solid var(--border-light);">
       <div class="tab-navigation" style="margin: 0;">
         <button class="tab-button active" onclick="switchAnalysisView('individual')" id="viewIndividual">
-          Individual Charts
+          Charts
         </button>
         <button class="tab-button" onclick="switchAnalysisView('overlay')" id="viewOverlay">
           Overlay
@@ -3913,7 +3913,6 @@
       let svg = `
         <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
           <h3 style="margin-top: 0; color: var(--accent-primary); text-align: center;">All Metrics Over Time</h3>
-          ${legendHtml}
           <svg width="100%" viewBox="0 0 ${width} ${height}" style="max-width: 700px; display: block; margin: 0 auto;">
             <!-- Grid lines -->
             <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${padding + chartHeight}" stroke="${borderColor}" stroke-width="1"/>
@@ -3962,6 +3961,7 @@
 
       svg += `
           </svg>
+          ${legendHtml}
         </div>
       `;
 
