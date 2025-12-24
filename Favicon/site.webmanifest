@@ -1,6 +1,6 @@
 {
-  "name": "Recalibration",
-  "short_name": "Recalibration",
+  "name": "Recalibrate",
+  "short_name": "Recalibrate",
   "description": "Strip away the noise and see what your body says without it. Signals, not scores.",
   "start_url": "/",
   "scope": "/",
