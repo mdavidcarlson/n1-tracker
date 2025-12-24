@@ -433,28 +433,35 @@ const entry = {
 
 ### 4. Protein Calculator
 
-**Function:** `calculateProtein()`
+**Function:** `calculateProtein()`, `toggleFatGuidance()`
 
-**Purpose:** Reality-check tool for carnivore/elimination dieters to understand safe protein ranges
+**Purpose:** Reality-check tool for carnivore/elimination dieters to understand safe protein ranges AND fat requirements
 
 **Features:**
 - Simple inputs: body weight (lb/kg toggle) + optional body fat %
 - Calculates three protein zones based on reference mass:
-  - **Working Range:** 1.6-2.2 g/kg (sensible daily protein)
-  - **Experiment Range:** 2.2-2.6 g/kg (higher, but safe)
-  - **Ceiling:** 3.0 g/kg (danger zone for rabbit starvation with low fat)
+  - **Primary Daily Band:** 1.6-2.2 g/kg (main target, most visually prominent)
+  - **Experiment Range:** 2.2-2.6 g/kg (secondary context for very active users)
+  - **Upper Limit:** 3.0 g/kg (subtle footnote, not a target)
 - Shows results in both grams and meat equivalents (~7g protein per oz cooked beef)
 - Uses lean mass if body fat % provided, otherwise total body weight
-- Descriptive, not prescriptive (no "should" language)
+- **Expandable fat guidance section:**
+  - "Protein is structure. Fat is fuel." mental model
+  - Simple rule: 1-1.5× fat grams per protein grams
+  - Practical food examples (ribeye vs chicken breast)
+  - Warning signs of eating too lean
+  - Dynamic fat calculation based on user's primary band
 
 **UI/UX:**
 - Dedicated "Calculator" tab in main navigation
-- Clean card-based layout with color-coded zones
-- Warning emphasis on ceiling (red card with explicit "NOT a target" text)
-- Mobile-friendly, theme-compatible
-- Results scroll into view on calculation
+- Consolidated single-card design (not separate cards competing for attention)
+- Visual hierarchy: primary band → experiment context → ceiling footnote
+- No red backgrounds (psychological fix - ceiling was drawing too much attention)
+- Expandable fat guidance (progressive disclosure)
+- Mobile-friendly grid for food examples
+- Theme-compatible (no hardcoded colors)
 
-**Location:** Lines ~1250-1375 (HTML), ~2915-3078 (JavaScript) in `index.html`
+**Location:** Lines ~1250-1470 (HTML), ~2915-3176 (JavaScript) in `index.html`
 
 ### 5. Settings Modal
 
