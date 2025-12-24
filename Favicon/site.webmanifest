@@ -1,21 +1,25 @@
 {
-  "name": "Recalibrate",
-  "short_name": "Recalibrate",
+  "name": "Recalibration",
+  "short_name": "Recalibration",
+  "description": "Strip away the noise and see what your body says without it. Signals, not scores.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#0F172A",
+  "background_color": "#0F172A",
   "icons": [
     {
-      "src": "/web-app-manifest-192x192.png",
+      "src": "/Favicon/web-app-manifest-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     },
     {
-      "src": "/web-app-manifest-512x512.png",
+      "src": "/Favicon/web-app-manifest-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     }
-  ],
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff",
-  "display": "standalone"
+  ]
 }
