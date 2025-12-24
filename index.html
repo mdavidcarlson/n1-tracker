@@ -1457,7 +1457,7 @@
     // ============================================================================
     // VERSION CHECK & CACHE MANAGEMENT
     // ============================================================================
-    const APP_VERSION = '1.4.1'; // Update this when making breaking changes
+    const APP_VERSION = '1.4.2'; // Update this when making breaking changes
 
     // Check version and clear cache if needed
     (function checkVersion() {
@@ -3672,15 +3672,6 @@
         document.getElementById('experimentGoal').value = config.experiment.goal || '';
         document.getElementById('experimentStart').value = config.experiment.startDate || '';
         document.getElementById('experimentEnd').value = config.experiment.endDate || '';
-
-        // Show/hide config fields based on enabled state
-        const experimentConfigDiv = document.getElementById('experimentConfig');
-        experimentConfigDiv.style.display = config.experiment.enabled ? 'block' : 'none';
-
-        // Add event listener to toggle
-        document.getElementById('experimentEnabled').onchange = function() {
-          experimentConfigDiv.style.display = this.checked ? 'block' : 'none';
-        };
       }
 
       // Render slider config
