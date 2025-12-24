@@ -1256,84 +1256,37 @@
           <label><strong>Tracker Title</strong></label>
           <input type="text" id="configTitle" placeholder="Recalibrate" style="width:100%;">
         </div>
-
-        <!-- Experiment Configuration -->
-        <div style="margin-bottom: 2rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 6px; border-left: 4px solid var(--accent-primary);">
-          <h3 style="margin-top: 0;">Experiment Progress Tracker</h3>
-
-          <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0 0 1rem 0;">
-            Optional: turn this on if you want a visual progress bar for a 30/60/90-day experiment.
-          </p>
-
-          <div style="margin-bottom: 1rem;">
-            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-              <input type="checkbox" id="experimentEnabled" style="width: auto;">
-              <strong>Enable Progress Tracker</strong>
-            </label>
-            <small style="color: var(--text-secondary); display: block; margin-top: 0.25rem;">Show visual progress bar with chapters and milestones</small>
-          </div>
-
-          <div id="experimentConfig" style="margin-top: 1rem;">
-            <div style="margin-bottom: 1rem;">
-              <label><strong>Experiment Goal</strong></label>
-              <input type="text" id="experimentGoal" placeholder="90-Day Carnivore Reset" style="width:100%;">
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
-              <div>
-                <label><strong>Start Date</strong></label>
-                <input type="date" id="experimentStart" style="width:100%;">
-              </div>
-              <div>
-                <label><strong>End Date</strong></label>
-                <input type="date" id="experimentEnd" style="width:100%;">
-              </div>
-            </div>
-
-            <details style="background: var(--bg-tertiary); padding: 0.75rem; border-radius: 4px; margin-top: 1rem; border-left: 3px solid var(--accent-primary);">
-              <summary style="cursor: pointer; font-weight: 600; color: var(--text-primary);">How to Edit Chapters & Milestones</summary>
-              <ol style="margin: 0.75rem 0 0 1.5rem; padding: 0; font-size: 0.85rem; color: var(--text-secondary);">
-                <li style="margin-bottom: 0.25rem;">Click "Export Settings Template" in the Data tab</li>
-                <li style="margin-bottom: 0.25rem;">Open the downloaded JSON file in any text editor</li>
-                <li style="margin-bottom: 0.25rem;">Find the "experiment" section with "chapters" and "milestones" arrays</li>
-                <li style="margin-bottom: 0.25rem;">Edit chapter names, day ranges, colors, and milestone dates/labels</li>
-                <li style="margin-bottom: 0.25rem;">Save the file and click "Import Settings Template" in the Data tab</li>
-              </ol>
-              <details style="margin-top: 0.75rem;">
-                <summary style="cursor: pointer; font-size: 0.8rem; color: var(--accent-primary);">Show JSON structure example</summary>
-                <pre style="background: var(--card-bg); padding: 0.5rem; border-radius: 4px; font-size: 0.7rem; overflow-x: auto; margin-top: 0.5rem;">
-"chapters": [
-  { "name": "Orientation", "endDay": 7, "color": "#2DD4BF", "message": "Getting oriented" },
-  { "name": "Adapting", "endDay": 42, "color": "#2DD4BF", "message": "Deep adaptation" }
-],
-"milestones": [
-  { "date": "2026-01-06", "label": "HTMA Test #1" },
-  { "date": "2026-02-17", "label": "Day 42 Check" }
-]</pre>
-              </details>
-            </details>
-          </div>
-        </div>
       </div>
 
       <!-- Experiment Tab -->
       <div class="settings-tab-content" id="settingsTabExperiment">
+        <!-- Enable Toggle -->
+        <div style="margin-bottom: 2rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 6px; border-left: 4px solid var(--accent-primary);">
+          <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+            <input type="checkbox" id="experimentEnabled" style="width: auto;">
+            <strong>Enable Progress Tracker</strong>
+          </label>
+          <small style="color: var(--text-secondary); display: block; margin-top: 0.5rem;">
+            Turn this on to show a visual progress bar for your experiment with phases and milestones
+          </small>
+        </div>
+
         <div style="margin-bottom: 2rem; padding: 1.25rem; background: var(--bg-tertiary); border-radius: 8px; border-left: 4px solid var(--accent-primary);">
-          <h3 style="margin-top: 0; color: var(--accent-primary);">Understanding Chapters & Milestones</h3>
+          <h3 style="margin-top: 0; color: var(--accent-primary);">Understanding Phases & Milestones</h3>
 
           <div style="display: grid; gap: 1.25rem; font-size: 0.95rem;">
             <div>
-              <strong style="color: var(--text-primary);">📖 Chapters</strong>
+              <strong style="color: var(--text-primary);">📖 Phases</strong>
               <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary); line-height: 1.5;">
                 Time <em>periods</em> that divide your experiment into stages (e.g., "Orientation" for Days 1-7, "Adapting" for Days 22-42).
-                Each chapter has a name, end day, color, and motivational message. The app shows which chapter you're currently in.
+                Each phase has a name, end day, color, and motivational message. The app shows which phase you're currently in.
               </p>
             </div>
 
             <div>
               <strong style="color: var(--text-primary);">📍 Milestones</strong>
               <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary); line-height: 1.5;">
-                Specific <em>point-in-time</em> markers for events (e.g., "HTMA Test #1" on Jan 6, "Day 42 Check" on Feb 17).
+                Specific <em>point-in-time</em> markers for events (e.g., "Weigh-in" on Jan 2, "Blood work" on Jan 6).
                 These appear as dots on the progress bar and show countdown/days remaining in the experiment tracker.
               </p>
             </div>
@@ -1362,12 +1315,12 @@
         </div>
 
         <div style="margin-bottom: 2rem;">
-          <h3>Chapters</h3>
+          <h3>Phases</h3>
           <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0 0 1rem 0;">
-            Define the chapters of your experiment. Each chapter lasts until the specified day number.
+            Define the phases of your experiment. Each phase lasts until the specified day number.
           </p>
           <div id="chaptersConfig"></div>
-          <button onclick="addChapter()" style="margin-top: 0.75rem;">+ Add Chapter</button>
+          <button onclick="addChapter()" style="margin-top: 0.75rem;">+ Add Phase</button>
         </div>
 
         <div style="margin-bottom: 2rem;">
@@ -1420,21 +1373,21 @@
             <div>
               <button onclick="exportConfig();" style="width: 100%; padding: 0.75rem;">Export Settings Template</button>
               <small style="display: block; color: var(--text-secondary); margin-top: 0.25rem; font-style: italic;">
-                Download a JSON template of your sliders, fields, chapters, and milestones.
+                Download a JSON template of your sliders, fields, phases, and milestones.
               </small>
             </div>
 
             <div>
               <button onclick="document.getElementById('configFileInput').click();" style="width: 100%; padding: 0.75rem;">Import Settings Template</button>
               <small style="display: block; color: var(--text-secondary); margin-top: 0.25rem; font-style: italic;">
-                Load a JSON settings template (sliders, fields, chapters). Existing entries are not changed.
+                Load a JSON settings template (sliders, fields, phases). Existing entries are not changed.
               </small>
             </div>
 
             <div style="border-top: 2px solid #ddd; padding-top: 1rem; margin-top: 0.5rem;">
               <button onclick="resetToDefault()" class="warning" style="width: 100%; padding: 0.75rem;">Reset Settings to Default</button>
               <small style="display: block; color: var(--text-secondary); margin-top: 0.25rem; font-style: italic;">
-                Restore the default tracker layout (sliders, fields, chapters). Saved entries stay.
+                Restore the default tracker layout (sliders, fields, phases). Saved entries stay.
               </small>
             </div>
 
@@ -1503,7 +1456,7 @@
     // ============================================================================
     // VERSION CHECK & CACHE MANAGEMENT
     // ============================================================================
-    const APP_VERSION = '1.3.4'; // Update this when making breaking changes
+    const APP_VERSION = '1.4.0'; // Update this when making breaking changes
 
     // Check version and clear cache if needed
     (function checkVersion() {
