@@ -1069,6 +1069,9 @@
     <button class="main-tab" onclick="switchMainTab('analysis')" id="mainTabAnalysis" style="flex: 1; padding: 0.75rem 1rem; background: none; border: none; border-bottom: 3px solid transparent; font-size: 1rem; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: all 0.2s;">
       Analysis
     </button>
+    <button class="main-tab" onclick="switchMainTab('calculator')" id="mainTabCalculator" style="flex: 1; padding: 0.75rem 1rem; background: none; border: none; border-bottom: 3px solid transparent; font-size: 1rem; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: all 0.2s;">
+      Calculator
+    </button>
   </div>
 
   <div class="backup-warning" id="backupWarning" style="display:none;">
@@ -1243,6 +1246,132 @@
 
   </div>
   <!-- End Analysis Tab Content -->
+
+  <!-- Calculator Tab Content -->
+  <div class="main-tab-content" id="contentCalculator" style="display: none; margin-top: 1.5rem;">
+
+    <div style="max-width: 700px; margin: 0 auto;">
+
+      <!-- Header -->
+      <div style="margin-bottom: 2rem;">
+        <h2 style="margin: 0 0 0.5rem 0; color: var(--text-primary);">Protein Calculator</h2>
+        <p style="margin: 0; color: var(--text-secondary); line-height: 1.6;">
+          A reality-check tool to help you understand sensible protein ranges for your size,
+          and where the danger zone starts if you're eating mostly lean meat with very little fat.
+        </p>
+      </div>
+
+      <!-- Input Card -->
+      <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 2rem; margin-bottom: 2rem;">
+
+        <!-- Body Weight Input -->
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-primary);">
+            Body Weight
+          </label>
+          <div style="display: flex; gap: 1rem; align-items: center;">
+            <input
+              type="number"
+              id="calcWeight"
+              placeholder="150"
+              min="50"
+              max="500"
+              step="0.5"
+              style="flex: 1; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px; font-size: 1rem; background: var(--input-bg); color: var(--text-primary);">
+
+            <!-- Unit Toggle -->
+            <div style="display: flex; gap: 0.5rem; background: var(--bg-tertiary); padding: 0.25rem; border-radius: 6px;">
+              <label style="padding: 0.5rem 1rem; cursor: pointer; border-radius: 4px; transition: background 0.2s; background: var(--accent-primary); color: white; font-weight: 600;">
+                <input type="radio" name="weightUnit" value="lb" checked style="display: none;">
+                lb
+              </label>
+              <label style="padding: 0.5rem 1rem; cursor: pointer; border-radius: 4px; transition: background 0.2s; color: var(--text-secondary);">
+                <input type="radio" name="weightUnit" value="kg" style="display: none;">
+                kg
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Body Fat % Input (Optional) -->
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-primary);">
+            Body Fat % <span style="font-weight: normal; color: var(--text-secondary); font-size: 0.9rem;">(only if you already know it)</span>
+          </label>
+          <input
+            type="number"
+            id="calcBodyFat"
+            placeholder="Optional"
+            min="3"
+            max="60"
+            step="0.5"
+            style="width: 150px; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px; font-size: 1rem; background: var(--input-bg); color: var(--text-primary);">
+          <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; color: var(--text-tertiary); font-style: italic;">
+            If you don't know it, just leave this blank. The calculator will use your total body weight instead.
+          </p>
+        </div>
+
+        <!-- Calculate Button -->
+        <button
+          onclick="calculateProtein()"
+          style="width: 100%; padding: 1rem; background: var(--accent-primary); color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s;"
+          onmouseover="this.style.opacity='0.9'"
+          onmouseout="this.style.opacity='1'">
+          Calculate Protein Ranges
+        </button>
+      </div>
+
+      <!-- Results Section (Hidden until calculated) -->
+      <div id="calcResults" style="display: none;">
+
+        <!-- Summary Card -->
+        <div style="background: var(--bg-tertiary); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+          <h3 style="margin: 0 0 1rem 0; color: var(--text-primary); font-size: 1.1rem;">Your Numbers</h3>
+          <div id="calcSummary" style="color: var(--text-secondary); line-height: 1.8;"></div>
+        </div>
+
+        <!-- Working Range Card -->
+        <div style="background: var(--card-bg); border: 2px solid var(--accent-primary); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+          <h3 style="margin: 0 0 0.5rem 0; color: var(--accent-primary); font-size: 1.1rem;">✓ Working Range</h3>
+          <p style="margin: 0 0 1rem 0; font-size: 0.9rem; color: var(--text-secondary);">
+            A sensible daily protein band for your size
+          </p>
+          <div id="calcWorking" style="color: var(--text-primary); line-height: 1.8;"></div>
+        </div>
+
+        <!-- Experiment Range Card -->
+        <div style="background: var(--card-bg); border: 2px solid var(--accent-blue); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+          <h3 style="margin: 0 0 0.5rem 0; color: var(--accent-blue); font-size: 1.1rem;">⚡ Higher Experiment Range</h3>
+          <p style="margin: 0 0 1rem 0; font-size: 0.9rem; color: var(--text-secondary);">
+            More aggressive, but still in human territory
+          </p>
+          <div id="calcExperiment" style="color: var(--text-primary); line-height: 1.8;"></div>
+        </div>
+
+        <!-- Ceiling Warning Card -->
+        <div style="background: #FEF2F2; border: 2px solid #DC2626; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+          <h3 style="margin: 0 0 0.5rem 0; color: #DC2626; font-size: 1.1rem;">⚠️ Caution Boundary</h3>
+          <p style="margin: 0 0 1rem 0; font-size: 0.9rem; color: #7F1D1D;">
+            This is NOT a target. Going above this with very little fat is where rabbit-starvation-type problems become more likely.
+          </p>
+          <div id="calcCeiling" style="color: #7F1D1D; line-height: 1.8;"></div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div style="background: var(--bg-tertiary); border-radius: 6px; padding: 1rem; margin-bottom: 2rem;">
+          <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+            <strong>Note:</strong> This assumes normal kidney and liver function and adequate dietary fat.
+            It's a sanity check for experiments, not a prescription or medical advice.
+          </p>
+        </div>
+
+      </div>
+      <!-- End Results Section -->
+
+    </div>
+
+  </div>
+  <!-- End Calculator Tab Content -->
 
   <!-- Settings Modal -->
   <div id="settingsModal" class="modal">
@@ -2765,12 +2894,14 @@
       });
       document.getElementById('content' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).style.display = 'block';
 
-      // Hide sticky Save Day button when in Analysis tab
+      // Hide sticky Save Day button when in Analysis or Calculator tabs
       const stickyBar = document.getElementById('stickyBottomBar');
       if (tabName === 'analysis') {
         stickyBar.classList.remove('show');
         // Render individual charts by default when switching to Analysis
         renderTrendsInTab();
+      } else if (tabName === 'calculator') {
+        stickyBar.classList.remove('show');
       } else {
         stickyBar.classList.add('show');
         // Hide success message when returning to Today tab
@@ -2779,6 +2910,171 @@
           successMsg.style.display = 'none';
         }
       }
+    }
+
+    // ============================================================================
+    // PROTEIN CALCULATOR FUNCTIONS
+    // ============================================================================
+
+    // Unit toggle handlers (make lb/kg buttons interactive)
+    document.addEventListener('DOMContentLoaded', function() {
+      const unitLabels = document.querySelectorAll('input[name="weightUnit"]');
+      unitLabels.forEach(input => {
+        input.addEventListener('change', function() {
+          // Update button styling
+          document.querySelectorAll('input[name="weightUnit"]').forEach(radio => {
+            const label = radio.parentElement;
+            if (radio.checked) {
+              label.style.background = 'var(--accent-primary)';
+              label.style.color = 'white';
+              label.style.fontWeight = '600';
+            } else {
+              label.style.background = 'transparent';
+              label.style.color = 'var(--text-secondary)';
+              label.style.fontWeight = 'normal';
+            }
+          });
+        });
+      });
+    });
+
+    function calculateProtein() {
+      // Get inputs
+      const weight = parseFloat(document.getElementById('calcWeight').value);
+      const unit = document.querySelector('input[name="weightUnit"]:checked').value;
+      const bodyFatInput = document.getElementById('calcBodyFat').value;
+      const bodyFat = bodyFatInput ? parseFloat(bodyFatInput) : null;
+
+      // Validation
+      if (!weight || weight <= 0) {
+        alert('Please enter a valid body weight.');
+        return;
+      }
+
+      if (bodyFat !== null && (bodyFat < 3 || bodyFat > 60)) {
+        alert('Body fat % should be between 3% and 60%, or leave it blank.');
+        return;
+      }
+
+      // Convert to both units
+      const weightKg = unit === 'lb' ? weight / 2.20462 : weight;
+      const weightLb = unit === 'kg' ? weight * 2.20462 : weight;
+
+      // Calculate reference mass
+      let referenceMassKg, referenceMassLb;
+      let usesLeanMass = false;
+
+      if (bodyFat !== null && bodyFat > 0 && bodyFat < 100) {
+        // Use lean mass
+        const leanMassKg = weightKg * (1 - bodyFat / 100);
+        referenceMassKg = leanMassKg;
+        referenceMassLb = leanMassKg * 2.20462;
+        usesLeanMass = true;
+      } else {
+        // Use total body weight
+        referenceMassKg = weightKg;
+        referenceMassLb = weightLb;
+      }
+
+      // Calculate protein zones (g/kg)
+      const workingMin = Math.round(referenceMassKg * 1.6);
+      const workingMax = Math.round(referenceMassKg * 2.2);
+      const experimentMin = Math.round(referenceMassKg * 2.2);
+      const experimentMax = Math.round(referenceMassKg * 2.6);
+      const ceiling = Math.round(referenceMassKg * 3.0);
+
+      // Convert to meat equivalents (~7g protein per oz cooked beef)
+      function gramsToMeat(grams) {
+        const ounces = grams / 7;
+        const pounds = ounces / 16;
+        if (pounds >= 1) {
+          return `${pounds.toFixed(1)} lb (${Math.round(ounces)} oz)`;
+        } else {
+          return `${Math.round(ounces)} oz`;
+        }
+      }
+
+      // Display results
+      displayProteinResults({
+        weightLb: Math.round(weightLb),
+        weightKg: Math.round(weightKg),
+        bodyFat,
+        referenceMassLb: Math.round(referenceMassLb),
+        referenceMassKg: Math.round(referenceMassKg),
+        usesLeanMass,
+        workingMin,
+        workingMax,
+        experimentMin,
+        experimentMax,
+        ceiling,
+        gramsToMeat
+      });
+
+      // Show results section
+      document.getElementById('calcResults').style.display = 'block';
+
+      // Scroll to results
+      document.getElementById('calcResults').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function displayProteinResults(data) {
+      // Summary section
+      let summaryHtml = `
+        <div><strong>You entered:</strong> ${data.weightLb} lb (${data.weightKg} kg)</div>
+      `;
+
+      if (data.usesLeanMass) {
+        summaryHtml += `
+          <div style="margin-top: 0.5rem;">
+            <strong>Estimated lean mass:</strong> ${data.referenceMassLb} lb (${data.referenceMassKg} kg) at ${data.bodyFat}% body fat
+          </div>
+          <div style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-tertiary);">
+            The ranges below are based on your lean mass.
+          </div>
+        `;
+      } else {
+        summaryHtml += `
+          <div style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-tertiary);">
+            The ranges below are based on your total body weight.
+          </div>
+        `;
+      }
+
+      document.getElementById('calcSummary').innerHTML = summaryHtml;
+
+      // Working range
+      document.getElementById('calcWorking').innerHTML = `
+        <div style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">
+          ${data.workingMin}–${data.workingMax}g protein per day
+        </div>
+        <div style="font-size: 0.95rem; color: var(--text-secondary);">
+          On a mostly beef diet, this is roughly <strong>${data.gramsToMeat(data.workingMin)}</strong> to <strong>${data.gramsToMeat(data.workingMax)}</strong> of cooked meat per day.
+        </div>
+      `;
+
+      // Experiment range
+      document.getElementById('calcExperiment').innerHTML = `
+        <div style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">
+          ${data.experimentMin}–${data.experimentMax}g protein per day
+        </div>
+        <div style="font-size: 0.95rem; color: var(--text-secondary);">
+          This is roughly <strong>${data.gramsToMeat(data.experimentMin)}</strong> to <strong>${data.gramsToMeat(data.experimentMax)}</strong> of cooked meat per day.
+        </div>
+      `;
+
+      // Ceiling
+      document.getElementById('calcCeiling').innerHTML = `
+        <div style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">
+          ${data.ceiling}g protein per day
+        </div>
+        <div style="font-size: 0.95rem;">
+          This is roughly <strong>${data.gramsToMeat(data.ceiling)}</strong> of lean meat per day.
+        </div>
+        <div style="margin-top: 0.75rem; padding: 0.75rem; background: rgba(220, 38, 38, 0.1); border-radius: 4px; font-size: 0.9rem;">
+          Going above this level, especially with very little dietary fat, is where rabbit-starvation-type problems become more likely.
+          This is not a target to aim for.
+        </div>
+      `;
     }
 
     function switchAnalysisView(viewName) {
