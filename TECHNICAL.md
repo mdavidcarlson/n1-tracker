@@ -1,51 +1,83 @@
 # Recalibrate - Technical Documentation
 
-> Comprehensive technical reference for developers and AI assistants
+> Reference guide for developers and AI assistants working with the Recalibrate codebase
 
-**Last Updated:** December 24, 2024
 **Version:** 1.5.2
 **Live URL:** https://recalibrate.unblocked.health
+**Last Updated:** 2025-12-24
 
 ---
 
 ## Table of Contents
 
-1. [Architecture Overview](#architecture-overview)
-2. [File Structure](#file-structure)
-3. [Database Schema](#database-schema)
-4. [Authentication Flow](#authentication-flow)
-5. [Data Model](#data-model)
-6. [Key Components](#key-components)
-7. [State Management](#state-management)
-8. [Sync Mechanism](#sync-mechanism)
-9. [Offline Functionality](#offline-functionality)
-10. [Configuration System](#configuration-system)
-11. [Theming](#theming)
-12. [Deployment](#deployment)
-13. [Common Modifications](#common-modifications)
+1. [Overview](#overview)
+2. [Architecture](#architecture)
+3. [File Structure](#file-structure)
+4. [Database Schema](#database-schema)
+5. [Authentication](#authentication)
+6. [Data Model](#data-model)
+7. [Core Components](#core-components)
+8. [State Management & Sync](#state-management--sync)
+9. [Theming System](#theming-system)
+10. [Configuration](#configuration)
+11. [Deployment](#deployment)
+12. [Development Guide](#development-guide)
+13. [API Reference](#api-reference)
 14. [Troubleshooting](#troubleshooting)
 
 ---
 
-## Architecture Overview
+## Overview
 
-**Stack:**
-- **Frontend:** Vanilla JavaScript (ES6+), Single HTML file
-- **Backend:** Supabase (PostgreSQL + Auth)
-- **Hosting:** GitHub Pages (static site)
-- **PWA:** Service worker-less PWA with manifest
+**What is Recalibrate?**
+
+A minimalist health tracking app focused on observing body signals without judgment or scoring. Users track daily "signals" (mental clarity, energy, sleep quality, etc.) and analyze trends over time during health experiments.
 
 **Philosophy:**
-- Zero build tools, zero dependencies (except Supabase SDK via CDN)
-- Offline-first with localStorage caching
-- Progressive Web App for native-like experience
-- Data ownership: users control their data
+- Track signals, not scores
+- Offline-first with cloud sync
+- User data ownership
+- Zero dependencies (except Supabase SDK)
+- No analytics, tracking, or third-party scripts
 
-**Key Architectural Decisions:**
-1. **Single HTML file** - Everything in `index.html` for simplicity
-2. **Offline-first** - localStorage as cache, Supabase as sync target
-3. **Optimistic UI** - Updates happen immediately, sync in background
-4. **Conflict resolution** - Cloud always wins on sync conflicts
+**Tech Stack:**
+- **Frontend:** Vanilla JavaScript (ES6+), single HTML file
+- **Backend:** Supabase (PostgreSQL + Auth)
+- **Hosting:** GitHub Pages
+- **PWA:** Installable web app via manifest
+
+---
+
+## Architecture
+
+### Design Principles
+
+1. **Single HTML File** - Everything in `index.html` for simplicity and zero build steps
+2. **Offline-First** - localStorage as primary cache, Supabase as sync target
+3. **Optimistic UI** - Changes apply immediately, sync happens in background
+4. **Eventual Consistency** - Cloud data wins on conflicts
+
+### Data Flow
+
+```
+User Input
+    ↓
+Update localStorage (immediate)
+    ↓
+Update UI (immediate)
+    ↓
+Sync to Supabase (background)
+    ↓
+Update sync indicator
+```
+
+### Key Architectural Components
+
+- **Entry Form:** Dynamic slider/field rendering from config
+- **Analysis Charts:** Canvas-based trend visualization
+- **Experiment Tracker:** Progress bar with phases and milestones
+- **Settings Modal:** Configuration UI with tabbed interface
+- **Sync Engine:** Background sync with offline queue
 
 ---
 
@@ -53,10 +85,10 @@
 
 ```
 /
-├── index.html              # Main app (all HTML, CSS, JS)
+├── index.html              # Main app (HTML + CSS + JS)
 ├── terms.html              # Terms of Service
 ├── privacy.html            # Privacy Policy
-├── README.md               # User-facing documentation
+├── README.md               # User documentation
 ├── TECHNICAL.md            # This file
 ├── supabase-schema.sql     # Database schema + RLS policies
 └── Favicon/                # PWA icons and manifest
@@ -66,19 +98,19 @@
     ├── apple-touch-icon.png
     ├── web-app-manifest-192x192.png
     ├── web-app-manifest-512x512.png
-    └── site.webmanifest    # PWA manifest
+    └── site.webmanifest    # PWA configuration
 ```
 
 ---
 
 ## Database Schema
 
-**Supabase Project:** npszsifoxxmiviqpaiog
+**Supabase Project:** `npszsifoxxmiviqpaiog`
 
 ### Tables
 
 #### `user_config`
-User's tracker configuration and settings.
+Stores user's tracker configuration and settings.
 
 ```sql
 CREATE TABLE public.user_config (
@@ -92,7 +124,7 @@ CREATE TABLE public.user_config (
 ```
 
 #### `daily_entries`
-Daily signal tracking data.
+Stores daily signal tracking data.
 
 ```sql
 CREATE TABLE public.daily_entries (
@@ -128,7 +160,7 @@ CREATE TABLE public.daily_entries (
 ```
 
 #### `user_preferences`
-User theme and UI preferences.
+Stores UI preferences (theme, etc.).
 
 ```sql
 CREATE TABLE public.user_preferences (
@@ -143,29 +175,28 @@ CREATE TABLE public.user_preferences (
 
 ### Row Level Security (RLS)
 
-All tables have RLS enabled with identical policies:
+All tables use identical RLS policies to enforce user data isolation:
 
 ```sql
--- Users can only view their own data
-CREATE POLICY "Users can view their own [table]"
+-- Users can only access their own data
+CREATE POLICY "Users can view their own data"
   ON [table] FOR SELECT
   USING (auth.uid() = user_id);
 
--- Users can only insert their own data
-CREATE POLICY "Users can insert their own [table]"
+CREATE POLICY "Users can insert their own data"
   ON [table] FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
--- Users can only update their own data
-CREATE POLICY "Users can update their own [table]"
+CREATE POLICY "Users can update their own data"
   ON [table] FOR UPDATE
   USING (auth.uid() = user_id);
 
--- Users can only delete their own data
-CREATE POLICY "Users can delete their own [table]"
+CREATE POLICY "Users can delete their own data"
   ON [table] FOR DELETE
   USING (auth.uid() = user_id);
 ```
+
+**Security Note:** RLS protects data even when the public `anon` key is exposed (which is required for client-side access).
 
 ### Triggers
 
@@ -202,23 +233,22 @@ CREATE TRIGGER on_auth_user_created
 
 ---
 
-## Authentication Flow
+## Authentication
 
 **Provider:** Supabase Auth (email/password)
 
-**Flow:**
-1. User visits site → `initializeApp()` checks for session
-2. If no session → show `authScreen`
-3. User signs up/logs in → `handleSignup()` or `handleLogin()`
-4. Email verification required (configured in Supabase dashboard)
-5. On successful auth → `onAuthStateChange(true)` fires
-6. Load user data → `loadFromSupabase()` → show `mainApp`
+**Requirements:**
+- Email verification enabled (configured in Supabase dashboard)
+- No social login providers
 
-**Session Management:**
-- Supabase handles tokens automatically
-- Session stored in localStorage by Supabase SDK
-- Auto-refresh on token expiry
-- Logout → `handleLogout()` → clears session
+**Auth Flow:**
+
+1. User visits → `initializeApp()` checks for session
+2. No session → show login/signup screen
+3. User signs up/logs in → Supabase handles authentication
+4. Email verification required before access
+5. On success → `onAuthStateChange(true)` → load user data → show app
+6. Session auto-refreshes via Supabase SDK
 
 **Key Functions:**
 
@@ -226,18 +256,23 @@ CREATE TRIGGER on_auth_user_created
 // Initialize app and check auth state
 async function initializeApp()
 
-// Handle signup
+// Handle user signup
 async function handleSignup()
 
-// Handle login
+// Handle user login
 async function handleLogin()
 
 // Handle logout
 async function handleLogout()
 
-// Auth state changed (login/logout)
+// Auth state change handler
 async function onAuthStateChange(isAuthenticated)
 ```
+
+**Session Management:**
+- Tokens stored in localStorage by Supabase SDK
+- Auto-refresh on expiry
+- Logout clears session and redirects to login
 
 ---
 
@@ -245,25 +280,30 @@ async function onAuthStateChange(isAuthenticated)
 
 ### Configuration Object
 
-**Stored in:** `user_config` table (Supabase) + `localStorage` (cache)
+**Storage:** `user_config` table (Supabase) + `localStorage` cache
+
+**Structure:**
 
 ```javascript
 const DEFAULT_CONFIG = {
-  version: 3,
-  title: "Recalibration",
+  version: 3,                    // Config schema version
+  title: "Recalibration",        // Tracker title
+
   experiment: {
     enabled: true,
     startDate: "2026-01-06",
     endDate: "2026-04-05",
     goal: "90-Day Carnivore Reset",
-    chapters: [
+
+    chapters: [                  // Internal key (for backward compatibility)
       {
-        name: "Orientation",
+        name: "Orientation",     // Displayed as "phases" in UI
         endDay: 7,
         color: "#2DD4BF",
         message: "Getting oriented to the signals"
       }
     ],
+
     milestones: [
       {
         date: "2026-01-06",
@@ -271,25 +311,28 @@ const DEFAULT_CONFIG = {
       }
     ]
   },
-  sliders: [
+
+  sliders: [                     // Custom signal trackers
     {
       id: "mental_clarity",
       label: "Mental Clarity",
-      left: "Brain fog",
-      right: "Clear-headed",
+      left: "Brain fog",         // Left anchor label
+      right: "Clear-headed",     // Right anchor label
       min: -3,
       max: 3
     }
   ],
-  fields: [
+
+  fields: [                      // Additional tracking fields
     {
       id: "cramps",
       label: "Muscle Cramps",
-      type: "select",
+      type: "select",            // "select" | "text" | "number"
       options: ["—", "None", "Mild", "Wakes-me-up"]
     }
   ],
-  context: {
+
+  context: {                     // Daily context toggles/dropdowns
     electrolytes_taken: false,
     movement_load: "none",
     stress_load: "none"
@@ -297,88 +340,125 @@ const DEFAULT_CONFIG = {
 };
 ```
 
+**Notes:**
+- `chapters` key used internally for backward compatibility
+- Displayed as "phases" in all user-facing text
+- Config version used for migration logic when schema changes
+
 ### Daily Entry Object
 
-**Stored in:** `daily_entries` table (Supabase) + `localStorage` (cache)
+**Storage:** `daily_entries` table (Supabase) + `localStorage` cache
+
+**Structure:**
 
 ```javascript
 const entry = {
   id: "uuid",
   user_id: "uuid",
-  date: "2025-12-23",
+  date: "2025-12-24",           // YYYY-MM-DD format
   data: {
-    sliders: { mental_clarity: 2 },
-    fields: { cramps: "None" },
-    context: { electrolytes_taken: true },
-    notes: "Felt great today"
+    sliders: {
+      mental_clarity: 2,        // Value from slider range
+      craving_noise: -1
+    },
+    fields: {
+      cramps: "None",           // Values from custom fields
+      palps: "Mild"
+    },
+    context: {
+      electrolytes_taken: true,
+      movement_load: "moderate",
+      stress_load: "high"
+    },
+    notes: "Optional daily notes"
   },
-  created_at: "2025-12-23T10:00:00Z",
-  updated_at: "2025-12-23T10:00:00Z"
+  created_at: "2025-12-24T10:00:00Z",
+  updated_at: "2025-12-24T10:00:00Z"
 };
 ```
 
 ---
 
-## Key Components
+## Core Components
 
-### 1. Entry Form (`renderEntryForm()`)
+### 1. Entry Form
 
-**Purpose:** Render daily tracking interface
+**Function:** `renderEntryForm()`
 
-**Key Features:**
-- Dynamic slider generation from config
-- Conditional field rendering (select/text/number)
-- Experiment day calculation
-- Saves to localStorage immediately
-- Syncs to Supabase in background
+**Purpose:** Render daily tracking interface with dynamic sliders and fields
 
-### 2. Analysis Tab (`renderTrends()`)
+**Features:**
+- Dynamically generates sliders from config
+- Renders custom fields (select/text/number types)
+- Shows experiment day number if enabled
+- Auto-saves to localStorage on change
+- Triggers background sync to Supabase
+
+**Location:** Lines ~1540-1700 in `index.html`
+
+### 2. Analysis Tab
+
+**Function:** `renderTrends()`
 
 **Purpose:** Visualize signal trends over time
 
-**Chart Types:**
-- Individual line charts per slider
-- Overlay mode (all signals on one chart)
-- Rolling averages (7/14/30 day)
+**Features:**
+- Canvas-based line charts (no external library)
+- Individual or overlay mode (all signals on one chart)
+- Rolling averages (7/14/30 day options)
 - Date range filtering
+- Shows "N/A" for unmoved sliders (value = 0)
 
-**Implementation:**
-- Canvas-based rendering (no chart library)
+**Chart Rendering:**
 - Responsive to container size
-- Shows N/A for unmoved sliders
+- X-axis: dates
+- Y-axis: slider values (-3 to +3)
+- Grid lines and labels auto-generated
+
+**Location:** Lines ~2100-2400 in `index.html`
 
 ### 3. Experiment Tracker
 
-**Purpose:** Visual progress bar with phases and milestones
+**Purpose:** Visual progress bar showing phases and milestones
 
 **Features:**
-- Color-coded phases based on day number
+- Color-coded phases based on current day
 - Milestone markers on timeline
 - Days remaining countdown
 - Current phase message display
 
+**Conditional Display:** Only shows if `experiment.enabled === true`
+
+**Location:** Lines ~1100-1200 in `index.html`
+
 ### 4. Settings Modal
 
 **Tabs:**
-- **General:** Tracker title
-- **Experiment:** Progress tracker config, phases, milestones
-- **Tracking Setup:** Slider and field customization
-- **Data:** Import/export, reset
-- **Account:** Email, sync status, logout
+- **General:** Tracker title customization
+- **Experiment:** Progress tracker config (goal, dates, phases, milestones)
+- **Tracking Setup:** Slider and field customization with UI editors
+- **Data:** Import/export config, reset data
+- **Account:** Email display, sync status, logout button
+
+**Location:** Lines ~1250-1480 in `index.html`
 
 ---
 
-## State Management
+## State Management & Sync
 
-**Strategy:** Dual-storage with eventual consistency
+### Storage Strategy
 
-### localStorage (Primary Cache)
+**Dual-Storage Model:**
+1. **localStorage** - Primary cache (fast reads/writes)
+2. **Supabase** - Cloud backup (sync target)
+
+### localStorage Keys
 
 ```javascript
-// Config
+// Configuration
 localStorage.setItem('trackerConfig', JSON.stringify(config));
 
-// Entries (all dates)
+// All daily entries (array)
 localStorage.setItem('dailyEntries', JSON.stringify(entries));
 
 // Theme preference
@@ -388,40 +468,9 @@ localStorage.setItem('theme', 'dark');
 localStorage.setItem('appVersion', '1.5.2');
 ```
 
-### Supabase (Cloud Sync)
+### Sync Mechanism
 
-**Config:**
-- Table: `user_config`
-- Syncs on: save settings, login
-
-**Entries:**
-- Table: `daily_entries`
-- Syncs on: save entry, manual sync, login
-
-**Conflict Resolution:**
-- Cloud always wins on load
-- Local cache immediately on save
-- Background sync reconciles
-
----
-
-## Sync Mechanism
-
-### Sync Flow
-
-```
-User Action
-    ↓
-Update localStorage (immediate)
-    ↓
-Update UI (immediate)
-    ↓
-Sync to Supabase (background)
-    ↓
-Update sync indicator
-```
-
-### Sync Functions
+**Sync Functions:**
 
 ```javascript
 // Sync all entries to cloud
@@ -433,33 +482,25 @@ async function syncEntry(entry)
 // Load all data from cloud (on login)
 async function loadFromSupabase()
 
-// Manual sync trigger
+// Force manual sync
 async function forceSyncAll()
 ```
 
-### Sync Indicators
+**Sync Flow:**
 
-- **Green dot:** Connected & synced
-- **Yellow dot:** Syncing in progress
-- **Red dot:** Offline or error
-- **Gray dot:** Not connected
+1. User edits entry → save to localStorage immediately
+2. Update UI immediately (optimistic)
+3. Call `syncEntry(entry)` in background
+4. Update sync indicator on success/failure
 
-**Location:** Header (always visible) + Account tab
+**Conflict Resolution:**
+- Cloud data always wins on initial load
+- User can manually trigger sync via Account tab
+- Offline changes queue and sync when connection returns
 
----
+### Offline Support
 
-## Offline Functionality
-
-**Strategy:** Works 100% offline, syncs when online
-
-### Offline Capabilities
-- ✅ Track daily signals
-- ✅ View all historical data
-- ✅ Analyze trends
-- ✅ Modify settings
-- ✅ Export data
-
-### Online Detection
+**Online Detection:**
 
 ```javascript
 let isOnline = navigator.onLine;
@@ -475,12 +516,19 @@ window.addEventListener('offline', () => {
 });
 ```
 
-### Pending Sync Queue
+**Offline Capabilities:**
+- ✅ Track daily signals
+- ✅ View historical data
+- ✅ Analyze trends
+- ✅ Modify settings
+- ✅ Export data
 
-Entries modified offline are tracked and synced when connection returns.
+**Pending Sync Queue:**
+
+Entries modified offline are tracked and synced when connection returns:
 
 ```javascript
-let pendingSync = []; // Tracks entries needing sync
+let pendingSync = [];
 
 // On save
 if (isOnline) {
@@ -498,9 +546,109 @@ window.addEventListener('online', async () => {
 });
 ```
 
+### Sync Status Indicators
+
+**Visual Indicators:**
+- 🟢 Green: Connected & synced
+- 🟡 Yellow: Syncing in progress
+- 🔴 Red: Error or offline
+- ⚪ Gray: Not connected
+
+**Locations:**
+- Header (always visible)
+- Account tab (detailed status)
+
 ---
 
-## Configuration System
+## Theming System
+
+### Available Themes
+
+1. **Light Mode** - Clean canvas (`#F8FAFC` background)
+2. **Dark Mode** - Cosmic ocean (`#0F172A` background) **[default]**
+3. **Dusk Mode** - Sunset horizon (`#1C1E2E` background)
+
+### CSS Custom Properties
+
+All colors use CSS variables defined in `:root` and theme classes:
+
+```css
+:root {
+  /* Light Mode (default) */
+  --bg-primary: #F8FAFC;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #F1F5F9;
+  --text-primary: #1E293B;
+  --text-secondary: #475569;
+  --accent-primary: #2DD4BF;
+  /* ... more variables */
+}
+
+body.dark-mode {
+  /* Dark Mode */
+  --bg-primary: #0F172A;
+  --bg-secondary: #1E293B;
+  --bg-tertiary: #334155;
+  --text-primary: #E2E8F0;
+  --text-secondary: #94A3B8;
+  --accent-primary: #2DD4BF;
+  /* ... more variables */
+}
+
+body.dusk-mode {
+  /* Dusk Mode - Sunset palette */
+  --bg-primary: #1C1E2E;
+  --bg-secondary: #2B2638;
+  --bg-tertiary: #3B3145;
+  --text-primary: #EDD5D1;
+  --text-secondary: #D6B8B4;
+  --accent-primary: #E8A87C;  /* Warm peach */
+  /* ... more variables */
+}
+```
+
+### Theme Toggle
+
+**Cycle Order:** Light → Dark → Dusk → Light
+
+**Implementation:**
+
+```javascript
+function toggleDarkMode() {
+  const currentTheme = localStorage.getItem('theme') || 'dark';
+
+  let nextTheme =
+    currentTheme === 'light' ? 'dark' :
+    currentTheme === 'dark' ? 'dusk' : 'light';
+
+  // Remove all theme classes
+  document.body.classList.remove('dark-mode', 'dusk-mode');
+
+  // Add appropriate class
+  if (nextTheme === 'dark') {
+    document.body.classList.add('dark-mode');
+  } else if (nextTheme === 'dusk') {
+    document.body.classList.add('dusk-mode');
+  }
+
+  // Update icon to indicate next theme
+  updateThemeIcon(nextTheme);
+
+  localStorage.setItem('theme', nextTheme);
+}
+```
+
+**Default Theme:** Dark mode (if no preference saved)
+
+```javascript
+const savedTheme = localStorage.getItem('theme') || 'dark';
+```
+
+**Location:** Lines ~3959-4011 and ~45-75 in `index.html`
+
+---
+
+## Configuration
 
 ### Config Versioning
 
@@ -513,7 +661,7 @@ function loadConfig() {
   const saved = localStorage.getItem('trackerConfig');
   const config = saved ? JSON.parse(saved) : DEFAULT_CONFIG;
 
-  // Version migration logic
+  // Migrate if version is outdated
   if (!config.version || config.version < CONFIG_VERSION) {
     return migrateConfig(config);
   }
@@ -522,111 +670,43 @@ function loadConfig() {
 }
 ```
 
+**When to Bump Version:**
+- Breaking changes to config structure
+- New required fields in config
+- Renamed config keys
+
 ### Customization Points
 
-Users can customize:
-1. **Tracker title** - App name
-2. **Experiment config** - Goal, dates, phases, milestones
-3. **Sliders** - Custom metrics with anchors
-4. **Fields** - Additional tracking (select/text/number)
-5. **Context** - Binary toggles and dropdowns
+Users can customize via Settings UI:
+
+1. **Tracker Title** - App display name
+2. **Experiment Config** - Goal, dates, phases, milestones
+3. **Sliders** - Custom metrics with left/right anchors
+4. **Fields** - Additional tracking (select/text/number types)
+5. **Context** - Binary toggles and dropdown options
 
 ### Import/Export
 
 **Export:**
-- Format: JSON
+- Format: JSON file
 - Contains: Full config (sliders, fields, experiment)
-- Use: Backup, share templates
+- Use case: Backup configuration or share template
 
 **Import:**
-- Upload JSON file
-- Validates structure
+- Upload JSON file via Settings → Data tab
+- Validates structure before applying
 - Merges with existing config
-- Does NOT overwrite entries
-
----
-
-## Theming
-
-### Theme System
-
-**Three themes:**
-1. **Light Mode** - Clean canvas (#F8FAFC background)
-2. **Dark Mode** - Cosmic ocean (#0F172A background) **[default]**
-3. **Dusk Mode** - Sunset horizon (#1C1E2E background)
-
-### CSS Variables
-
-All colors use CSS custom properties:
-
-```css
-:root {
-  /* Light Mode */
-  --bg-primary: #F8FAFC;
-  --bg-secondary: #FFFFFF;
-  --text-primary: #1E293B;
-  --accent-primary: #2DD4BF;
-}
-
-body.dark-mode {
-  /* Dark Mode */
-  --bg-primary: #0F172A;
-  --bg-secondary: #1E293B;
-  --text-primary: #E2E8F0;
-  --accent-primary: #2DD4BF;
-}
-
-body.dusk-mode {
-  /* Dusk Mode */
-  --bg-primary: #1C1E2E;
-  --bg-secondary: #2B2638;
-  --text-primary: #EDD5D1;
-  --accent-primary: #E8A87C;
-}
-```
-
-### Theme Toggle
-
-Cycles: Light → Dark → Dusk → Light
-
-```javascript
-function toggleDarkMode() {
-  const currentTheme = localStorage.getItem('theme') || 'dark';
-
-  // Cycle logic
-  let nextTheme =
-    currentTheme === 'light' ? 'dark' :
-    currentTheme === 'dark' ? 'dusk' : 'light';
-
-  // Apply theme
-  document.body.classList.remove('dark-mode', 'dusk-mode');
-  if (nextTheme === 'dark') {
-    document.body.classList.add('dark-mode');
-  } else if (nextTheme === 'dusk') {
-    document.body.classList.add('dusk-mode');
-  }
-
-  localStorage.setItem('theme', nextTheme);
-}
-```
-
-### Default Theme
-
-**Dark mode** is default (set on initial load):
-
-```javascript
-const savedTheme = localStorage.getItem('theme') || 'dark';
-```
+- Does NOT overwrite daily entries
 
 ---
 
 ## Deployment
 
-### GitHub Pages Setup
+### GitHub Pages
 
-**Repository:** mdavidcarlson/recalibrate
+**Repository:** `mdavidcarlson/HIC`
 **Branch:** `claude/daily-tracker-app-txMxk`
-**Custom Domain:** recalibrate.unblocked.health
+**Custom Domain:** `recalibrate.unblocked.health`
 
 **DNS Configuration (GoDaddy):**
 ```
@@ -636,11 +716,17 @@ Value: mdavidcarlson.github.io
 ```
 
 **GitHub Pages Settings:**
-1. Settings → Pages
+1. Repository → Settings → Pages
 2. Source: Deploy from branch
 3. Branch: `claude/daily-tracker-app-txMxk` / `root`
 4. Custom domain: `recalibrate.unblocked.health`
-5. Enforce HTTPS: ✅
+5. Enforce HTTPS: ✅ Enabled
+
+**Deployment Process:**
+1. Commit changes to branch
+2. Push to GitHub
+3. GitHub Pages auto-deploys in ~1-2 minutes
+4. Visit `https://recalibrate.unblocked.health`
 
 ### PWA Installation
 
@@ -650,15 +736,33 @@ Value: mdavidcarlson.github.io
 {
   "name": "Recalibrate",
   "short_name": "Recalibrate",
+  "description": "Strip away the noise and see what your body says without it.",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "theme_color": "#0F172A",
   "background_color": "#0F172A",
-  "icons": [...]
+  "icons": [
+    {
+      "src": "/Favicon/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/Favicon/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
 ```
 
-**iOS:** Safari → Share → Add to Home Screen
-**Android:** Chrome → Menu → Install app
+**Installation:**
+- **iOS:** Safari → Share → Add to Home Screen
+- **Android:** Chrome → Menu → Install app
 
 ### Cache Busting
 
@@ -669,182 +773,414 @@ const APP_VERSION = '1.5.2';
 
 (function checkVersion() {
   const storedVersion = localStorage.getItem('appVersion');
+
   if (storedVersion !== APP_VERSION) {
-    // Clear cache (except auth tokens)
+    console.log(`App updated from ${storedVersion} to ${APP_VERSION}`);
+
+    // Preserve auth tokens
+    const authKeys = Object.keys(localStorage).filter(key =>
+      key.startsWith('sb-') || key.includes('supabase')
+    );
+    const authData = {};
+    authKeys.forEach(key => authData[key] = localStorage.getItem(key));
+
+    // Clear cache
     localStorage.clear();
+
     // Restore auth
-    // Force reload
-    location.reload(true);
+    Object.keys(authData).forEach(key => localStorage.setItem(key, authData[key]));
+    localStorage.setItem('appVersion', APP_VERSION);
+
+    // Force reload from server
+    if (storedVersion) {
+      location.reload(true);
+    }
+  } else {
+    localStorage.setItem('appVersion', APP_VERSION);
   }
 })();
 ```
 
-**When to bump version:**
+**When to Bump Version:**
 - Breaking config structure changes
 - Major UI refactors
 - Schema migrations
-- Cache corruption fixes
+- Persistent cache corruption fixes
+
+**Location:** Lines ~1506-1533 in `index.html`
 
 ---
 
-## Common Modifications
+## Development Guide
 
-### Adding a New Slider
+### Local Development
 
-1. **Update DEFAULT_CONFIG:**
+**Requirements:**
+- Modern web browser (Chrome, Firefox, Safari)
+- No build tools required
+
+**Steps:**
+1. Clone repository
+2. Open `index.html` in browser
+3. Sign up with test email
+4. Make changes to `index.html`
+5. Refresh browser to test
+
+**No build step, no dependencies!**
+
+### Testing Checklist
+
+**Auth:**
+- [ ] Sign up with new email
+- [ ] Verify email works (check inbox)
+- [ ] Log in with credentials
+- [ ] Log out
+
+**Data Entry:**
+- [ ] Save entry (check localStorage)
+- [ ] Verify sync to Supabase (check Network tab)
+- [ ] Load entry next day
+- [ ] Edit existing entry
+
+**Offline:**
+- [ ] Disable network
+- [ ] Save entry (should work)
+- [ ] Re-enable network
+- [ ] Verify sync happens automatically
+
+**Settings:**
+- [ ] Change tracker title
+- [ ] Add custom slider
+- [ ] Add custom field
+- [ ] Export config
+- [ ] Import config
+- [ ] Enable/disable experiment
+
+**UI:**
+- [ ] Toggle theme (Light/Dark/Dusk)
+- [ ] View trends chart
+- [ ] Test responsive layout (mobile)
+- [ ] Install as PWA
+
+### Common Modifications
+
+#### Adding a New Slider
+
+1. Edit `DEFAULT_CONFIG.sliders` in `index.html`:
 
 ```javascript
 sliders: [
   {
-    id: "new_metric",
-    label: "New Metric",
-    left: "Low anchor",
-    right: "High anchor",
+    id: "new_metric",           // Unique ID (no spaces)
+    label: "New Metric",         // Display name
+    left: "Low anchor",          // Left side label
+    right: "High anchor",        // Right side label
     min: -3,
     max: 3
   }
 ]
 ```
 
-2. **No code changes needed** - dynamically rendered
+2. No code changes needed - dynamically rendered
 3. Save settings to update user config
 
-### Adding a New Field
+#### Adding a New Field
 
 ```javascript
 fields: [
   {
     id: "new_field",
     label: "New Field",
-    type: "select", // or "text" or "number"
-    options: ["Option 1", "Option 2"] // only for select
+    type: "select",              // "select" | "text" | "number"
+    options: ["Option 1", "Option 2"]  // Only for select type
   }
 ]
 ```
 
-### Changing Experiment Default
+#### Adding a New Theme
 
-```javascript
-experiment: {
-  enabled: true,
-  startDate: "2026-01-06", // Update this
-  endDate: "2026-04-05",   // Update this
-  goal: "Your Goal Here",  // Update this
-  chapters: [...],
-  milestones: [...]
-}
-```
-
-### Adding a New Theme
-
-1. **Add CSS variables:**
+1. Add CSS variables in `<style>` section:
 
 ```css
 body.new-theme {
   --bg-primary: #hexcolor;
   --bg-secondary: #hexcolor;
-  /* ... all other variables */
+  --text-primary: #hexcolor;
+  --accent-primary: #hexcolor;
+  /* ... all other CSS variables */
 }
 ```
 
-2. **Update toggle function:**
+2. Update `toggleDarkMode()` function to include new theme in cycle
+
+3. (Optional) Update `site.webmanifest` `theme_color`
+
+#### Changing Default Experiment
+
+Edit `DEFAULT_CONFIG.experiment`:
 
 ```javascript
-function toggleDarkMode() {
-  // Add 'new-theme' to cycle
+experiment: {
+  enabled: true,
+  startDate: "2026-01-06",      // Update
+  endDate: "2026-04-05",        // Update
+  goal: "Your Goal Here",       // Update
+  chapters: [                   // Update phases
+    {
+      name: "Phase 1",
+      endDay: 14,
+      color: "#2DD4BF",
+      message: "Custom message"
+    }
+  ],
+  milestones: [                 // Update milestones
+    {
+      date: "2026-01-15",
+      label: "Check-in"
+    }
+  ]
 }
 ```
 
-3. **Update manifest theme_color** (optional)
+---
+
+## API Reference
+
+### Supabase Client Initialization
+
+```javascript
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+```
+
+### Authentication API
+
+```javascript
+// Sign up
+const { data, error } = await sb.auth.signUp({
+  email: 'user@example.com',
+  password: 'password'
+});
+
+// Sign in
+const { data, error } = await sb.auth.signInWithPassword({
+  email: 'user@example.com',
+  password: 'password'
+});
+
+// Sign out
+await sb.auth.signOut();
+
+// Get current session
+const { data: { session } } = await sb.auth.getSession();
+
+// Get current user
+const { data: { user } } = await sb.auth.getUser();
+```
+
+### Database API
+
+```javascript
+// Insert/Update (upsert)
+const { data, error } = await sb
+  .from('daily_entries')
+  .upsert({
+    user_id: currentUser.id,
+    date: '2025-12-24',
+    data: entryData
+  })
+  .eq('user_id', currentUser.id);
+
+// Select all entries
+const { data, error } = await sb
+  .from('daily_entries')
+  .select('*')
+  .eq('user_id', currentUser.id)
+  .order('date', { ascending: false });
+
+// Select single entry by date
+const { data, error } = await sb
+  .from('daily_entries')
+  .select('*')
+  .eq('user_id', currentUser.id)
+  .eq('date', '2025-12-24')
+  .single();
+
+// Delete entry
+const { error } = await sb
+  .from('daily_entries')
+  .delete()
+  .eq('id', entryId);
+
+// Update config
+const { data, error } = await sb
+  .from('user_config')
+  .update({ title: 'New Title' })
+  .eq('user_id', currentUser.id);
+```
 
 ---
 
 ## Troubleshooting
 
-### Common Issues
+### Data Not Syncing
 
-#### Settings Button Doesn't Work
+**Symptoms:** Changes in app don't appear in Supabase, or vice versa
 
-**Cause:** JavaScript error on `renderSettingsModal()`
-**Check:** Browser console for errors
-**Fix:** Ensure all element IDs referenced exist in HTML
-
-#### Data Not Syncing
-
-**Cause:** Authentication issue or RLS policy problem
 **Check:**
-1. User logged in? (`currentUser` is set)
-2. Network tab shows 200 responses?
-3. RLS policies exist and reference `auth.uid()`
+1. User logged in? (Check `currentUser` in console)
+2. Network tab shows 200 responses from Supabase?
+3. RLS policies exist and use `auth.uid()`?
+4. Browser console shows errors?
 
-**Fix:**
+**Solutions:**
+- Verify RLS policies are enabled on all tables
+- Check Supabase dashboard → Authentication → Users (user exists?)
+- Try manual sync from Account tab
+- Check browser localStorage for auth tokens
+
+### Blank Page on Load
+
+**Symptoms:** Dark/white blank page, no content
+
+**Common Causes:**
+1. JavaScript error preventing initialization
+2. Cached old version with breaking changes
+3. Missing or corrupted localStorage data
+
+**Solutions:**
+1. Open browser console - check for errors
+2. Clear site data (Application → Storage → Clear)
+3. Force refresh: Ctrl+Shift+R (Windows) or Cmd+Shift+R (Mac)
+4. Try incognito/private mode
+5. Bump `APP_VERSION` to force cache clear for all users
+
+### Chart Not Rendering
+
+**Symptoms:** Analysis tab shows no chart or error
+
+**Check:**
+1. At least 3 days of data with moved sliders (value ≠ 0)
+2. Browser console for errors
+3. Canvas element exists in DOM
+
+**Solutions:**
+- Add more daily entries
+- Ensure sliders are moved (default 0 is treated as "no data")
+- Check that `renderTrends()` is called after data loads
+
+### Settings Not Saving
+
+**Symptoms:** Settings changes don't persist after refresh
+
+**Check:**
+1. localStorage quota not exceeded?
+2. Browser allows localStorage?
+3. Sync indicator shows success?
+
+**Solutions:**
+- Check browser localStorage settings (not disabled)
+- Clear old data if quota exceeded
+- Check Network tab for failed Supabase requests
+- Verify `saveConfig()` function completes without error
+
+### Login/Signup Not Working
+
+**Symptoms:** "User already exists" or "Invalid credentials" errors
+
+**Common Causes:**
+1. Email verification not complete
+2. Password too weak
+3. Rate limiting from Supabase
+
+**Solutions:**
+- Check email for verification link
+- Use stronger password (8+ chars, mixed case, numbers)
+- Wait 1 minute if rate limited
+- Check Supabase dashboard → Authentication → Users for user status
+
+### PWA Not Installing
+
+**Symptoms:** "Add to Home Screen" option not available
+
+**Check:**
+1. Using HTTPS? (required for PWA)
+2. Manifest file accessible? (check `/Favicon/site.webmanifest`)
+3. Icons exist? (check `/Favicon/` directory)
+4. Mobile browser supports PWA? (Chrome/Safari do)
+
+**Solutions:**
+- Ensure site served over HTTPS
+- Verify manifest path in `<link rel="manifest">`
+- Check browser console for manifest errors
+- Try different browser (Chrome is most reliable)
+
+### Debugging Database Issues
+
+**Verify RLS Policies:**
+
 ```sql
--- Verify RLS enabled
+-- Check if RLS is enabled
 SELECT tablename, rowsecurity
 FROM pg_tables
 WHERE schemaname = 'public';
 
--- Should show TRUE for user_config, daily_entries, user_preferences
+-- Should show TRUE for: user_config, daily_entries, user_preferences
 ```
 
-#### Blank Page After Update
-
-**Cause:** Cached old version with breaking changes
-**Fix:** Bump `APP_VERSION` → force cache clear on next load
-
-#### "Relation does not exist" Error on Signup
-
-**Cause:** Database trigger can't find tables
-**Fix:** Add `SET search_path = public` to trigger function
+**Check Trigger Function:**
 
 ```sql
-CREATE OR REPLACE FUNCTION public.initialize_user_config()
-RETURNS TRIGGER
-SECURITY DEFINER
-SET search_path = public  -- Add this
-LANGUAGE plpgsql
+-- Verify trigger exists
+SELECT trigger_name, event_manipulation, event_object_table
+FROM information_schema.triggers
+WHERE trigger_schema = 'public';
+
+-- Should show: on_auth_user_created → INSERT → auth.users
 ```
-
-#### Chart Not Rendering
-
-**Cause:** Not enough data points
-**Check:** Need at least 3 entries with moved sliders
-**Debug:** Console shows "Need at least 3 days of data"
 
 ---
 
 ## Security Considerations
 
 ### Authentication
-- ✅ Email verification required (set in Supabase dashboard)
-- ✅ Passwords hashed by Supabase Auth
-- ✅ Session tokens auto-managed
-- ⚠️ No 2FA (Supabase feature, not enabled)
+- ✅ Email verification required
+- ✅ Passwords hashed by Supabase Auth (bcrypt)
+- ✅ Session tokens auto-managed and refreshed
+- ✅ HTTPS enforced on custom domain
+- ⚠️ No 2FA (Supabase supports it, but not enabled)
 
 ### Data Access
 - ✅ Row Level Security enforces user isolation
-- ✅ `auth.uid()` ensures users only access own data
-- ✅ HTTPS enforced on custom domain
-- ✅ No analytics or tracking scripts
+- ✅ `auth.uid()` ensures users only see own data
+- ✅ No analytics or third-party tracking
+- ✅ No external scripts (except Supabase SDK from CDN)
 
 ### API Keys
-- ⚠️ Supabase `anon` key is public (by design)
+- ⚠️ Supabase `anon` key is public (by design - required for client access)
 - ✅ RLS policies protect data even with public key
-- ✅ Service role key NOT exposed (stays server-side)
+- ✅ Service role key NOT exposed (stays server-side only)
 
-### Vulnerabilities to Monitor
-- **SQL Injection:** Mitigated by Supabase parameterized queries
-- **XSS:** Mitigated by using `textContent` not `innerHTML` for user data
-- **CSRF:** Not applicable (no session cookies)
-- **Rate Limiting:** Supabase handles this
+### Known Vulnerabilities
+- **SQL Injection:** ✅ Mitigated (Supabase uses parameterized queries)
+- **XSS:** ✅ Mitigated (use `textContent` not `innerHTML` for user data)
+- **CSRF:** ✅ Not applicable (no session cookies, token-based auth)
+- **Rate Limiting:** ✅ Handled by Supabase
+
+### Best Practices
+- Never expose service role key in client code
+- Always validate user input before storing
+- Keep Supabase SDK updated
+- Monitor Supabase dashboard for suspicious activity
+- Review RLS policies regularly
 
 ---
 
-## Performance Optimization
+## Performance Notes
 
-### Current Performance
+### Current Metrics
 
-- **First Load:** ~500ms (HTML + Supabase SDK)
+- **First Load:** ~500ms (HTML + Supabase SDK from CDN)
 - **Time to Interactive:** ~800ms
 - **Entry Save:** Instant (localStorage) + background sync
 - **Trend Rendering:** ~100ms for 90 days of data
@@ -852,171 +1188,56 @@ LANGUAGE plpgsql
 ### Optimizations Applied
 
 1. **Lazy Load Supabase SDK** - Only when authenticated
-2. **Debounced Sync** - Avoid rapid-fire API calls
-3. **localStorage Cache** - Instant reads, no API calls
-4. **Canvas Charts** - Fast, no SVG DOM manipulation
-5. **Single HTML File** - No round trips for assets
+2. **Debounced Sync** - Avoid rapid-fire API calls on quick edits
+3. **localStorage Cache** - Instant reads, no network calls
+4. **Canvas Charts** - Fast rendering, no DOM manipulation
+5. **Single HTML File** - No HTTP round trips for assets
 
 ### If Performance Degrades
 
 **Problem:** Chart rendering slow
-**Solution:** Limit data points, add pagination
+**Solution:** Limit data points, add pagination, or use data sampling
 
 **Problem:** Sync taking too long
-**Solution:** Batch upserts, use Supabase bulk insert
+**Solution:** Batch upserts, use Supabase bulk insert API
 
-**Problem:** localStorage full
-**Solution:** Limit cached entries to last 365 days
-
----
-
-## API Reference
-
-### Supabase Client
-
-```javascript
-const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
-```
-
-### Key API Calls
-
-**Auth:**
-```javascript
-// Sign up
-await sb.auth.signUp({ email, password });
-
-// Sign in
-await sb.auth.signInWithPassword({ email, password });
-
-// Sign out
-await sb.auth.signOut();
-
-// Get session
-const { data: { session } } = await sb.auth.getSession();
-```
-
-**Database:**
-```javascript
-// Insert/Update (upsert)
-await sb.from('daily_entries')
-  .upsert({ user_id, date, data })
-  .eq('user_id', user_id);
-
-// Select
-const { data } = await sb.from('daily_entries')
-  .select('*')
-  .eq('user_id', user_id);
-
-// Delete
-await sb.from('daily_entries')
-  .delete()
-  .eq('id', entry_id);
-```
+**Problem:** localStorage quota exceeded
+**Solution:** Limit cached entries to last 365 days, implement data pruning
 
 ---
 
-## Version History
+## Cost Monitoring
 
-**1.5.2** (Current)
-- Fixed app icon name to "Recalibrate"
+**Supabase Free Tier Limits:**
+- 500MB database storage
+- 2GB bandwidth/month
+- 50,000 monthly active users
+- Unlimited API requests
 
-**1.5.1**
-- Added email verification requirement
-- Added Terms of Service and Privacy Policy pages
+**Where to Monitor:**
+1. Supabase Dashboard → Project Settings → Usage
+2. Database tab shows table sizes
+3. Bandwidth tab shows transfer usage
 
-**1.5.0**
-- Added PWA support (installable app)
-- Created README.md
-
-**1.4.3**
-- Moved "Signals, not scores" tagline to separate line
-
-**1.4.2**
-- Fixed settings button after tab reorganization
-
-**1.4.1**
-- Updated title to "Recalibration"
-- Added new tagline with "Signals, not scores"
-
-**1.4.0**
-- Major tab reorganization (General vs Experiment)
-- Restored "phases" terminology throughout
-
-**1.3.x**
-- Added three-theme system (Light/Dark/Dusk)
-- Added cache-busting version check system
-
-**1.0.0**
-- Initial release with Supabase sync
+**If Approaching Limits:**
+- Upgrade to Pro tier ($25/month)
+- Optimize data structure (reduce JSONB size)
+- Implement data archiving for old entries
 
 ---
 
-## Development Workflow
+## Contact & Resources
 
-### Local Development
-
-1. Clone repo
-2. Open `index.html` in browser
-3. Sign up with test email
-4. Make changes to `index.html`
-5. Refresh browser to test
-
-**No build step required!**
-
-### Testing
-
-**Manual Testing Checklist:**
-- [ ] Signup flow with email verification
-- [ ] Login/logout
-- [ ] Save entry (check localStorage)
-- [ ] Sync entry (check Supabase)
-- [ ] Offline mode (disable network, save entry)
-- [ ] Settings save/load
-- [ ] Import/export config
-- [ ] Theme toggle
-- [ ] Chart rendering
-
-### Deployment
-
-```bash
-git add .
-git commit -m "Description of changes"
-git push origin claude/daily-tracker-app-txMxk
-```
-
-GitHub Pages auto-deploys in ~1-2 minutes.
-
-### Version Bumping
-
-When making breaking changes:
-
-```javascript
-// In index.html
-const APP_VERSION = '1.5.3'; // Increment this
-```
-
-This forces cache clear for all users on next visit.
-
----
-
-## Contact & Support
-
-**Repository:** https://github.com/mdavidcarlson/recalibrate
+**Repository:** https://github.com/mdavidcarlson/HIC
 **Live App:** https://recalibrate.unblocked.health
-**Issues:** Use GitHub Issues for bugs/features
+**User Documentation:** See [README.md](README.md)
+**Legal:** [Terms of Service](terms.html) | [Privacy Policy](privacy.html)
 
 ---
 
-## License
-
-MIT License - See repository for details
-
----
-
-**This documentation is intended for:**
-- Developers modifying the codebase
+**This documentation is for:**
+- Developers modifying or extending the codebase
 - AI assistants providing technical support
-- Future maintainers understanding architecture
+- Future maintainers understanding architecture and design decisions
 
-**For user-facing documentation, see:** [README.md](README.md)
+**For user-facing help, see:** [README.md](README.md)
