@@ -2514,15 +2514,23 @@
         }
       });
 
-      // Render each layer with header
-      layers.forEach(layer => {
+      // Render each layer with divider + subtle label (A+C hybrid)
+      layers.forEach((layer, layerIndex) => {
         if (slidersByLayer[layer].length === 0) return;
 
-        // Add layer header
-        const layerHeader = document.createElement('h3');
-        layerHeader.style.cssText = 'margin: 1.5rem 0 0.75rem 0; font-size: 1rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;';
-        layerHeader.textContent = layer;
-        slidersContainer.appendChild(layerHeader);
+        // Add divider + label (skip divider for first section)
+        if (layerIndex > 0) {
+          // Thin divider line
+          const divider = document.createElement('div');
+          divider.style.cssText = 'height: 1px; background: rgba(100, 116, 139, 0.15); margin: 1.5rem 0 0.5rem 0;';
+          slidersContainer.appendChild(divider);
+        }
+
+        // Subtle label below divider
+        const layerLabel = document.createElement('div');
+        layerLabel.style.cssText = 'font-size: 0.7rem; font-weight: 400; color: var(--text-tertiary); margin-bottom: 0.75rem; opacity: 0.7;';
+        layerLabel.textContent = layer;
+        slidersContainer.appendChild(layerLabel);
 
         // Render sliders in this layer
         slidersByLayer[layer].forEach(slider => {
