@@ -4,7 +4,7 @@
 
 **Version:** 1.5.2
 **Live URL:** https://recalibrate.unblocked.health
-**Last Updated:** 2025-12-24
+**Last Updated:** 2025-12-28
 
 ---
 
@@ -24,6 +24,28 @@
 12. [Development Guide](#development-guide)
 13. [API Reference](#api-reference)
 14. [Troubleshooting](#troubleshooting)
+
+---
+
+## Recent Changes
+
+### Version 1.5.2 (Dec 24-28, 2025)
+
+**Dec 27:**
+- Updated favicon folder structure from `/Favicon/` to `/favicon4/`
+- Replaced favicon assets with high-resolution Tactile Fusion Dark theme icons
+- Updated all HTML references to new favicon location
+
+**Dec 25:**
+- Fixed Data settings tab colors to use theme variables for proper dark mode compatibility
+- Fixed app title to display 'Recalibrate' consistently
+- Corrected slider anchor label terminology to use "left/right" instead of "low/high"
+
+**Dec 24:**
+- Redesigned Protein Calculator with improved UX
+- Added expandable fat guidance section to Calculator
+- Consolidated calculator into single-card design with visual hierarchy
+- Updated TECHNICAL.md documentation
 
 ---
 
@@ -90,8 +112,12 @@ Update sync indicator
 ├── privacy.html            # Privacy Policy
 ├── README.md               # User documentation
 ├── TECHNICAL.md            # This file
+├── GETTING_STARTED.md      # Legacy guide (outdated - refers to old n1-tracker)
+├── SUPABASE_SETUP.md       # Supabase setup instructions
+├── UX_EVALUATION.md        # Historical UX analysis (pre-Supabase)
 ├── supabase-schema.sql     # Database schema + RLS policies
-└── Favicon/                # PWA icons and manifest
+├── n1-tracker-enhanced.html # Legacy tracker (localStorage-only version)
+└── favicon4/               # PWA icons and manifest
     ├── favicon.ico
     ├── favicon.svg
     ├── favicon-96x96.png
@@ -762,7 +788,7 @@ Value: mdavidcarlson.github.io
 
 ### PWA Installation
 
-**Manifest:** `/Favicon/site.webmanifest`
+**Manifest:** `/favicon4/site.webmanifest`
 
 ```json
 {
@@ -777,13 +803,13 @@ Value: mdavidcarlson.github.io
   "background_color": "#0F172A",
   "icons": [
     {
-      "src": "/Favicon/web-app-manifest-192x192.png",
+      "src": "/favicon4/web-app-manifest-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/Favicon/web-app-manifest-512x512.png",
+      "src": "/favicon4/web-app-manifest-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -1160,8 +1186,8 @@ const { data, error } = await sb
 
 **Check:**
 1. Using HTTPS? (required for PWA)
-2. Manifest file accessible? (check `/Favicon/site.webmanifest`)
-3. Icons exist? (check `/Favicon/` directory)
+2. Manifest file accessible? (check `/favicon4/site.webmanifest`)
+3. Icons exist? (check `/favicon4/` directory)
 4. Mobile browser supports PWA? (Chrome/Safari do)
 
 **Solutions:**
