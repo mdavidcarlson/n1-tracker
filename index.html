@@ -2275,7 +2275,7 @@
     const CONFIG_KEY = 'n1_tracker_config_v2';
     const EXPORT_KEY = 'n1_last_export_date';
 
-    const CONFIG_VERSION = 4; // Increment when config structure changes
+    const CONFIG_VERSION = 5; // Increment when config structure changes
 
     const DEFAULT_CONFIG = {
       version: CONFIG_VERSION,
@@ -2305,12 +2305,13 @@
         { id: "sleep_waking_state", label: "Sleep (upon wake)", left: "Wake by snooze", right: "Ready to start", min: -3, max: 3, layer: "Physical" },
         { id: "gut_state", label: "Digestion", left: "Bloated and slow", right: "Light and clean", min: -3, max: 3, layer: "Physical" },
         { id: "body_comfort", label: "Physical Comfort", left: "Stiff and creaky", right: "Easy to live in", min: -3, max: 3, layer: "Physical" },
-        { id: "energy_stability", label: "Energy Stability", left: "Crashing / wired-tired", right: "Steady all day", min: -3, max: 3, layer: "Physical" },
+        { id: "energy_stability", label: "Energy Stability", left: "Crashing / Wired-tired", right: "Steady all day", min: -3, max: 3, layer: "Physical" },
         // Cognitive layer
         { id: "mental_clarity", label: "Mental Clarity", left: "Brain fog", right: "Clear-headed", min: -3, max: 3, layer: "Cognitive" },
-        { id: "craving_noise", label: "Craving Thoughts", left: "Sweet seeking", right: "Satiated", min: -3, max: 3, layer: "Cognitive" },
+        { id: "craving_noise", label: "Craving Thoughts", left: "Loud / Sweet seeking", right: "Quiet / Satiated", min: -3, max: 3, layer: "Cognitive" },
+        { id: "mood_stability", label: "Mood Stability", left: "Reactive", right: "Grounded", min: -3, max: 3, layer: "Cognitive" },
         // Identity layer
-        { id: "sense_of_self", label: "Sense of Self", left: "hidden", right: "Hell Yeah, it's me.", min: -3, max: 3, layer: "Identity" }
+        { id: "sense_of_self", label: "Sense of Self", left: "Hidden", right: "Hell Yeah, it's me.", min: -3, max: 3, layer: "Identity" }
       ],
       fields: [
         { id: "cramps", label: "Muscle Cramps", type: "select", options: ["—", "None", "Mild", "Wakes-me-up"] },
@@ -2382,10 +2383,6 @@
           // Update ALL slider properties to match DEFAULT_CONFIG
           if (config.sliders && Array.isArray(config.sliders) && config.sliders.length > 0) {
             console.log('Updating slider properties from defaults...');
-
-            // Remove mood_stability slider
-            config.sliders = config.sliders.filter(s => s.id !== 'mood_stability');
-            console.log('  - Removed mood_stability slider');
 
             // Update existing sliders with properties from DEFAULT_CONFIG
             config.sliders.forEach(slider => {
