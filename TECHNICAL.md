@@ -27,28 +27,6 @@
 
 ---
 
-## Recent Changes
-
-### Version 1.5.2 (Dec 24-28, 2025)
-
-**Dec 27:**
-- Updated favicon folder structure from `/Favicon/` to `/favicon4/`
-- Replaced favicon assets with high-resolution Tactile Fusion Dark theme icons
-- Updated all HTML references to new favicon location
-
-**Dec 25:**
-- Fixed Data settings tab colors to use theme variables for proper dark mode compatibility
-- Fixed app title to display 'Recalibrate' consistently
-- Corrected slider anchor label terminology to use "left/right" instead of "low/high"
-
-**Dec 24:**
-- Redesigned Protein Calculator with improved UX
-- Added expandable fat guidance section to Calculator
-- Consolidated calculator into single-card design with visual hierarchy
-- Updated TECHNICAL.md documentation
-
----
-
 ## Overview
 
 **What is Recalibrate?**
@@ -112,11 +90,8 @@ Update sync indicator
 ├── privacy.html            # Privacy Policy
 ├── README.md               # User documentation
 ├── TECHNICAL.md            # This file
-├── GETTING_STARTED.md      # Legacy guide (outdated - refers to old n1-tracker)
 ├── SUPABASE_SETUP.md       # Supabase setup instructions
-├── UX_EVALUATION.md        # Historical UX analysis (pre-Supabase)
 ├── supabase-schema.sql     # Database schema + RLS policies
-├── n1-tracker-enhanced.html # Legacy tracker (localStorage-only version)
 └── favicon4/               # PWA icons and manifest
     ├── favicon.ico
     ├── favicon.svg
