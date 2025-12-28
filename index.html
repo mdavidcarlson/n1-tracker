@@ -2275,7 +2275,7 @@
     const CONFIG_KEY = 'n1_tracker_config_v2';
     const EXPORT_KEY = 'n1_last_export_date';
 
-    const CONFIG_VERSION = 3; // Increment when config structure changes
+    const CONFIG_VERSION = 4; // Increment when config structure changes
 
     const DEFAULT_CONFIG = {
       version: CONFIG_VERSION,
@@ -2285,28 +2285,32 @@
         startDate: "2026-01-06",
         endDate: "2026-04-05",
         goal: "90-Day Carnivore Reset",
-        chapters: [
+        phases: [
           { name: "Orientation", endDay: 7, color: "#2DD4BF", message: "Getting oriented to the signals" },
-          { name: "Stabilizing", endDay: 21, color: "#2DD4BF", message: "Stabilizing baseline signals" },
-          { name: "Adapting", endDay: 42, color: "#2DD4BF", message: "Deep adaptation underway" },
+          { name: "Withdrawal", endDay: 14, color: "#2DD4BF", message: "Early adaptation phase" },
+          { name: "Adaptation", endDay: 28, color: "#2DD4BF", message: "Deeper metabolic shifts" },
+          { name: "Fat Adapted", endDay: 42, color: "#2DD4BF", message: "Metabolic flexibility achieved" },
           { name: "Living", endDay: 999, color: "#2DD4BF", message: "Living with clarity" }
         ],
         milestones: [
-          { date: "2026-01-06", label: "HTMA Test #1" },
-          { date: "2026-02-17", label: "Day 42 Check" }
+          { date: "2026-01-06", label: "Day 1: Waist measurement + Blood work" },
+          { date: "2026-01-10", label: "Day 5: Food environment ready (freezer/fridge stocked)" },
+          { date: "2026-01-12", label: "Day 7: Start ketone readings" },
+          { date: "2026-01-27", label: "Midpoint: Waist check" },
+          { date: "2026-02-17", label: "Day 42: Decision checkpoint" }
         ]
       },
       sliders: [
-        // Physical sliders (in order)
-        { id: "sleep_waking_state", label: "Sleep (upon wake)", left: "Wake by snooze", right: "Ready to start", min: -3, max: 3 },
-        { id: "gut_state", label: "Digestion", left: "Bloated and slow", right: "Light and clean", min: -3, max: 3 },
-        { id: "body_comfort", label: "Physical Comfort", left: "Stiff and creaky", right: "Easy to live in", min: -3, max: 3 },
-        { id: "energy_stability", label: "Energy Stability", left: "Crashing / wired-tired", right: "Steady all day", min: -3, max: 3 },
-        // Mental/Emotional sliders
-        { id: "mental_clarity", label: "Mental Clarity", left: "Brain fog", right: "Clear-headed", min: -3, max: 3 },
-        { id: "craving_noise", label: "Craving Noise", left: "Sweet seeking", right: "Satiated", min: -3, max: 3 },
-        { id: "mood_stability", label: "Mood Stability", left: "Reactive", right: "Grounded", min: -3, max: 3 },
-        { id: "sense_of_self", label: "Sense of Self", left: "hidden", right: "Hell Yeah, it's me.", min: -3, max: 3 }
+        // Physical layer
+        { id: "sleep_waking_state", label: "Sleep (upon wake)", left: "Wake by snooze", right: "Ready to start", min: -3, max: 3, layer: "Physical" },
+        { id: "gut_state", label: "Digestion", left: "Bloated and slow", right: "Light and clean", min: -3, max: 3, layer: "Physical" },
+        { id: "body_comfort", label: "Physical Comfort", left: "Stiff and creaky", right: "Easy to live in", min: -3, max: 3, layer: "Physical" },
+        { id: "energy_stability", label: "Energy Stability", left: "Crashing / wired-tired", right: "Steady all day", min: -3, max: 3, layer: "Physical" },
+        // Cognitive layer
+        { id: "mental_clarity", label: "Mental Clarity", left: "Brain fog", right: "Clear-headed", min: -3, max: 3, layer: "Cognitive" },
+        { id: "craving_noise", label: "Craving Thoughts", left: "Sweet seeking", right: "Satiated", min: -3, max: 3, layer: "Cognitive" },
+        // Identity layer
+        { id: "sense_of_self", label: "Sense of Self", left: "hidden", right: "Hell Yeah, it's me.", min: -3, max: 3, layer: "Identity" }
       ],
       fields: [
         { id: "cramps", label: "Muscle Cramps", type: "select", options: ["—", "None", "Mild", "Wakes-me-up"] },
@@ -2314,9 +2318,7 @@
         { id: "strictness", label: "Strictness", type: "select", options: ["N/A", "Getting There", "Almost there", "BBBE (Beef, Butter, Bacon, Eggs)"] }
       ],
       context: {
-        electrolytes_taken: false,
-        movement_load: "none",
-        stress_load: "none"
+        // All context items default to "not recorded" (no defaults)
       }
     };
 
@@ -2366,38 +2368,71 @@
       if (configVersion < CONFIG_VERSION) {
         console.log(`Migrating config from v${configVersion} to v${CONFIG_VERSION}`);
 
-        // Ensure sliders array exists
-        if (!config.sliders || !Array.isArray(config.sliders)) {
-          console.log('Missing sliders array, adding defaults');
-          config.sliders = JSON.parse(JSON.stringify(DEFAULT_CONFIG.sliders));
-        } else if (config.sliders.length === 0) {
-          console.log('Empty sliders array, adding defaults');
-          config.sliders = JSON.parse(JSON.stringify(DEFAULT_CONFIG.sliders));
-        } else {
-          // Ensure all default sliders exist (in case user deleted some)
-          console.log('Checking for missing sliders...');
-          DEFAULT_CONFIG.sliders.forEach(defaultSlider => {
-            const exists = config.sliders.some(s => s.id === defaultSlider.id);
-            if (!exists) {
-              console.log(`  + Adding missing slider: ${defaultSlider.id}`);
-              config.sliders.push(JSON.parse(JSON.stringify(defaultSlider)));
+        // V3 to V4: Migrate chapters to phases
+        if (configVersion < 4) {
+          if (config.experiment) {
+            // Migrate chapters to phases
+            if (config.experiment.chapters && !config.experiment.phases) {
+              console.log('Migrating experiment.chapters to experiment.phases');
+              config.experiment.phases = config.experiment.chapters;
+              delete config.experiment.chapters;
             }
-          });
-        }
+          }
 
-        // Ensure fields array exists
-        if (!config.fields || !Array.isArray(config.fields)) {
-          console.log('Missing fields array, adding defaults');
-          config.fields = JSON.parse(JSON.stringify(DEFAULT_CONFIG.fields));
-        } else if (config.fields.length === 0) {
-          console.log('Empty fields array, adding defaults');
-          config.fields = JSON.parse(JSON.stringify(DEFAULT_CONFIG.fields));
-        }
+          // Update ALL slider properties to match DEFAULT_CONFIG
+          if (config.sliders && Array.isArray(config.sliders) && config.sliders.length > 0) {
+            console.log('Updating slider properties from defaults...');
 
-        // Ensure title exists
-        if (!config.title) {
-          console.log('Missing title, adding default');
-          config.title = DEFAULT_CONFIG.title;
+            // Remove mood_stability slider
+            config.sliders = config.sliders.filter(s => s.id !== 'mood_stability');
+            console.log('  - Removed mood_stability slider');
+
+            // Update existing sliders with properties from DEFAULT_CONFIG
+            config.sliders.forEach(slider => {
+              const defaultSlider = DEFAULT_CONFIG.sliders.find(ds => ds.id === slider.id);
+              if (defaultSlider) {
+                // Update all properties from default
+                Object.assign(slider, defaultSlider);
+                console.log(`  ✓ Updated ${slider.id}`);
+              }
+            });
+
+            // Add any missing default sliders
+            DEFAULT_CONFIG.sliders.forEach(defaultSlider => {
+              const exists = config.sliders.some(s => s.id === defaultSlider.id);
+              if (!exists) {
+                console.log(`  + Adding missing slider: ${defaultSlider.id}`);
+                config.sliders.push(JSON.parse(JSON.stringify(defaultSlider)));
+              }
+            });
+          } else {
+            // No sliders or empty, use defaults
+            console.log('No existing sliders, using defaults');
+            config.sliders = JSON.parse(JSON.stringify(DEFAULT_CONFIG.sliders));
+          }
+
+          // Update fields to match defaults
+          if (config.fields && Array.isArray(config.fields) && config.fields.length > 0) {
+            console.log('Updating field properties from defaults...');
+            config.fields.forEach(field => {
+              const defaultField = DEFAULT_CONFIG.fields.find(df => df.id === field.id);
+              if (defaultField) {
+                Object.assign(field, defaultField);
+                console.log(`  ✓ Updated ${field.id}`);
+              }
+            });
+
+            // Add any missing default fields
+            DEFAULT_CONFIG.fields.forEach(defaultField => {
+              const exists = config.fields.some(f => f.id === defaultField.id);
+              if (!exists) {
+                console.log(`  + Adding missing field: ${defaultField.id}`);
+                config.fields.push(JSON.parse(JSON.stringify(defaultField)));
+              }
+            });
+          } else {
+            config.fields = JSON.parse(JSON.stringify(DEFAULT_CONFIG.fields));
+          }
         }
 
         // V2 to V3: Add experiment config
@@ -2406,6 +2441,12 @@
             console.log('Adding experiment config');
             config.experiment = JSON.parse(JSON.stringify(DEFAULT_CONFIG.experiment));
           }
+        }
+
+        // Ensure title exists
+        if (!config.title) {
+          console.log('Missing title, adding default');
+          config.title = DEFAULT_CONFIG.title;
         }
 
         // Update version
@@ -2460,36 +2501,60 @@
         sliderStates[slider.id] = { isSet: false, value: 0 };
       });
 
-      // Render sliders with new mobile-first layout
+      // Render sliders with new mobile-first layout, grouped by layer
       const slidersContainer = document.getElementById('slidersContainer');
       slidersContainer.innerHTML = '';
+
+      // Group sliders by layer
+      const layers = ['Physical', 'Cognitive', 'Identity'];
+      const slidersByLayer = {};
+      layers.forEach(layer => { slidersByLayer[layer] = []; });
+
       config.sliders.forEach(slider => {
-        const div = document.createElement('div');
-        div.className = 'slider-group unset';
-        div.id = `group-${slider.id}`;
-        div.innerHTML = `
-          <div class="slider-header">
-            <span class="metric-name">${slider.label}</span>
-            <div style="display: flex; align-items: center;">
-              <span class="value-chip" id="val-${slider.id}">N/A</span>
-              <button class="clear-btn" id="clear-${slider.id}" style="display: none;" onclick="clearSlider('${slider.id}')">Reset (N/A)</button>
+        const layer = slider.layer || 'Physical'; // fallback for old configs
+        if (slidersByLayer[layer]) {
+          slidersByLayer[layer].push(slider);
+        }
+      });
+
+      // Render each layer with header
+      layers.forEach(layer => {
+        if (slidersByLayer[layer].length === 0) return;
+
+        // Add layer header
+        const layerHeader = document.createElement('h3');
+        layerHeader.style.cssText = 'margin: 1.5rem 0 0.75rem 0; font-size: 1rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;';
+        layerHeader.textContent = layer;
+        slidersContainer.appendChild(layerHeader);
+
+        // Render sliders in this layer
+        slidersByLayer[layer].forEach(slider => {
+          const div = document.createElement('div');
+          div.className = 'slider-group unset';
+          div.id = `group-${slider.id}`;
+          div.innerHTML = `
+            <div class="slider-header">
+              <span class="metric-name">${slider.label}</span>
+              <div style="display: flex; align-items: center;">
+                <span class="value-chip" id="val-${slider.id}">N/A</span>
+                <button class="clear-btn" id="clear-${slider.id}" style="display: none;" onclick="clearSlider('${slider.id}')">Reset (N/A)</button>
+              </div>
             </div>
-          </div>
-          <div class="slider-label">
-            <span style="font-size: 0.85rem; color: var(--text-tertiary);">${slider.left}</span>
-            <span style="font-size: 0.85rem; color: var(--text-tertiary);">${slider.right}</span>
-          </div>
-          <div class="slider-track-wrapper">
-            <div class="slider-gradient-bg"></div>
-            <input type="range" id="${slider.id}" min="-3" max="3" value="0" step="1">
-          </div>
-          <div class="spectrum-ticks">
-            <span>–3</span>
-            <span>0</span>
-            <span>+3</span>
-          </div>
-        `;
-        slidersContainer.appendChild(div);
+            <div class="slider-label">
+              <span style="font-size: 0.85rem; color: var(--text-tertiary);">${slider.left}</span>
+              <span style="font-size: 0.85rem; color: var(--text-tertiary);">${slider.right}</span>
+            </div>
+            <div class="slider-track-wrapper">
+              <div class="slider-gradient-bg"></div>
+              <input type="range" id="${slider.id}" min="-3" max="3" value="0" step="1">
+            </div>
+            <div class="spectrum-ticks">
+              <span>–3</span>
+              <span>0</span>
+              <span>+3</span>
+            </div>
+          `;
+          slidersContainer.appendChild(div);
 
         // Bind slider with unset/set state management
         const input = div.querySelector('input');
@@ -2518,7 +2583,8 @@
 
           updateCompleteness();
         });
-      });
+        }); // end slidersByLayer[layer].forEach
+      }); // end layers.forEach
 
       // Render symptoms section (moved from fields)
       const symptomsContainer = document.getElementById('symptomsContainer');
@@ -2581,7 +2647,7 @@
             <div class="row" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
               <label style="font-weight: 600; font-size: 0.9rem; color: var(--text-secondary);">Physical Load</label>
               <select id="movement_load" style="width: 100%; padding: 8px;">
-                <option value="none">None</option>
+                <option value="">N/A</option>
                 <option value="normal">Normal</option>
                 <option value="high">High</option>
               </select>
@@ -2589,7 +2655,7 @@
             <div class="row" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
               <label style="font-weight: 600; font-size: 0.9rem; color: var(--text-secondary);">Mental Load</label>
               <select id="stress_load" style="width: 100%; padding: 8px;">
-                <option value="none">None</option>
+                <option value="">N/A</option>
                 <option value="moderate">Moderate</option>
                 <option value="high">High</option>
               </select>
@@ -2823,20 +2889,11 @@
       // Calculate progress percentage
       const progressPercent = Math.min(100, Math.round((currentDay / totalDays) * 100));
 
-      // Determine current chapter
-      let currentChapter = exp.chapters ? exp.chapters[exp.chapters.length - 1] : null;
-      if (exp.chapters) {
-        for (const chapter of exp.chapters) {
-          if (currentDay <= chapter.endDay) {
-            currentChapter = chapter;
-            break;
-          }
-        }
-      }
-      // Fallback to phases if chapters don't exist (migration compatibility)
-      if (!currentChapter && exp.phases) {
-        currentChapter = exp.phases[exp.phases.length - 1];
-        for (const phase of exp.phases) {
+      // Determine current phase (backward compatible with chapters)
+      const phasesOrChapters = exp.phases || exp.chapters;
+      let currentChapter = phasesOrChapters ? phasesOrChapters[phasesOrChapters.length - 1] : null;
+      if (phasesOrChapters) {
+        for (const phase of phasesOrChapters) {
           if (currentDay <= phase.endDay) {
             currentChapter = phase;
             break;
@@ -3415,15 +3472,30 @@
         }
       });
 
-      // Collect context values
-      entry.electrolytes_taken = document.getElementById('electrolytes_taken')?.checked || false;
-      entry.breathwork_taken = document.getElementById('breathwork_taken')?.checked || false;
-      entry.gut_support_taken = document.getElementById('gut_support_taken')?.checked || false;
-      entry.gut_support_detail = getValue('gut_support_detail') || '';
-      entry.movement_load = getValue('movement_load') || 'none';
-      entry.stress_load = getValue('stress_load') || 'none';
-      entry.strictness = getValue('strictness') || '';
-      entry.ketones = getValue('ketones') || '';
+      // Collect context values (only if set, use null for not-recorded)
+      const electrolytesTaken = document.getElementById('electrolytes_taken')?.checked;
+      if (electrolytesTaken) entry.electrolytes_taken = true;
+
+      const breathworkTaken = document.getElementById('breathwork_taken')?.checked;
+      if (breathworkTaken) entry.breathwork_taken = true;
+
+      const gutSupportTaken = document.getElementById('gut_support_taken')?.checked;
+      if (gutSupportTaken) entry.gut_support_taken = true;
+
+      const gutSupportDetail = getValue('gut_support_detail');
+      if (gutSupportDetail) entry.gut_support_detail = gutSupportDetail;
+
+      const movementLoad = getValue('movement_load');
+      if (movementLoad) entry.movement_load = movementLoad;
+
+      const stressLoad = getValue('stress_load');
+      if (stressLoad) entry.stress_load = stressLoad;
+
+      const strictness = getValue('strictness');
+      if (strictness && strictness !== 'N/A') entry.strictness = strictness;
+
+      const ketones = getValue('ketones');
+      if (ketones) entry.ketones = ketones;
 
       // Collect symptom values
       ['cramps', 'palps', 'headache'].forEach(symptomId => {
@@ -3499,12 +3571,12 @@
         return !entry[symptomId] || entry[symptomId] === 'None';
       });
 
-      // Check if context fields are unset
+      // Check if context fields are unset (null/undefined/empty)
       const contextEmpty = !entry.electrolytes_taken &&
                           !entry.breathwork_taken &&
                           !entry.gut_support_taken &&
-                          entry.movement_load === 'none' &&
-                          entry.stress_load === 'none' &&
+                          !entry.movement_load &&
+                          !entry.stress_load &&
                           !entry.strictness &&
                           !entry.ketones;
 
@@ -4193,20 +4265,21 @@
         });
       });
 
-      // Render chapters config
+      // Render phases config (backward compatible with chapters)
       const chaptersConfig = document.getElementById('chaptersConfig');
-      if (chaptersConfig && config.experiment && config.experiment.chapters) {
+      if (chaptersConfig && config.experiment) {
+        const phasesOrChapters = config.experiment.phases || config.experiment.chapters || [];
         chaptersConfig.innerHTML = '';
-        config.experiment.chapters.forEach((chapter, idx) => {
+        phasesOrChapters.forEach((phase, idx) => {
           const div = document.createElement('div');
           div.className = 'config-item';
           div.innerHTML = `
-            <label>Chapter ${idx + 1}</label>
-            <input type="text" placeholder="Orientation" value="${chapter.name}" data-idx="${idx}" data-field="name" class="chapter-field">
-            <small style="display: block; color: var(--text-tertiary); margin: 0.25rem 0 0.5rem 0;">Chapter name</small>
-            <input type="number" placeholder="7" value="${chapter.endDay}" data-idx="${idx}" data-field="endDay" class="chapter-field">
+            <label>Phase ${idx + 1}</label>
+            <input type="text" placeholder="Orientation" value="${phase.name}" data-idx="${idx}" data-field="name" class="chapter-field">
+            <small style="display: block; color: var(--text-tertiary); margin: 0.25rem 0 0.5rem 0;">Phase name</small>
+            <input type="number" placeholder="7" value="${phase.endDay}" data-idx="${idx}" data-field="endDay" class="chapter-field">
             <small style="display: block; color: var(--text-tertiary); margin: 0.25rem 0 0.5rem 0;">End day number</small>
-            <input type="text" placeholder="Getting oriented to the signals" value="${chapter.message}" data-idx="${idx}" data-field="message" class="chapter-field">
+            <input type="text" placeholder="Getting oriented to the signals" value="${phase.message}" data-idx="${idx}" data-field="message" class="chapter-field">
             <small style="display: block; color: var(--text-tertiary); margin: 0.25rem 0 0.5rem 0;">Motivational message</small>
             <button onclick="removeChapter(${idx})" class="danger" style="margin-top:0.5rem;">Remove</button>
           `;
@@ -4268,19 +4341,30 @@
     }
 
     function addChapter() {
-      if (!config.experiment.chapters) config.experiment.chapters = [];
-      config.experiment.chapters.push({
-        name: "New Chapter",
+      // Use phases, but maintain backward compatibility
+      if (!config.experiment.phases) config.experiment.phases = [];
+      config.experiment.phases.push({
+        name: "New Phase",
         endDay: 30,
         color: "#2DD4BF",
         message: "Keep going!"
       });
+      // Clear old chapters if they exist
+      delete config.experiment.chapters;
       renderSettingsModal();
     }
 
     function removeChapter(idx) {
-      if (confirm('Remove this chapter?')) {
-        config.experiment.chapters.splice(idx, 1);
+      if (confirm('Remove this phase?')) {
+        const phasesOrChapters = config.experiment.phases || config.experiment.chapters;
+        if (phasesOrChapters) {
+          phasesOrChapters.splice(idx, 1);
+          // If we modified chapters, migrate to phases
+          if (config.experiment.chapters && !config.experiment.phases) {
+            config.experiment.phases = config.experiment.chapters;
+            delete config.experiment.chapters;
+          }
+        }
         renderSettingsModal();
       }
     }
@@ -4337,19 +4421,25 @@
         }
       });
 
-      // Update chapters
+      // Update phases (backward compatible with chapters)
       const chapterInputs = document.querySelectorAll('.chapter-field');
+      const phasesOrChapters = config.experiment.phases || config.experiment.chapters;
       chapterInputs.forEach(input => {
         const idx = parseInt(input.dataset.idx);
         const field = input.dataset.field;
-        if (config.experiment.chapters && config.experiment.chapters[idx]) {
+        if (phasesOrChapters && phasesOrChapters[idx]) {
           if (field === 'endDay') {
-            config.experiment.chapters[idx][field] = parseInt(input.value);
+            phasesOrChapters[idx][field] = parseInt(input.value);
           } else {
-            config.experiment.chapters[idx][field] = input.value;
+            phasesOrChapters[idx][field] = input.value;
           }
         }
       });
+      // Migrate chapters to phases if needed
+      if (config.experiment.chapters && !config.experiment.phases) {
+        config.experiment.phases = config.experiment.chapters;
+        delete config.experiment.chapters;
+      }
 
       // Update milestones
       const milestoneInputs = document.querySelectorAll('.milestone-field');
