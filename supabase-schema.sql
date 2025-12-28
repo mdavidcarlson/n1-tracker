@@ -46,19 +46,21 @@ CREATE TABLE user_config (
 
   -- Sliders configuration
   sliders JSONB NOT NULL DEFAULT '[
+    {"id": "sleep_waking_state", "label": "Sleep (upon wake)", "left": "Wake by snooze", "right": "Ready to start", "min": -3, "max": 3},
+    {"id": "gut_state", "label": "Digestion", "left": "Bloated and slow", "right": "Light and clean", "min": -3, "max": 3},
+    {"id": "body_comfort", "label": "Physical Comfort", "left": "Stiff and creaky", "right": "Easy to live in", "min": -3, "max": 3},
+    {"id": "energy_stability", "label": "Energy Stability", "left": "Crashing / wired-tired", "right": "Steady all day", "min": -3, "max": 3},
     {"id": "mental_clarity", "label": "Mental Clarity", "left": "Brain fog", "right": "Clear-headed", "min": -3, "max": 3},
     {"id": "craving_noise", "label": "Craving Noise", "left": "Sweet seeking", "right": "Satiated", "min": -3, "max": 3},
-    {"id": "sleep_waking_state", "label": "Sleep (Waking State)", "left": "Wake by snooze", "right": "Ready to start", "min": -3, "max": 3},
-    {"id": "gut_state", "label": "Gut State", "left": "Bloated and slow", "right": "Light and clean", "min": -3, "max": 3},
-    {"id": "energy_stability", "label": "Energy Stability", "left": "Crashing / wired-tired", "right": "Steady all day", "min": -3, "max": 3},
-    {"id": "body_comfort", "label": "Body Comfort", "left": "Stiff and creaky", "right": "Easy to live in", "min": -3, "max": 3},
-    {"id": "mood_stability", "label": "Mood Stability", "left": "Reactive", "right": "Grounded", "min": -3, "max": 3}
+    {"id": "mood_stability", "label": "Mood Stability", "left": "Reactive", "right": "Grounded", "min": -3, "max": 3},
+    {"id": "sense_of_self", "label": "Sense of Self", "left": "hidden", "right": "Hell Yeah, it'\''s me.", "min": -3, "max": 3}
   ]'::jsonb,
 
   -- Additional fields/symptoms configuration
   fields JSONB NOT NULL DEFAULT '[
     {"id": "cramps", "label": "Muscle Cramps", "type": "select", "options": ["—", "None", "Mild", "Wakes-me-up"]},
-    {"id": "palps", "label": "Palpitations", "type": "select", "options": ["—", "None", "Mild", "Concerning"]}
+    {"id": "palps", "label": "Palpitations", "type": "select", "options": ["—", "None", "Mild", "Concerning"]},
+    {"id": "strictness", "label": "Strictness", "type": "select", "options": ["N/A", "Getting There", "Almost there", "BBBE (Beef, Butter, Bacon, Eggs)"]}
   ]'::jsonb,
 
   -- Default context values
@@ -107,7 +109,7 @@ CREATE TABLE daily_entries (
   gut_support_detail TEXT,
   movement_load TEXT,
   stress_load TEXT,
-  offnote TEXT,
+  strictness TEXT,
   ketones TEXT,
 
   -- Symptoms (stored as JSONB for flexibility)

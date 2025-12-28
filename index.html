@@ -1584,7 +1584,7 @@
 
         <h3>Additional Fields (Optional)</h3>
         <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0 0 1rem 0;">
-          Additional fields become extra columns in your log (for things like cramps, palpitations, off-plan, ketones). Use "Choice" for buttons, "Text" for notes, and "Number" for numeric values.
+          Additional fields become extra columns in your log (for things like cramps, palpitations, strictness, ketones). Use "Choice" for buttons, "Text" for notes, and "Number" for numeric values.
         </p>
         <div id="fieldConfig"></div>
         <button onclick="addField()" style="margin-bottom:1rem;">+ Add Field</button>
@@ -2171,7 +2171,7 @@
         gut_support_detail: entry.gut_support_detail || null,
         movement_load: entry.movement_load || null,
         stress_load: entry.stress_load || null,
-        offnote: entry.offnote || null,
+        strictness: entry.strictness || null,
         ketones: entry.ketones || null,
 
         // Symptoms
@@ -2240,7 +2240,7 @@
         gut_support_detail: supabaseEntry.gut_support_detail || '',
         movement_load: supabaseEntry.movement_load || '',
         stress_load: supabaseEntry.stress_load || '',
-        offnote: supabaseEntry.offnote || '',
+        strictness: supabaseEntry.strictness || '',
         ketones: supabaseEntry.ketones || ''
       };
 
@@ -2297,17 +2297,21 @@
         ]
       },
       sliders: [
+        // Physical sliders (in order)
+        { id: "sleep_waking_state", label: "Sleep (upon wake)", left: "Wake by snooze", right: "Ready to start", min: -3, max: 3 },
+        { id: "gut_state", label: "Digestion", left: "Bloated and slow", right: "Light and clean", min: -3, max: 3 },
+        { id: "body_comfort", label: "Physical Comfort", left: "Stiff and creaky", right: "Easy to live in", min: -3, max: 3 },
+        { id: "energy_stability", label: "Energy Stability", left: "Crashing / wired-tired", right: "Steady all day", min: -3, max: 3 },
+        // Mental/Emotional sliders
         { id: "mental_clarity", label: "Mental Clarity", left: "Brain fog", right: "Clear-headed", min: -3, max: 3 },
         { id: "craving_noise", label: "Craving Noise", left: "Sweet seeking", right: "Satiated", min: -3, max: 3 },
-        { id: "sleep_waking_state", label: "Sleep (Waking State)", left: "Wake by snooze", right: "Ready to start", min: -3, max: 3 },
-        { id: "gut_state", label: "Gut State", left: "Bloated and slow", right: "Light and clean", min: -3, max: 3 },
-        { id: "energy_stability", label: "Energy Stability", left: "Crashing / wired-tired", right: "Steady all day", min: -3, max: 3 },
-        { id: "body_comfort", label: "Body Comfort", left: "Stiff and creaky", right: "Easy to live in", min: -3, max: 3 },
-        { id: "mood_stability", label: "Mood Stability", left: "Reactive", right: "Grounded", min: -3, max: 3 }
+        { id: "mood_stability", label: "Mood Stability", left: "Reactive", right: "Grounded", min: -3, max: 3 },
+        { id: "sense_of_self", label: "Sense of Self", left: "hidden", right: "Hell Yeah, it's me.", min: -3, max: 3 }
       ],
       fields: [
         { id: "cramps", label: "Muscle Cramps", type: "select", options: ["—", "None", "Mild", "Wakes-me-up"] },
         { id: "palps", label: "Palpitations", type: "select", options: ["—", "None", "Mild", "Concerning"] },
+        { id: "strictness", label: "Strictness", type: "select", options: ["N/A", "Getting There", "Almost there", "BBBE (Beef, Butter, Bacon, Eggs)"] }
       ],
       context: {
         electrolytes_taken: false,
@@ -2597,8 +2601,13 @@
         <div style="border-top: 1px solid #e5e5e5; padding-top: 1rem;">
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
             <div class="row" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
-              <label style="font-weight: 600; font-size: 0.9rem; color: var(--text-secondary);">Off-plan note</label>
-              <input type="text" id="offnote" placeholder="cookies, chips, beer…" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.9rem; background: var(--input-bg);">
+              <label style="font-weight: 600; font-size: 0.9rem; color: var(--text-secondary);">Strictness</label>
+              <select id="strictness" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.9rem; background: var(--input-bg); color: var(--text-primary);">
+                <option value="N/A">N/A</option>
+                <option value="Getting There">Getting There</option>
+                <option value="Almost there">Almost there</option>
+                <option value="BBBE (Beef, Butter, Bacon, Eggs)">BBBE (Beef, Butter, Bacon, Eggs)</option>
+              </select>
             </div>
             <div class="row" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
               <label style="font-weight: 600; font-size: 0.9rem; color: var(--text-secondary);">Ketones (mmol/L)</label>
@@ -2635,7 +2644,7 @@
       const fieldsContainer = document.getElementById('fieldsContainer');
       if (fieldsContainer) {
         fieldsContainer.innerHTML = '';
-        const excludedFields = ['cramps', 'palps', 'headache', 'offnote', 'ketones', 'macros'];
+        const excludedFields = ['cramps', 'palps', 'headache', 'strictness', 'ketones', 'macros'];
         const remainingFields = config.fields.filter(f => !excludedFields.includes(f.id));
 
         remainingFields.forEach(field => {
@@ -3257,11 +3266,55 @@
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return [];
         const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) ? parsed : [];
+        const entries = Array.isArray(parsed) ? parsed : [];
+
+        // Migrate empty strings to null
+        return migrateEmptyStringsToNull(entries);
       } catch (e) {
         console.error('Failed to load entries', e);
         return [];
       }
+    }
+
+    // Migration function to convert empty strings to null
+    function migrateEmptyStringsToNull(entries) {
+      let migrated = false;
+
+      const migratedEntries = entries.map(entry => {
+        const newEntry = { ...entry };
+
+        // List of fields that should have null instead of empty strings
+        const fieldsToMigrate = [
+          'influenceNote', 'gut_support_detail', 'movement_load', 'stress_load',
+          'strictness', 'ketones', 'cramps', 'palps', 'headache',
+          'cramps-context', 'palps-context', 'headache-context'
+        ];
+
+        fieldsToMigrate.forEach(field => {
+          if (newEntry[field] === '') {
+            newEntry[field] = null;
+            migrated = true;
+          }
+        });
+
+        // Also check slider values - if they're empty strings, set to null
+        config.sliders.forEach(slider => {
+          if (newEntry[slider.id] === '') {
+            newEntry[slider.id] = null;
+            migrated = true;
+          }
+        });
+
+        return newEntry;
+      });
+
+      // If we migrated any data, save it back to localStorage
+      if (migrated) {
+        console.log('Migrated empty strings to null in entries');
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(migratedEntries));
+      }
+
+      return migratedEntries;
     }
 
     async function saveEntries(entries) {
@@ -3369,7 +3422,7 @@
       entry.gut_support_detail = getValue('gut_support_detail') || '';
       entry.movement_load = getValue('movement_load') || 'none';
       entry.stress_load = getValue('stress_load') || 'none';
-      entry.offnote = getValue('offnote') || '';
+      entry.strictness = getValue('strictness') || '';
       entry.ketones = getValue('ketones') || '';
 
       // Collect symptom values
@@ -3390,7 +3443,7 @@
       });
 
       // Collect any remaining field values (excluding hardcoded ones)
-      const excludedFields = ['cramps', 'palps', 'headache', 'offnote', 'ketones', 'macros'];
+      const excludedFields = ['cramps', 'palps', 'headache', 'strictness', 'ketones', 'macros'];
       config.fields.filter(f => !excludedFields.includes(f.id)).forEach(f => {
         entry[f.id] = getValue(f.id);
       });
@@ -3452,7 +3505,7 @@
                           !entry.gut_support_taken &&
                           entry.movement_load === 'none' &&
                           entry.stress_load === 'none' &&
-                          !entry.offnote &&
+                          !entry.strictness &&
                           !entry.ketones;
 
       // Check if notes are empty
