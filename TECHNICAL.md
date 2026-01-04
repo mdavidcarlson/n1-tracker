@@ -2,9 +2,10 @@
 
 > Reference guide for developers and AI assistants working with the Recalibrate codebase
 
-**Version:** 1.5.2
+**Version:** 1.6.0
 **Live URL:** https://recalibrate.unblocked.health
-**Last Updated:** 2025-12-28
+**Last Updated:** 2026-01-04
+**Config Version:** V5
 
 ---
 
@@ -287,8 +288,8 @@ async function onAuthStateChange(isAuthenticated)
 
 ```javascript
 const DEFAULT_CONFIG = {
-  version: 3,                    // Config schema version
-  title: "Recalibration",        // Tracker title
+  version: 5,                    // Config schema version (current: V5)
+  title: "Recalibrate",          // Tracker title
 
   experiment: {
     enabled: true,
@@ -296,31 +297,125 @@ const DEFAULT_CONFIG = {
     endDate: "2026-04-05",
     goal: "90-Day Carnivore Reset",
 
-    chapters: [                  // Internal key (for backward compatibility)
+    phases: [                    // Renamed from "chapters" in V4
       {
-        name: "Orientation",     // Displayed as "phases" in UI
+        name: "Orientation",
         endDay: 7,
         color: "#2DD4BF",
         message: "Getting oriented to the signals"
+      },
+      {
+        name: "Withdrawal",      // Phase 2: metabolic adaptation
+        endDay: 14,
+        color: "#2DD4BF",
+        message: "Early adaptation phase"
+      },
+      {
+        name: "Adaptation",
+        endDay: 28,
+        color: "#2DD4BF",
+        message: "Deeper metabolic shifts"
+      },
+      {
+        name: "Fat Adapted",     // Phase 4: metabolic flexibility
+        endDay: 42,
+        color: "#2DD4BF",
+        message: "Metabolic flexibility achieved"
+      },
+      {
+        name: "Living",
+        endDay: 999,
+        color: "#2DD4BF",
+        message: "Living with clarity"
       }
     ],
 
     milestones: [
-      {
-        date: "2026-01-06",
-        label: "HTMA Test #1"
-      }
+      { date: "2026-01-06", label: "Day 1: Waist measurement + Blood work" },
+      { date: "2026-01-10", label: "Day 5: Food environment ready (freezer/fridge stocked)" },
+      { date: "2026-01-12", label: "Day 7: Start ketone readings" },
+      { date: "2026-01-27", label: "Midpoint: Waist check" },
+      { date: "2026-02-17", label: "Day 42: Decision checkpoint" }
     ]
   },
 
-  sliders: [                     // Custom signal trackers
+  sliders: [                     // 8 sliders organized by layer
+    // Physical layer (4 sliders)
+    {
+      id: "sleep_waking_state",
+      label: "Sleep (upon wake)",
+      left: "Wake by snooze",
+      right: "Ready to start",
+      min: -3,
+      max: 3,
+      layer: "Physical"          // Layer grouping (V4+)
+    },
+    {
+      id: "gut_state",
+      label: "Digestion",
+      left: "Bloated and slow",
+      right: "Light and clean",
+      min: -3,
+      max: 3,
+      layer: "Physical"
+    },
+    {
+      id: "body_comfort",
+      label: "Physical Comfort",
+      left: "Stiff and creaky",
+      right: "Easy to live in",
+      min: -3,
+      max: 3,
+      layer: "Physical"
+    },
+    {
+      id: "energy_stability",
+      label: "Energy Stability",
+      left: "Crashing / Wired-tired",
+      right: "Steady all day",
+      min: -3,
+      max: 3,
+      layer: "Physical"
+    },
+
+    // Cognitive layer (3 sliders)
     {
       id: "mental_clarity",
       label: "Mental Clarity",
-      left: "Brain fog",         // Left anchor label
-      right: "Clear-headed",     // Right anchor label
+      left: "Brain fog",
+      right: "Clear-headed",
       min: -3,
-      max: 3
+      max: 3,
+      layer: "Cognitive"
+    },
+    {
+      id: "craving_noise",
+      label: "Craving Thoughts",
+      left: "Loud / Sweet seeking",
+      right: "Quiet / Satiated",
+      min: -3,
+      max: 3,
+      layer: "Cognitive"
+    },
+    {
+      id: "mood_stability",
+      label: "Mood Stability",
+      left: "Reactive",
+      right: "Grounded",
+      min: -3,
+      max: 3,
+      layer: "Cognitive"
+    },
+
+    // Identity layer (1 slider)
+    {
+      id: "sense_of_self",
+      label: "Sense of Self",
+      left: "Hidden",
+      right: "Unmistakable me",
+      min: -3,
+      max: 3,
+      layer: "Identity"
     }
   ],
 
@@ -328,23 +423,40 @@ const DEFAULT_CONFIG = {
     {
       id: "cramps",
       label: "Muscle Cramps",
-      type: "select",            // "select" | "text" | "number"
+      type: "select",
       options: ["—", "None", "Mild", "Wakes-me-up"]
+    },
+    {
+      id: "palps",
+      label: "Palpitations",
+      type: "select",
+      options: ["—", "None", "Mild", "Concerning"]
+    },
+    {
+      id: "strictness",
+      label: "Strictness",
+      type: "select",
+      options: ["N/A", "Getting There", "Almost there", "BBBE (Beef, Butter, Bacon, Eggs)"]
     }
   ],
 
-  context: {                     // Daily context toggles/dropdowns
-    electrolytes_taken: false,
-    movement_load: "none",
-    stress_load: "none"
+  context: {
+    // All context items default to "not recorded" (null/unset)
+    // Only stored when user actively sets them
   }
 };
 ```
 
-**Notes:**
-- `chapters` key used internally for backward compatibility
-- Displayed as "phases" in all user-facing text
+**Key Changes in V4-V5:**
+- V4: Renamed `chapters` → `phases`, added 5th phase structure, layer grouping
+- V5: Re-added `mood_stability` slider, refined labels (Unmistakable me, Craving Thoughts)
 - Config version used for migration logic when schema changes
+- Context fields use null/"" for "not recorded" instead of false/"none"
+
+**UI Rendering:**
+- Sliders grouped by layer with subtle divider lines + labels
+- Physical → Cognitive → Identity (hierarchical progression)
+- First section (Physical) has no divider above it
 
 ### Daily Entry Object
 
@@ -688,7 +800,7 @@ const savedTheme = localStorage.getItem('theme') || 'dark';
 **Purpose:** Handle breaking changes to config structure
 
 ```javascript
-const CONFIG_VERSION = 3;
+const CONFIG_VERSION = 5; // Current version (as of 2026-01-04)
 
 function loadConfig() {
   const saved = localStorage.getItem('trackerConfig');
@@ -703,8 +815,16 @@ function loadConfig() {
 }
 ```
 
+**Version History:**
+- V1-V2: Initial structure
+- V3: Added experiment config
+- V4: Renamed chapters→phases, added layer grouping, 5 phases, new milestones
+- V5: Re-added mood_stability, refined slider labels
+
 **When to Bump Version:**
 - Breaking changes to config structure
+- Adding/removing default sliders
+- Renaming config keys
 - New required fields in config
 - Renamed config keys
 
