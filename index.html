@@ -1290,24 +1290,37 @@
 
       <!-- Page 2: Purpose -->
       <div id="onboardingPage2" class="onboarding-page" style="display: none;">
-        <h2 style="font-size: 1.8rem; margin: 0 0 1.5rem 0; color: var(--text-primary);">Quiet the noise. Hear what's real. Locate yourself.</h2>
-        <p style="font-size: 1rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 1rem;">
+        <h2 style="font-size: 1.8rem; margin: 0 0 1.5rem 0; line-height: 1.3; color: var(--text-primary);">Quiet the noise. Hear what's real. Locate yourself.</h2>
+
+        <p style="font-size: 1.05rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 1.25rem;">
           Modern life is engineered to pull you away from your native signals:
         </p>
-        <ul style="font-size: 1rem; line-height: 1.8; color: var(--text-secondary); margin: 0 0 1.5rem 1.5rem; padding-left: 0;">
-          <li style="margin-bottom: 0.5rem;">Food designed to override satiety</li>
-          <li style="margin-bottom: 0.5rem;">Screens and algorithms that fragment attention</li>
-          <li style="margin-bottom: 0.5rem;">Constant advice that drowns out your own knowing</li>
+
+        <ul style="font-size: 1rem; line-height: 1.9; color: var(--text-secondary); margin: 0 0 2rem 0; padding-left: 1.25rem; list-style-position: outside;">
+          <li style="margin-bottom: 0.75rem;">Food designed to override satiety</li>
+          <li style="margin-bottom: 0.75rem;">Screens and algorithms that fragment attention</li>
+          <li style="margin-bottom: 0.75rem;">Constant advice that drowns out your own knowing</li>
         </ul>
-        <p style="font-size: 1rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 1.5rem;">
-          <strong>The food constraint is the noise-reduction method.</strong> The point is signal recovery and self-location.
-        </p>
-        <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-tertiary); margin-bottom: 2.5rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 6px;">
-          <strong>Left = interference/noise.</strong> Right = "you" (native signal).
-        </p>
+
+        <div style="padding: 1.5rem; background: rgba(45, 212, 191, 0.1); border-left: 4px solid var(--accent-primary); border-radius: 8px; margin-bottom: 2rem;">
+          <p style="font-size: 1.05rem; line-height: 1.6; color: var(--text-primary); margin: 0 0 0.75rem 0;">
+            <strong style="color: var(--accent-primary);">The food constraint is the noise-reduction method.</strong>
+          </p>
+          <p style="font-size: 1rem; line-height: 1.6; color: var(--text-secondary); margin: 0;">
+            The point is signal recovery and self-location.
+          </p>
+        </div>
+
+        <div style="padding: 1.25rem 1.5rem; background: var(--bg-secondary); border: 1px solid var(--border-color, #e5e7eb); border-radius: 8px; margin-bottom: 2.5rem;">
+          <p style="font-size: 0.95rem; line-height: 1.7; color: var(--text-secondary); margin: 0; text-align: center;">
+            <strong style="color: var(--text-primary);">Left side = interference/noise.</strong><br>
+            <strong style="color: var(--text-primary);">Right side = "you" (native signal).</strong>
+          </p>
+        </div>
+
         <div style="display: flex; gap: 1rem;">
-          <button onclick="prevOnboardingPage()" style="flex: 1; padding: 1rem; background: var(--bg-tertiary); color: var(--text-primary); border: none; border-radius: 6px; cursor: pointer;">← Back</button>
-          <button onclick="nextOnboardingPage()" class="primary" style="flex: 2; padding: 1rem; font-size: 1rem;">Continue →</button>
+          <button onclick="prevOnboardingPage()" style="flex: 1; padding: 1rem; background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color, #e5e7eb); border-radius: 6px; cursor: pointer; font-weight: 500;">← Back</button>
+          <button onclick="nextOnboardingPage()" class="primary" style="flex: 2; padding: 1rem; font-size: 1rem; font-weight: 500;">Continue →</button>
         </div>
       </div>
 
@@ -2396,10 +2409,10 @@
         endDate: "2026-02-16",
         goal: "6-Week Carnivore-ish Reset",
         phases: [
-          { name: "Week 1: Orientation", endDay: 7, color: "#2DD4BF", message: "Getting oriented to the signals" },
-          { name: "Weeks 2-3: Stabilizing", endDay: 21, color: "#2DD4BF", message: "Stabilizing baseline signals" },
-          { name: "Weeks 4-6: Adapting", endDay: 42, color: "#2DD4BF", message: "Deep adaptation underway" },
-          { name: "Week 7+: Living", endDay: 999, color: "#2DD4BF", message: "Living with clarity" }
+          { name: "Withdrawal", endDay: 4, color: "#2DD4BF", message: "Push heavy electrolytes" },
+          { name: "Rebalance", endDay: 14, color: "#2DD4BF", message: "Work up to heavy fat; continue electrolytes" },
+          { name: "Adaptation", endDay: 42, color: "#2DD4BF", message: "Metabolism is upregulating to efficient fat burning" },
+          { name: "Living", endDay: 999, color: "#2DD4BF", message: "Living with clarity" }
         ],
         milestones: [
           { date: "2026-01-06", label: "Start" },
